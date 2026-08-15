@@ -344,7 +344,7 @@
     Zurück
   </a>
   <h1>📰 Was ist neu?</h1>
-  <span class="badge">v6.44</span>
+  <span class="badge">v6.63</span>
 </header>
 
 <div class="news-layout">
@@ -352,7 +352,10 @@
   <!-- ── Sidebar-Navigation ── -->
   <nav class="news-sidebar" aria-label="Artikel-Navigation">
     <p class="news-sidebar-title">Artikel</p>
-    <a href="#scan-import"      class="news-sidebar-link" data-id="scan-import"><span class="news-sidebar-version">v6.28–6.46</span>Scan-Import</a>
+    <a href="#ki-anbieter"      class="news-sidebar-link" data-id="ki-anbieter"><span class="news-sidebar-version">v6.49, 6.58–6.63</span>KI-Anbieter-Wahl</a>
+    <a href="#personen-profile" class="news-sidebar-link" data-id="personen-profile"><span class="news-sidebar-version">v6.53–6.57</span>Personen-Profile</a>
+    <a href="#transkript-editor" class="news-sidebar-link" data-id="transkript-editor"><span class="news-sidebar-version">v6.50–6.51</span>Transkript-Editor</a>
+    <a href="#scan-import"      class="news-sidebar-link" data-id="scan-import"><span class="news-sidebar-version">v6.28–6.47</span>Scan-Import</a>
     <a href="#vorlagen"          class="news-sidebar-link" data-id="vorlagen"><span class="news-sidebar-version">v6.29</span>Vorlagen-Datenbank</a>
     <a href="#lokale-suche"      class="news-sidebar-link" data-id="lokale-suche"><span class="news-sidebar-version">v6.25</span>Lokale Semantiksuche</a>
     <a href="#md-export"         class="news-sidebar-link" data-id="md-export"><span class="news-sidebar-version">v6.19</span>MD-Export</a>
@@ -379,11 +382,254 @@
 
 
     <!-- ════════════════════════════════════════
-         ARTIKEL: Scan-Import (v6.28 – v6.46)
+         ARTIKEL: KI-Anbieter-Wahl (v6.49, v6.58 – v6.63)
+         ════════════════════════════════════════ -->
+    <article class="news-article" id="ki-anbieter">
+      <div class="news-meta">
+        <span class="news-version">v6.58 – v6.63</span>
+        <span class="news-date">15. August 2026</span>
+        <span class="news-category">Feature</span>
+      </div>
+
+      <div class="news-tile-hero" style="background:#0f1522">
+        <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
+          <defs><linearGradient id="nh_ai" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#0f1522" stop-opacity="0"/><stop offset="100%" stop-color="#0f1522" stop-opacity="0.95"/></linearGradient></defs>
+          <circle cx="320" cy="120" r="200" fill="#3b82f6" opacity="0.05"/>
+          <!-- Anbieter-Karten -->
+          <rect x="40" y="26" width="170" height="86" rx="10" fill="#1a1d27" stroke="#3b82f6" stroke-width="1.5"/>
+          <circle cx="66" cy="52" r="10" fill="rgba(59,130,246,0.18)" stroke="#3b82f6" stroke-width="1"/>
+          <text x="66" y="56" font-size="10" fill="#3b82f6" font-family="sans-serif" text-anchor="middle">✦</text>
+          <text x="84" y="50" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="700">Claude</text>
+          <text x="84" y="62" font-size="7" fill="#7a7f9a" font-family="sans-serif">Sonnet 4.6</text>
+          <text x="56" y="88" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Beste Qualität, Deutsch</text>
+          <text x="56" y="100" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Bezahlt per Token</text>
+
+          <rect x="235" y="26" width="170" height="86" rx="10" fill="#1a1d27" stroke="#f59e0b" stroke-width="1.5"/>
+          <circle cx="261" cy="52" r="10" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="1"/>
+          <text x="261" y="56" font-size="10" fill="#f59e0b" font-family="sans-serif" text-anchor="middle">◆</text>
+          <text x="279" y="50" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="700">Mistral</text>
+          <text x="279" y="62" font-size="7" fill="#7a7f9a" font-family="sans-serif">Large 3</text>
+          <text x="251" y="88" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Günstiger, ebenfalls API</text>
+          <text x="251" y="100" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Bezahlt per Token</text>
+
+          <rect x="430" y="26" width="170" height="86" rx="10" fill="#1a1d27" stroke="#10b981" stroke-width="1.5"/>
+          <circle cx="456" cy="52" r="10" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1"/>
+          <text x="456" y="56" font-size="10" fill="#10b981" font-family="sans-serif" text-anchor="middle">⌂</text>
+          <text x="474" y="50" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="700">Ollama</text>
+          <rect x="524" y="42" width="30" height="14" rx="5" fill="#10b981" opacity="0.9"/>
+          <text x="539" y="52" font-size="7" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="700">0 €</text>
+          <text x="446" y="88" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Läuft lokal, kein Key</text>
+          <text x="446" y="100" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Kostenlos, aber schwächer</text>
+
+          <!-- Standard-Auswahl -->
+          <rect x="40" y="128" width="560" height="40" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.2"/>
+          <text x="58" y="145" font-size="8" fill="#7a7f9a" font-family="sans-serif" font-weight="700">STANDARD-KI-ANBIETER</text>
+          <text x="58" y="159" font-size="8.5" fill="#c8cad6" font-family="sans-serif">Gilt automatisch für Analysen, Chats, Kalender, Mindmap …</text>
+          <rect x="466" y="134" width="118" height="24" rx="6" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="525" y="150" font-size="8" fill="#e8eaf0" font-family="sans-serif" text-anchor="middle">Mistral ▾</text>
+
+          <!-- Modell-Historie Pillen -->
+          <rect x="40" y="182" width="560" height="70" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.2"/>
+          <text x="58" y="200" font-size="8" fill="#7a7f9a" font-family="sans-serif" font-weight="700">GESPRÄCHSANALYSE — MODELL-HISTORIE</text>
+          <rect x="58" y="210" width="70" height="20" rx="10" fill="#3b82f6" opacity="0.9"/>
+          <text x="93" y="224" font-size="8" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="700">Claude</text>
+          <rect x="134" y="210" width="72" height="20" rx="10" fill="#22263a" stroke="#f59e0b" stroke-width="1"/>
+          <text x="170" y="224" font-size="8" fill="#f59e0b" font-family="sans-serif" text-anchor="middle" font-weight="700">Mistral</text>
+          <text x="58" y="246" font-size="7.5" fill="#7a7f9a" font-family="sans-serif">Beide Ergebnisse bleiben erhalten — jederzeit umschaltbar, nichts überschreibt sich.</text>
+          <rect x="0" y="0" width="640" height="280" fill="url(#nh_ai)"/>
+        </svg>
+        <div class="news-tile-hero-text">
+          <span>Neu in v6.58 – v6.63</span>
+          <h3>Drei KI-Anbieter — Claude, Mistral, Ollama</h3>
+        </div>
+      </div>
+
+      <h2>Claude, Mistral oder Ollama – du entscheidest</h2>
+      <p class="lead">Distill Voice ist nicht länger an einen einzigen KI-Anbieter gebunden. Mistral Large 3 kam als günstigere Alternative dazu, Ollama ermöglicht lokale, komplett kostenlose Analysen ohne API-Key — und ein globaler Standard sorgt dafür, dass die Wahl nicht in jedem einzelnen Feature neu getroffen werden muss.</p>
+
+      <h3>Mistral Large 3 als Alternative (v6.58)</h3>
+      <p>Im Analysen-Tab steht seit v6.58 ein Modell-Dropdown neben „Starten". Mistral ist spürbar günstiger als Claude (0,50 €/1,50 € statt der Claude-Preise pro 1 Mio. Token) und für die meisten Standardanalysen ausreichend. Ohne explizite Auswahl läuft weiterhin alles über Claude — nichts ändert sich automatisch.</p>
+
+      <h3>Ollama — lokal und komplett kostenlos (v6.63)</h3>
+      <p>Der dritte Anbieter läuft nicht in der Cloud, sondern auf dem eigenen Rechner: <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> mit einem lokal installierten Modell wie Llama 3.1. Kein API-Key, keine Kosten, keine Datenübertragung an einen externen Dienst. Der Preis dafür: lokale Modelle sind bei Deutsch und bei den strikten JSON-Analysen von Distill Voice tendenziell unzuverlässiger als Claude oder Mistral — eine kostenlose Zusatzoption zum Ausprobieren und Vergleichen, kein Ersatz für die Cloud-Modelle.</p>
+      <div class="news-info-box">
+        <strong>Ollama einrichten:</strong> Ollama lokal installieren, Modell laden (z.B. <code>ollama pull llama3.1</code>) und mit <code>OLLAMA_ORIGINS</code> starten, damit der Browser die Anfrage nicht per CORS blockt. Endpunkt und Modellname lassen sich im API-Modal anpassen, ein Erreichbarkeits-Test prüft die Verbindung.
+      </div>
+
+      <h3>Ein Standard für die ganze App (v6.60)</h3>
+      <p>Die „Standard-KI-Anbieter"-Einstellung im API-Modal gilt jetzt global. Wird dort Mistral oder Ollama eingestellt, nutzen automatisch auch Analyse-Chat, Gesprächs-Chat, Mindmap, Kalender, E-Mail-Entwürfe, Projekt-Assistent, Personen-Synthese, Semantiksuche, Präsentations-Generator und der Prompt-Generator diesen Anbieter — ohne eigenes Dropdown in jeder einzelnen Funktion. Bewusst ausgenommen bleiben Foto-Analyse/Scan-Import (Vision ist weiterhin Claude-only) und der Export nach claude.ai.</p>
+
+      <h3>Eigene Wahl pro Chat (v6.61)</h3>
+      <p>Analyse-Chat, Gesprächs-Chat und Projekt-Assistent bekommen zusätzlich ein eigenes, kompaktes Anbieter-Dropdown im Panel-Header. Vorbelegt mit dem globalen Standard, aber pro Nachricht umschaltbar — praktisch, um für eine einzelne Rückfrage kurz auf ein anderes Modell zu wechseln, ohne den globalen Standard zu ändern.</p>
+
+      <h3>Modell-Historie: nichts geht mehr verloren (v6.62)</h3>
+      <p>Läuft eine Analyse (Gesprächs-/Arbeits-Analyse, Stimmung, Kapitel, Themen, 360° oder ein eigener Prompt) erneut mit einem anderen Anbieter, wird das bisherige Ergebnis nicht mehr überschrieben, sondern archiviert. Kleine Pillen direkt im jeweiligen Analyse-Block erlauben das Umschalten zwischen den gespeicherten Ständen — praktisch, um Claude- und Mistral-Ergebnisse direkt zu vergleichen.</p>
+
+      <h3>Kosten im Griff (v6.49 &amp; v6.59)</h3>
+      <p>Parallel wurde das Kosten-Tracking lückenlos: auch Scan-OCR, Kalender-Termine, E-Mail-Entwürfe, Foto-Analysen und Projekt-Analysen fließen jetzt vollständig in die Kostenübersicht ein (v6.49). Die Kosten-Seite selbst zeigt seit v6.59 eine Card pro tatsächlich genutztem Anbieter statt einer fest verdrahteten Claude-Ansicht, und jede Sitzung bekommt farbige Chips für jedes dort verwendete Modell — ein Kernbefund mit Claude, eine spätere Nachanalyse mit Mistral sind so auf einen Blick nebeneinander sichtbar.</p>
+
+      <div class="news-info-box">
+        <strong>So wählst du deinen Anbieter:</strong> API-Keys öffnen → „Standard-KI-Anbieter" für den globalen Standard setzen → optional pro Chat im jeweiligen Panel-Header umschalten. Für Ollama zusätzlich Endpunkt/Modell hinterlegen und Erreichbarkeit testen.
+      </div>
+    </article>
+
+
+    <!-- ════════════════════════════════════════
+         ARTIKEL: Personen-Profile smarter (v6.53 – v6.57)
+         ════════════════════════════════════════ -->
+    <article class="news-article" id="personen-profile">
+      <div class="news-meta">
+        <span class="news-version">v6.53 – v6.57</span>
+        <span class="news-date">14. August 2026</span>
+        <span class="news-category">Feature</span>
+      </div>
+
+      <div class="news-tile-hero" style="background:#1a1022">
+        <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
+          <defs><linearGradient id="nh_pp" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#1a1022" stop-opacity="0"/><stop offset="100%" stop-color="#1a1022" stop-opacity="0.95"/></linearGradient></defs>
+          <circle cx="320" cy="120" r="200" fill="#ec4899" opacity="0.05"/>
+          <!-- Personen-Karten -->
+          <rect x="40" y="30" width="150" height="150" rx="10" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <circle cx="115" cy="76" r="26" fill="rgba(236,72,153,0.18)" stroke="#ec4899" stroke-width="1.5"/>
+          <text x="115" y="82" font-size="18" fill="#ec4899" font-family="sans-serif" text-anchor="middle" font-weight="700">JR</text>
+          <text x="115" y="122" font-size="9.5" fill="#e8eaf0" font-family="sans-serif" text-anchor="middle" font-weight="700">Jan Richter</text>
+          <text x="115" y="136" font-size="7.5" fill="#7a7f9a" font-family="sans-serif" text-anchor="middle">"Jan" + "Jan R." vereint</text>
+          <rect x="60" y="148" width="110" height="16" rx="5" fill="rgba(236,72,153,0.12)" stroke="rgba(236,72,153,0.4)" stroke-width="0.8"/>
+          <text x="115" y="159" font-size="7" fill="#ec4899" font-family="sans-serif" text-anchor="middle">8 Sitzungen</text>
+
+          <!-- Sprecher → Person Pfeil -->
+          <text x="205" y="105" font-size="18" fill="#ec4899" font-family="sans-serif" opacity="0.7">→</text>
+
+          <!-- Sitzungs-Zuordnung Karte -->
+          <rect x="230" y="30" width="370" height="80" rx="10" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <text x="248" y="48" font-size="7.5" fill="#7a7f9a" font-family="sans-serif" font-weight="700">SPRECHER-ERKENNUNG</text>
+          <line x1="230" y1="54" x2="600" y2="54" stroke="#2e3347" stroke-width="0.8"/>
+          <text x="248" y="70" font-size="8" fill="#c8cad6" font-family="sans-serif">Sprecher B: „Jan Richter" → automatisch als</text>
+          <text x="248" y="83" font-size="8" fill="#c8cad6" font-family="sans-serif">Person nachgetragen, Beteiligte Personen ✓</text>
+          <rect x="248" y="90" width="90" height="14" rx="5" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.4)" stroke-width="0.8"/>
+          <text x="293" y="100" font-size="6.5" fill="#10b981" font-family="sans-serif" text-anchor="middle" font-weight="700">automatisch</text>
+
+          <!-- Sprecher-Suche -->
+          <rect x="230" y="120" width="370" height="60" rx="10" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <text x="248" y="138" font-size="7.5" fill="#7a7f9a" font-family="sans-serif" font-weight="700">SITZUNGSSUCHE</text>
+          <rect x="248" y="146" width="334" height="24" rx="7" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="260" y="162" font-size="8" fill="#c8cad6" font-family="sans-serif">🔍 Jan Richter</text>
+          <text x="500" y="162" font-size="7" fill="#4a4f6a" font-family="sans-serif">→ auch Sprecher-Treffer</text>
+
+          <!-- Untere Karte Profilbild -->
+          <rect x="40" y="200" width="150" height="60" rx="10" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <text x="58" y="218" font-size="7.5" fill="#7a7f9a" font-family="sans-serif" font-weight="700">PROFILBILD</text>
+          <circle cx="70" cy="240" r="14" fill="rgba(236,72,153,0.2)" stroke="#ec4899" stroke-width="1.2"/>
+          <text x="70" y="245" font-size="12" fill="#ec4899" font-family="sans-serif" text-anchor="middle">📷</text>
+          <text x="96" y="238" font-size="7" fill="#7a7f9a" font-family="sans-serif">Klick auf Avatar</text>
+          <text x="96" y="248" font-size="7" fill="#7a7f9a" font-family="sans-serif">→ Foto zuschneiden</text>
+          <rect x="0" y="0" width="640" height="280" fill="url(#nh_pp)"/>
+        </svg>
+        <div class="news-tile-hero-text">
+          <span>Neu in v6.53 – v6.57</span>
+          <h3>Personen-Profile — smarter verknüpft</h3>
+        </div>
+      </div>
+
+      <h2>Personen erkennen sich jetzt von selbst</h2>
+      <p class="lead">Wer in einer Sitzung als Sprecher benannt wird, taucht ab sofort automatisch als Person auf — und verschiedene Schreibweisen desselben Namens verschmelzen zu einem einzigen Profil. Dazu: Profilbilder und eine Sitzungssuche, die auch Sprechernamen durchsucht.</p>
+
+      <h3>Personen nachträglich zuordnen (v6.53)</h3>
+      <p>Das Feld „Beteiligte Personen" ließ sich bisher nur beim Hochladen setzen. Jetzt ist es direkt im Transkript-Header editierbar — auch für längst abgeschlossene Sitzungen. Die Personen-Ansicht zeigt oben zusätzlich eine Liste aller Sitzungen mit noch unklar benannten Sprechern, damit nichts übersehen wird.</p>
+
+      <h3>Automatisch nachgetragen (v6.55 – v6.56)</h3>
+      <p>Wird ein Sprecher umbenannt, trägt Distill Voice ihn ab sofort direkt als Person ein — ohne zusätzlichen Klick. Ein neuer Button „Personen aus Sprechern nachtragen" holt das für bereits bestehende Sitzungen einmalig nach. Platzhalter wie „Sprecher B", „Gesprächspartner" oder „?" werden dabei erkannt und bewusst ausgeschlossen, damit keine leeren Profile entstehen.</p>
+
+      <h3>Namensvarianten werden zusammengeführt (v6.55)</h3>
+      <p>„Jan" und „Jan R." landeten bisher als zwei getrennte Profile in der Personen-Ansicht. Ein neuer Zusammenführungs-Schlüssel erkennt, wenn zwei Namen zur selben Person gehören, und zeigt sie als ein Profil mit der längeren, vollständigeren Namensform — inklusive korrekt zusammengezählter Sitzungen.</p>
+
+      <h3>Profilbilder für Personen (v6.57)</h3>
+      <p>Ein Klick auf den Avatar im Personen-Profil öffnet die Foto-Auswahl. Das Bild wird automatisch auf ein rundes 200×200-Vorschaubild zugeschnitten und erscheint fortan auf Personen-Karte und Profil-Header. Ohne Foto bleibt es beim gewohnten Initialen-Kreis.</p>
+
+      <h3>Sprecher-Suche (v6.57)</h3>
+      <p>Die Sofortsuche durchsucht jetzt zusätzlich die Sprechernamen einer Sitzung — unabhängig vom Feld „Beteiligte Personen". Ein eigenes Treffer-Feld „Sprecher" zeigt in den Suchergebnissen, warum eine Sitzung gefunden wurde.</p>
+
+      <div class="news-info-box">
+        <strong>So nutzt du die Personen-Profile:</strong> Personen-Ansicht öffnen → „Personen aus Sprechern nachtragen" für Bestandsdaten → Profil öffnen → Avatar klicken für ein Foto. Neue Sitzungen tragen benannte Sprecher künftig automatisch ein.
+      </div>
+    </article>
+
+
+    <!-- ════════════════════════════════════════
+         ARTIKEL: Transkript-Editor erweitert (v6.49 – v6.51)
+         ════════════════════════════════════════ -->
+    <article class="news-article" id="transkript-editor">
+      <div class="news-meta">
+        <span class="news-version">v6.50 – v6.51</span>
+        <span class="news-date">9. – 12. August 2026</span>
+        <span class="news-category">Feature</span>
+      </div>
+
+      <div class="news-tile-hero" style="background:#1a1216">
+        <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
+          <defs><linearGradient id="nh_te" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#1a1216" stop-opacity="0"/><stop offset="100%" stop-color="#1a1216" stop-opacity="0.95"/></linearGradient></defs>
+          <circle cx="320" cy="120" r="200" fill="#ef4444" opacity="0.05"/>
+          <!-- Transkript-Header -->
+          <rect x="40" y="28" width="560" height="36" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <text x="58" y="51" font-size="9.5" fill="#e8eaf0" font-family="sans-serif" font-weight="700">Transkript</text>
+          <rect x="128" y="36" width="76" height="20" rx="6" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="166" y="50" font-size="7.5" fill="#c8cad6" font-family="sans-serif" text-anchor="middle">✎ Bearbeiten</text>
+          <rect x="470" y="36" width="52" height="20" rx="6" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="496" y="50" font-size="7.5" fill="#c8cad6" font-family="sans-serif" text-anchor="middle">MD</text>
+          <rect x="528" y="36" width="52" height="20" rx="6" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="554" y="50" font-size="7.5" fill="#c8cad6" font-family="sans-serif" text-anchor="middle">PDF</text>
+
+          <!-- Utterance mit Löschen-Icon -->
+          <rect x="40" y="76" width="560" height="52" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
+          <circle cx="62" cy="102" r="10" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1"/>
+          <text x="62" y="106" font-size="7.5" fill="#3b82f6" font-family="sans-serif" text-anchor="middle" font-weight="700">A</text>
+          <text x="82" y="98" font-size="8" fill="#c8cad6" font-family="sans-serif">Wir sollten den Termin noch einmal</text>
+          <text x="82" y="110" font-size="8" fill="#c8cad6" font-family="sans-serif">verschieben, das passt sonst nicht.</text>
+          <rect x="558" y="90" width="24" height="24" rx="6" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1"/>
+          <text x="570" y="106" font-size="10" fill="#ef4444" font-family="sans-serif" text-anchor="middle">🗑</text>
+
+          <rect x="40" y="136" width="560" height="52" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5" opacity="0.5"/>
+          <circle cx="62" cy="162" r="10" fill="rgba(139,92,246,0.15)" stroke="#8b5cf6" stroke-width="1" opacity="0.5"/>
+          <text x="62" y="166" font-size="7.5" fill="#8b5cf6" font-family="sans-serif" text-anchor="middle" font-weight="700" opacity="0.5">B</text>
+          <text x="82" y="158" font-size="8" fill="#7a7f9a" font-family="sans-serif" opacity="0.5">Ja gut, dann schauen wir auf</text>
+          <text x="82" y="170" font-size="8" fill="#7a7f9a" font-family="sans-serif" opacity="0.5">nächste Woche.</text>
+          <rect x="558" y="150" width="24" height="24" rx="6" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-width="1" opacity="0.5"/>
+          <text x="570" y="166" font-size="10" fill="#ef4444" font-family="sans-serif" text-anchor="middle" opacity="0.5">🗑</text>
+
+          <!-- Speichern/Abbrechen -->
+          <rect x="40" y="204" width="90" height="26" rx="7" fill="#3b82f6" opacity="0.9"/>
+          <text x="85" y="221" font-size="8" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="700">Speichern</text>
+          <rect x="138" y="204" width="86" height="26" rx="7" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
+          <text x="181" y="221" font-size="8" fill="#c8cad6" font-family="sans-serif" text-anchor="middle">Abbrechen</text>
+          <rect x="0" y="0" width="640" height="280" fill="url(#nh_te)"/>
+        </svg>
+        <div class="news-tile-hero-text">
+          <span>Neu in v6.50 – v6.51</span>
+          <h3>Transkript-Editor — mehr Kontrolle</h3>
+        </div>
+      </div>
+
+      <h2>Mehr Kontrolle über den Text</h2>
+      <p class="lead">Das Transkript lässt sich jetzt direkt bereinigen statt nur zu lesen: einzelne Abschnitte löschen, ein aufgeräumter Header mit direktem Zugriff auf Bearbeiten und Export, plus ein neuer PDF-Export neben dem bestehenden Markdown-Export.</p>
+
+      <h3>Abschnitte löschen (v6.50)</h3>
+      <p>Im Bearbeitungsmodus erscheint neben jedem Gesprächsabschnitt ein Papierkorb-Icon. Ein Klick entfernt den Abschnitt dauerhaft — praktisch für versehentlich mit aufgenommene Nebengespräche, abgebrochene Sätze oder Stellen, die nicht Teil der Sitzung sein sollen. Es gibt kein Undo, daher lohnt sich ein kurzer Blick vor dem Löschen.</p>
+
+      <h3>Neuer Header, direkter PDF-Export (v6.51)</h3>
+      <p>Der „Bearbeiten"-Button sitzt jetzt direkt neben der Überschrift „Transkript" — im Bearbeitungsmodus wird er durch Speichern/Abbrechen ersetzt. Rechts daneben stehen die Export-Buttons MD und PDF nebeneinander: PDF baut das Transkript inklusive Sitzungsname und Datum als druckfertiges Dokument und öffnet direkt den Druckdialog des Browsers.</p>
+
+      <div class="news-info-box">
+        <strong>So nutzt du den Editor:</strong> Sitzung öffnen → Tab „Transkript" → „✎ Bearbeiten" → Papierkorb-Icon zum Entfernen einzelner Abschnitte → „Speichern". Export über MD oder PDF rechts oben, unabhängig vom Bearbeitungsmodus.
+      </div>
+    </article>
+
+
+    <!-- ════════════════════════════════════════
+         ARTIKEL: Scan-Import (v6.28 – v6.47)
          ════════════════════════════════════════ -->
     <article class="news-article" id="scan-import">
       <div class="news-meta">
-        <span class="news-version">v6.28 – v6.46</span>
+        <span class="news-version">v6.28 – v6.47</span>
         <span class="news-date">8. August 2026</span>
         <span class="news-category">Feature</span>
       </div>
@@ -471,6 +717,9 @@
         <li><strong>Hoher Kontrast</strong>Schwarzer Text auf weißem Hintergrund: ideal. Grauer Text, farbiger Hintergrund oder verblasste Tinte reduzieren die Trefferquote. Falls möglich: im Fotoeditor Helligkeit und Kontrast kurz nachschärfen.</li>
         <li><strong>Keine Reflexionen</strong>Glänzendes Papier oder laminierte Seiten können Lichtreflexe erzeugen, die Zeilen verdecken. Leicht schräger Kamerawinkel (2–5°) hilft, Reflexe zu vermeiden, ohne die Perspektive zu kippen.</li>
       </ul>
+
+      <h3>Saubere Metadaten (v6.46 – v6.47)</h3>
+      <p>Zwei kleine Nacharbeiten sorgen dafür, dass sich Scan-Sitzungen auch in Übersichten korrekt verhalten: Zeitstrahl und Sitzungsraster zeigen jetzt „Dokument · X Seiten" statt einer erfundenen Gesprächsdauer, und da ein Scan kein Audio durchläuft, taucht auch kein AssemblyAI-Kostenanteil mehr in der Kostenübersicht auf.</p>
 
       <div class="news-info-box">
         <strong>So nutzt du den Scan-Import:</strong> Upload-Panel öffnen → Tab „Scan" → Fotos <em>oder PDF</em> auswählen → Engine wählen → „Text erkennen". Die fertige Sitzung erscheint direkt in Distill Voice.
