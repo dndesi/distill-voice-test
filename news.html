@@ -24,8 +24,8 @@
       --border:   #2e3347;
       --text:     #e8eaf0;
       --muted:    #7a7f9a;
-      --accent:   #6c63ff;
-      --accent2:  #a78bfa;
+      --accent:   #ff7a1a;
+      --accent2:  #ffb066;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -125,7 +125,7 @@
     .news-sidebar-link.active {
       color: var(--accent2);
       border-left-color: var(--accent);
-      background: rgba(108, 99, 255, 0.08);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
     }
     .news-sidebar-version {
       display: inline-block;
@@ -274,7 +274,7 @@
       align-items: center;
       gap: 5px;
       padding: 4px 10px;
-      border: 1px solid rgba(108,99,255,0.3);
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
       border-radius: 6px;
       background: transparent;
       color: var(--accent2);
@@ -284,15 +284,15 @@
       transition: background 0.15s, border-color 0.15s;
       text-decoration: none;
     }
-    .news-share-btn:hover { background: rgba(108,99,255,0.12); border-color: rgba(108,99,255,0.6); }
+    .news-share-btn:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
     .news-share-btn svg { flex-shrink: 0; }
 
     /* ── Info-Box ── */
     .news-info-box {
       margin-top: 24px;
       padding: 16px 20px;
-      background: rgba(108, 99, 255, 0.08);
-      border: 1px solid rgba(108, 99, 255, 0.25);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
       border-radius: 8px;
       font-size: 0.875rem;
       color: #c8cad6;
@@ -835,7 +835,7 @@
           <!-- Buttons -->
           <rect x="80" y="78" width="120" height="26" rx="7" fill="#22263a" stroke="#3a3d5c" stroke-width="1.2"/>
           <text x="140" y="95" font-size="8.5" fill="#c8cad6" font-family="sans-serif" text-anchor="middle" font-weight="600">⚡ Lokale Suche</text>
-          <rect x="210" y="78" width="120" height="26" rx="7" fill="#6c63ff" opacity="0.9"/>
+          <rect x="210" y="78" width="120" height="26" rx="7" fill="#ff7a1a" opacity="0.9"/>
           <text x="270" y="95" font-size="8.5" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="600">✦ Claude fragen</text>
           <!-- Ergebnis-Karten -->
           <rect x="80" y="118" width="520" height="52" rx="9" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
@@ -888,7 +888,7 @@
       <div class="news-tile-hero" style="background:#0f1117">
         <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
           <defs><linearGradient id="nh_md" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#0f1117" stop-opacity="0"/><stop offset="100%" stop-color="#0f1117" stop-opacity="0.95"/></linearGradient></defs>
-          <circle cx="200" cy="130" r="160" fill="#a78bfa" opacity="0.05"/>
+          <circle cx="200" cy="130" r="160" fill="#ffb066" opacity="0.05"/>
           <!-- DiVo-Karte links -->
           <rect x="42" y="40" width="230" height="170" rx="12" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
           <text x="62" y="64" font-size="8" fill="#7a7f9a" font-family="sans-serif" font-weight="700">GESPRÄCHSANALYSE</text>
@@ -897,18 +897,18 @@
           <rect x="58" y="96" width="170" height="8" rx="2" fill="#22263a"/>
           <rect x="58" y="110" width="186" height="8" rx="2" fill="#22263a"/>
           <!-- MD-Button -->
-          <rect x="58" y="130" width="40" height="20" rx="5" fill="rgba(167,139,250,0.2)" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
-          <text x="78" y="144" font-size="8.5" fill="#a78bfa" font-family="sans-serif" text-anchor="middle" font-weight="700">MD</text>
+          <rect x="58" y="130" width="40" height="20" rx="5" fill="color-mix(in srgb, var(--accent2) 20%, transparent)" stroke="color-mix(in srgb, var(--accent2) 50%, transparent)" stroke-width="1"/>
+          <text x="78" y="144" font-size="8.5" fill="#ffb066" font-family="sans-serif" text-anchor="middle" font-weight="700">MD</text>
           <rect x="104" y="130" width="42" height="20" rx="5" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
           <text x="125" y="144" font-size="8.5" fill="#7a7f9a" font-family="sans-serif" text-anchor="middle">TXT</text>
           <rect x="152" y="130" width="42" height="20" rx="5" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
           <text x="173" y="144" font-size="8.5" fill="#7a7f9a" font-family="sans-serif" text-anchor="middle">PDF</text>
           <!-- Pfeil -->
-          <text x="285" y="135" font-size="22" fill="#a78bfa" font-family="sans-serif">→</text>
+          <text x="285" y="135" font-size="22" fill="#ffb066" font-family="sans-serif">→</text>
           <!-- MD-Datei rechts -->
           <rect x="316" y="28" width="278" height="210" rx="12" fill="#1a1d27" stroke="#3a2e5c" stroke-width="1.5"/>
           <rect x="316" y="28" width="278" height="28" rx="12" fill="#22263a" style="border-radius: 12px 12px 0 0"/>
-          <text x="335" y="47" font-size="8" fill="#a78bfa" font-family="sans-serif" font-weight="700">2026-08-01-anna-ben-gespraechsanalyse.md</text>
+          <text x="335" y="47" font-size="8" fill="#ffb066" font-family="sans-serif" font-weight="700">2026-08-01-anna-ben-gespraechsanalyse.md</text>
           <text x="335" y="76" font-size="7.5" fill="#4a4f6a" font-family="monospace">---</text>
           <text x="335" y="89" font-size="7.5" fill="#6366f1" font-family="monospace">datum: 2026-08-01</text>
           <text x="335" y="102" font-size="7.5" fill="#6366f1" font-family="monospace">teilnehmer: [anna, ben]</text>
@@ -1045,7 +1045,7 @@
           <rect x="66" y="108" width="52" height="17" rx="5" fill="#22263a" stroke="#2e3347" stroke-width="1"/>
           <text x="80" y="120" font-size="7.5" fill="#7a7f9a" font-family="sans-serif" text-anchor="middle">Kopieren</text>
           <rect x="124" y="108" width="46" height="17" rx="5" fill="rgba(139,92,246,0.18)" stroke="rgba(139,92,246,0.5)" stroke-width="1"/>
-          <text x="147" y="120" font-size="7.5" fill="#a78bfa" font-family="sans-serif" text-anchor="middle" font-weight="700">Merken ✓</text>
+          <text x="147" y="120" font-size="7.5" fill="#ffb066" font-family="sans-serif" text-anchor="middle" font-weight="700">Merken ✓</text>
 
           <!-- Toast -->
           <rect x="160" y="152" width="170" height="22" rx="8" fill="#166534" opacity="0.9"/>
@@ -1061,7 +1061,7 @@
           <rect x="374" y="73" width="56" height="13" rx="3" fill="rgba(99,102,241,0.15)" stroke="rgba(99,102,241,0.4)" stroke-width="0.8"/>
           <text x="402" y="83" font-size="7" fill="#6366f1" font-family="sans-serif" text-anchor="middle">27.06.26</text>
           <rect x="436" y="73" width="66" height="13" rx="3" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="0.8"/>
-          <text x="469" y="83" font-size="7" fill="#a78bfa" font-family="sans-serif" text-anchor="middle">Projekt-Ass.</text>
+          <text x="469" y="83" font-size="7" fill="#ffb066" font-family="sans-serif" text-anchor="middle">Projekt-Ass.</text>
           <text x="561" y="76" font-size="10" fill="#8b5cf6" font-family="sans-serif">›</text>
           <circle cx="378" cy="98" r="2.5" fill="#8b5cf6"/>
           <text x="385" y="101" font-size="7.5" fill="#c8cad6" font-family="sans-serif">Offene Aufgaben aus Meeting</text>
@@ -1126,26 +1126,26 @@
       <div class="news-tile-hero" style="background:#12102a">
         <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
           <defs><linearGradient id="nh_er" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#12102a" stop-opacity="0"/><stop offset="100%" stop-color="#12102a" stop-opacity="0.95"/></linearGradient></defs>
-          <circle cx="320" cy="120" r="200" fill="#6c63ff" opacity="0.05"/>
+          <circle cx="320" cy="120" r="200" fill="#ff7a1a" opacity="0.05"/>
 
           <!-- Rollen-Selector mit 3 aktiven Rollen -->
           <rect x="50" y="25" width="540" height="40" rx="8" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
           <text x="68" y="41" font-size="8" fill="#7a7f9a" font-family="sans-serif" font-weight="700">ROLLEN WÄHLEN (bis zu 3)</text>
-          <rect x="160" y="31" width="84" height="20" rx="5" fill="#1e1a40" stroke="#6c63ff" stroke-width="1.2"/>
-          <text x="202" y="45" font-size="7.5" fill="#a78bfa" font-family="sans-serif" text-anchor="middle" font-weight="700">🧡 Life Coach</text>
+          <rect x="160" y="31" width="84" height="20" rx="5" fill="#1e1a40" stroke="#ff7a1a" stroke-width="1.2"/>
+          <text x="202" y="45" font-size="7.5" fill="#ffb066" font-family="sans-serif" text-anchor="middle" font-weight="700">🧡 Life Coach</text>
           <rect x="252" y="31" width="100" height="20" rx="5" fill="#1e2a1a" stroke="#10b981" stroke-width="1.2"/>
           <text x="302" y="45" font-size="7.5" fill="#10b981" font-family="sans-serif" text-anchor="middle" font-weight="700">💼 Führungskraft</text>
           <rect x="360" y="31" width="106" height="20" rx="5" fill="#2a1a1a" stroke="#f59e0b" stroke-width="1.2"/>
           <text x="413" y="45" font-size="7.5" fill="#f59e0b" font-family="sans-serif" text-anchor="middle" font-weight="700">⚡ Sparringspartner</text>
-          <rect x="496" y="33" width="74" height="16" rx="4" fill="#6c63ff" opacity="0.9"/>
+          <rect x="496" y="33" width="74" height="16" rx="4" fill="#ff7a1a" opacity="0.9"/>
           <text x="533" y="44" font-size="7.5" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="700">Experten-Runde</text>
 
           <!-- Antwort-Block -->
           <rect x="50" y="78" width="540" height="158" rx="10" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
 
           <!-- Rolle 1: Life Coach -->
-          <rect x="66" y="90" width="66" height="16" rx="4" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.4)" stroke-width="1"/>
-          <text x="99" y="101" font-size="7.5" fill="#a78bfa" font-family="sans-serif" text-anchor="middle" font-weight="700">🧡 Life Coach</text>
+          <rect x="66" y="90" width="66" height="16" rx="4" fill="color-mix(in srgb, var(--accent2) 15%, transparent)" stroke="color-mix(in srgb, var(--accent2) 40%, transparent)" stroke-width="1"/>
+          <text x="99" y="101" font-size="7.5" fill="#ffb066" font-family="sans-serif" text-anchor="middle" font-weight="700">🧡 Life Coach</text>
           <rect x="66" y="112" width="490" height="8" rx="2" fill="#22263a"/>
           <rect x="66" y="124" width="420" height="8" rx="2" fill="#22263a"/>
           <rect x="66" y="136" width="460" height="8" rx="2" fill="#22263a"/>
@@ -1194,8 +1194,8 @@
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:18px 0;font-size:0.88rem;line-height:1.7">
         <div style="color:var(--muted);font-size:0.75rem;font-weight:700;letter-spacing:0.05em;margin-bottom:10px">BEISPIEL</div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="background:var(--surface);border-radius:6px;padding:8px 12px;border-left:3px solid #a78bfa;color:var(--text)">
-            <span style="color:#a78bfa;font-weight:700">@Life Coach:</span> Was würdest du mir für die nächste Woche empfehlen?
+          <div style="background:var(--surface);border-radius:6px;padding:8px 12px;border-left:3px solid #ffb066;color:var(--text)">
+            <span style="color:#ffb066;font-weight:700">@Life Coach:</span> Was würdest du mir für die nächste Woche empfehlen?
           </div>
           <div style="color:var(--muted);font-size:0.8rem;padding-left:4px">→ Nur der Life Coach antwortet — die anderen Rollen werden ignoriert</div>
         </div>
@@ -1296,7 +1296,7 @@
       <div class="news-tile-hero" style="background:#12102a">
         <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
           <defs><linearGradient id="nh_rolle" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#12102a" stop-opacity="0"/><stop offset="100%" stop-color="#12102a" stop-opacity="0.95"/></linearGradient></defs>
-          <circle cx="320" cy="120" r="200" fill="#6c63ff" opacity="0.05"/>
+          <circle cx="320" cy="120" r="200" fill="#ff7a1a" opacity="0.05"/>
 
           <!-- Linke Seite: Folge-Gespräch Panel -->
           <rect x="42" y="28" width="258" height="208" rx="12" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
@@ -1306,7 +1306,7 @@
           <!-- Rollen-Select bar -->
           <rect x="54" y="68" width="234" height="22" rx="5" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
           <text x="66" y="83" font-size="8.5" fill="#5a5f7a" font-family="sans-serif">Rolle:</text>
-          <text x="100" y="83" font-size="8.5" fill="#a78bfa" font-family="sans-serif" font-weight="600">🎭 Life Coach</text>
+          <text x="100" y="83" font-size="8.5" fill="#ffb066" font-family="sans-serif" font-weight="600">🎭 Life Coach</text>
           <text x="279" y="84" font-size="10" fill="#5a5f7a" font-family="sans-serif">▾</text>
 
           <!-- User message -->
@@ -1316,7 +1316,7 @@
 
           <!-- Claude answer -->
           <rect x="54" y="138" width="218" height="54" rx="7" fill="#1c2040" stroke="#2e3347" stroke-width="1"/>
-          <text x="68" y="154" font-size="8" fill="#a78bfa" font-family="sans-serif" font-weight="700">Life Coach</text>
+          <text x="68" y="154" font-size="8" fill="#ffb066" font-family="sans-serif" font-weight="700">Life Coach</text>
           <text x="68" y="166" font-size="8" fill="#c8cad6" font-family="sans-serif">Du hast bereits viel Klarheit über deine</text>
           <text x="68" y="177" font-size="8" fill="#c8cad6" font-family="sans-serif">Ziele. Als nächster Schritt wäre es</text>
           <text x="68" y="188" font-size="8" fill="#c8cad6" font-family="sans-serif">hilfreich, Prioritäten zu setzen…</text>
@@ -1324,19 +1324,19 @@
           <!-- Input field -->
           <rect x="54" y="202" width="234" height="26" rx="6" fill="#22263a" stroke="#3a3d5c" stroke-width="1"/>
           <text x="68" y="219" font-size="8.5" fill="#4a4f6a" font-family="sans-serif">Nächste Folgefrage…</text>
-          <rect x="274" y="205" width="10" height="20" rx="3" fill="#6c63ff"/>
+          <rect x="274" y="205" width="10" height="20" rx="3" fill="#ff7a1a"/>
 
           <!-- Rechte Seite: Rollen-Auswahl -->
           <rect x="334" y="28" width="266" height="208" rx="12" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
           <text x="354" y="52" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="700">Rolle wählen</text>
-          <rect x="490" y="38" width="96" height="18" rx="9" fill="rgba(108,99,255,0.15)" stroke="rgba(108,99,255,0.35)" stroke-width="1"/>
-          <text x="538" y="51" text-anchor="middle" font-size="7.5" fill="#a78bfa" font-family="sans-serif" font-weight="700">System-Prompt</text>
+          <rect x="490" y="38" width="96" height="18" rx="9" fill="color-mix(in srgb, var(--accent) 15%, transparent)" stroke="color-mix(in srgb, var(--accent) 35%, transparent)" stroke-width="1"/>
+          <text x="538" y="51" text-anchor="middle" font-size="7.5" fill="#ffb066" font-family="sans-serif" font-weight="700">System-Prompt</text>
           <line x1="334" y1="60" x2="600" y2="60" stroke="#2e3347" stroke-width="1"/>
 
           <!-- Rolle 1: Life Coach – aktiv -->
-          <rect x="346" y="68" width="242" height="30" rx="6" fill="#1e1a40" stroke="#6c63ff" stroke-width="1.5"/>
-          <text x="360" y="84" font-size="10" fill="#a78bfa" font-family="sans-serif" font-weight="600">🧡  Life Coach</text>
-          <text x="448" y="84" font-size="7.5" fill="#6c63ff" font-family="sans-serif">Empathisch · Lösungsfokussiert</text>
+          <rect x="346" y="68" width="242" height="30" rx="6" fill="#1e1a40" stroke="#ff7a1a" stroke-width="1.5"/>
+          <text x="360" y="84" font-size="10" fill="#ffb066" font-family="sans-serif" font-weight="600">🧡  Life Coach</text>
+          <text x="448" y="84" font-size="7.5" fill="#ff7a1a" font-family="sans-serif">Empathisch · Lösungsfokussiert</text>
 
           <!-- Rolle 2 -->
           <rect x="346" y="104" width="242" height="28" rx="6" fill="#22263a" stroke="#2e3347" stroke-width="1"/>
@@ -1413,11 +1413,11 @@
       <div class="news-tile-hero" style="background:#12102a">
         <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
           <defs><linearGradient id="nh_cp" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#12102a" stop-opacity="0"/><stop offset="100%" stop-color="#12102a" stop-opacity="0.95"/></linearGradient></defs>
-          <circle cx="320" cy="110" r="180" fill="#6c63ff" opacity="0.05"/>
+          <circle cx="320" cy="110" r="180" fill="#ff7a1a" opacity="0.05"/>
           <!-- Toolbar-Buttons oben -->
           <rect x="140" y="30" width="110" height="34" rx="8" fill="#1e1a40" stroke="#3a3060" stroke-width="1.5"/>
-          <text x="195" y="52" text-anchor="middle" font-size="11" fill="#a78bfa" font-family="sans-serif" font-weight="700">✦ Generator</text>
-          <rect x="260" y="30" width="130" height="34" rx="8" fill="#6c63ff"/>
+          <text x="195" y="52" text-anchor="middle" font-size="11" fill="#ffb066" font-family="sans-serif" font-weight="700">✦ Generator</text>
+          <rect x="260" y="30" width="130" height="34" rx="8" fill="#ff7a1a"/>
           <text x="325" y="52" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">+ Neuer Prompt</text>
           <!-- Picker Modal -->
           <rect x="190" y="80" width="260" height="140" rx="12" fill="#1a1d27" stroke="#2e3347" stroke-width="1.5"/>
@@ -1428,8 +1428,8 @@
           <text x="248" y="133" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="600">Analyse</text>
           <text x="310" y="133" font-size="8.5" fill="#5a5f7a" font-family="sans-serif">Analysen-Tab</text>
           <!-- Option 2: Design – highlighted -->
-          <rect x="208" y="148" width="224" height="28" rx="7" fill="#1e1a40" stroke="#6c63ff" stroke-width="1.5"/>
-          <text x="228" y="167" font-size="11" fill="#a78bfa" font-family="sans-serif">🎨</text>
+          <rect x="208" y="148" width="224" height="28" rx="7" fill="#1e1a40" stroke="#ff7a1a" stroke-width="1.5"/>
+          <text x="228" y="167" font-size="11" fill="#ffb066" font-family="sans-serif">🎨</text>
           <text x="248" y="167" font-size="10" fill="#e8eaf0" font-family="sans-serif" font-weight="600">Design</text>
           <text x="300" y="167" font-size="8.5" fill="#7a6fd0" font-family="sans-serif">Design-Tab</text>
           <!-- Option 3: Foto -->
@@ -1598,7 +1598,7 @@
           <text x="267" y="241" text-anchor="middle" font-size="9" fill="#06b6d4" font-family="sans-serif" font-weight="600">💡 Erkenntnis</text>
           <rect x="306" y="226" width="48" height="22" rx="6" fill="rgba(239,68,68,0.10)" stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
           <text x="330" y="241" text-anchor="middle" font-size="9" fill="#ef4444" font-family="sans-serif" font-weight="600">⚠️ Risiko</text>
-          <rect x="360" y="226" width="76" height="22" rx="6" fill="rgba(167,139,250,0.12)" stroke="rgba(167,139,250,0.45)" stroke-width="1"/>
+          <rect x="360" y="226" width="76" height="22" rx="6" fill="color-mix(in srgb, var(--accent2) 12%, transparent)" stroke="color-mix(in srgb, var(--accent2) 45%, transparent)" stroke-width="1"/>
           <text x="398" y="241" text-anchor="middle" font-size="9" fill="#a78bfa" font-family="sans-serif" font-weight="600">🔑 Schlüsselbegriff</text>
 
           <defs><linearGradient id="nh_lz" x1="0" y1="0" x2="0" y2="1"><stop offset="25%" stop-color="#0e1520" stop-opacity="0"/><stop offset="100%" stop-color="#0e1520" stop-opacity="0.95"/></linearGradient></defs>
@@ -1629,7 +1629,7 @@
           <div style="font-size:1rem; font-weight:700; color:#ef4444; margin-bottom:6px">⚠️ Risiko</div>
           <p style="font-size:0.85rem; color:var(--muted); margin:0">Warnzeichen, Konflikte oder Aussagen, auf die du besonders achten willst.</p>
         </div>
-        <div style="background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.3); border-radius:10px; padding:14px">
+        <div style="background:color-mix(in srgb, var(--accent2) 8%, transparent); border:1px solid color-mix(in srgb, var(--accent2) 30%, transparent); border-radius:10px; padding:14px">
           <div style="font-size:1rem; font-weight:700; color:#a78bfa; margin-bottom:6px">🔑 Schlüsselbegriff</div>
           <p style="font-size:0.85rem; color:var(--muted); margin:0">Wichtige Begriffe, Namen oder Konzepte, die für den gesamten Kontext relevant sind.</p>
         </div>
@@ -1686,14 +1686,14 @@
           <line x1="200" y1="62" x2="122" y2="62" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3"/>
           <line x1="200" y1="62" x2="278" y2="62" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3"/>
           <!-- Sitzungen unter A -->
-          <rect x="44" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#6c63ff" stroke-width="1.2"/>
+          <rect x="44" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#ff7a1a" stroke-width="1.2"/>
           <text x="80" y="125" text-anchor="middle" font-size="9" fill="#a5b4fc" font-family="sans-serif">Sitzung 1</text>
-          <rect x="126" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#6c63ff" stroke-width="1.2"/>
+          <rect x="126" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#ff7a1a" stroke-width="1.2"/>
           <text x="162" y="125" text-anchor="middle" font-size="9" fill="#a5b4fc" font-family="sans-serif">Sitzung 2</text>
           <!-- Sitzungen unter B -->
-          <rect x="202" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#6c63ff" stroke-width="1.2"/>
+          <rect x="202" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#ff7a1a" stroke-width="1.2"/>
           <text x="238" y="125" text-anchor="middle" font-size="9" fill="#a5b4fc" font-family="sans-serif">Sitzung 3</text>
-          <rect x="284" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#6c63ff" stroke-width="1.2"/>
+          <rect x="284" y="110" width="72" height="22" rx="6" fill="#1c1c2e" stroke="#ff7a1a" stroke-width="1.2"/>
           <text x="320" y="125" text-anchor="middle" font-size="9" fill="#a5b4fc" font-family="sans-serif">Sitzung 4</text>
           <!-- Linien zu Sitzungen -->
           <line x1="122" y1="90" x2="80" y2="110" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,2"/>
@@ -1704,10 +1704,10 @@
           <text x="200" y="162" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="sans-serif" opacity="0.8">Kontext</text>
           <text x="122" y="162" text-anchor="middle" font-size="9" fill="#22c55e" font-family="sans-serif" opacity="0.7">Projekte</text>
           <text x="278" y="162" text-anchor="middle" font-size="9" fill="#22c55e" font-family="sans-serif" opacity="0.7">Projekte</text>
-          <text x="80" y="178" text-anchor="middle" font-size="8" fill="#6c63ff" font-family="sans-serif" opacity="0.6">Sitzungen</text>
-          <text x="162" y="178" text-anchor="middle" font-size="8" fill="#6c63ff" font-family="sans-serif" opacity="0.6">Sitzungen</text>
-          <text x="238" y="178" text-anchor="middle" font-size="8" fill="#6c63ff" font-family="sans-serif" opacity="0.6">Sitzungen</text>
-          <text x="320" y="178" text-anchor="middle" font-size="8" fill="#6c63ff" font-family="sans-serif" opacity="0.6">Sitzungen</text>
+          <text x="80" y="178" text-anchor="middle" font-size="8" fill="#ff7a1a" font-family="sans-serif" opacity="0.6">Sitzungen</text>
+          <text x="162" y="178" text-anchor="middle" font-size="8" fill="#ff7a1a" font-family="sans-serif" opacity="0.6">Sitzungen</text>
+          <text x="238" y="178" text-anchor="middle" font-size="8" fill="#ff7a1a" font-family="sans-serif" opacity="0.6">Sitzungen</text>
+          <text x="320" y="178" text-anchor="middle" font-size="8" fill="#ff7a1a" font-family="sans-serif" opacity="0.6">Sitzungen</text>
         </svg>
       </div>
 
@@ -1974,12 +1974,12 @@
 
       <div class="news-tile-hero" style="background:#12102a">
         <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
-          <circle cx="200" cy="130" r="150" fill="#6c63ff" opacity="0.08"/>
-          <circle cx="500" cy="100" r="110" fill="#a78bfa" opacity="0.05"/>
+          <circle cx="200" cy="130" r="150" fill="#ff7a1a" opacity="0.08"/>
+          <circle cx="500" cy="100" r="110" fill="#ffb066" opacity="0.05"/>
           <!-- Step connector lines -->
           <line x1="108" y1="110" x2="182" y2="110" stroke="#3a3060" stroke-width="2"/>
           <line x1="218" y1="110" x2="292" y2="110" stroke="#3a3060" stroke-width="2"/>
-          <line x1="328" y1="110" x2="352" y2="110" stroke="#6c63ff" stroke-width="2"/>
+          <line x1="328" y1="110" x2="352" y2="110" stroke="#ff7a1a" stroke-width="2"/>
           <line x1="388" y1="110" x2="442" y2="110" stroke="#3a3060" stroke-width="2" stroke-dasharray="4 3"/>
           <!-- Step circles 1-3 (done) -->
           <circle cx="90" cy="110" r="18" fill="#1e1a40" stroke="#3a3060" stroke-width="1.5"/>
@@ -1992,20 +1992,20 @@
           <text x="310" y="116" text-anchor="middle" font-size="13" fill="#5a5490" font-family="sans-serif" font-weight="700">3</text>
           <text x="310" y="140" text-anchor="middle" font-size="9" fill="#3a3060" font-family="sans-serif">Kontext</text>
           <!-- Step 4 active -->
-          <circle cx="370" cy="110" r="22" fill="#6c63ff" opacity="0.15" stroke="#6c63ff" stroke-width="2"/>
-          <circle cx="370" cy="110" r="18" fill="#2a1f6e" stroke="#6c63ff" stroke-width="2"/>
-          <text x="370" y="116" text-anchor="middle" font-size="13" fill="#a78bfa" font-family="sans-serif" font-weight="700">4</text>
-          <text x="370" y="140" text-anchor="middle" font-size="9" fill="#6c63ff" font-family="sans-serif">Ausgabe</text>
+          <circle cx="370" cy="110" r="22" fill="#ff7a1a" opacity="0.15" stroke="#ff7a1a" stroke-width="2"/>
+          <circle cx="370" cy="110" r="18" fill="#2a1f6e" stroke="#ff7a1a" stroke-width="2"/>
+          <text x="370" y="116" text-anchor="middle" font-size="13" fill="#ffb066" font-family="sans-serif" font-weight="700">4</text>
+          <text x="370" y="140" text-anchor="middle" font-size="9" fill="#ff7a1a" font-family="sans-serif">Ausgabe</text>
           <!-- Step 5 pending -->
           <circle cx="460" cy="110" r="18" fill="#1e1a40" stroke="#3a3060" stroke-width="1.5" stroke-dasharray="5 3"/>
           <text x="460" y="116" text-anchor="middle" font-size="13" fill="#5a5490" font-family="sans-serif" font-weight="700">5</text>
           <text x="460" y="140" text-anchor="middle" font-size="9" fill="#3a3060" font-family="sans-serif">Fertig</text>
           <!-- KI mode panel -->
           <rect x="80" y="162" width="480" height="62" rx="8" fill="#1e1a40" stroke="#3a3060" stroke-width="1.5"/>
-          <text x="105" y="186" font-size="10" fill="#6c63ff" font-family="sans-serif" font-weight="700">&#10022; KI-ASSISTENT</text>
+          <text x="105" y="186" font-size="10" fill="#ff7a1a" font-family="sans-serif" font-weight="700">&#10022; KI-ASSISTENT</text>
           <rect x="105" y="194" width="335" height="18" rx="4" fill="#2a2650"/>
           <text x="115" y="207" font-size="10" fill="#5a5490" font-family="sans-serif">&#8222;Analysiere Sales-Gespr&#228;che auf Einw&#228;nde und Kaufsignale &#8230;&#8220;</text>
-          <rect x="452" y="192" width="88" height="22" rx="5" fill="#6c63ff"/>
+          <rect x="452" y="192" width="88" height="22" rx="5" fill="#ff7a1a"/>
           <text x="496" y="207" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">Generieren</text>
           <defs><linearGradient id="nh7" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#12102a" stop-opacity="0"/><stop offset="100%" stop-color="#12102a" stop-opacity="0.95"/></linearGradient></defs>
           <rect x="0" y="0" width="640" height="280" fill="url(#nh7)"/>
@@ -2063,16 +2063,16 @@
           <rect x="240" y="65" width="90" height="145" rx="12" fill="#2d1f6e" stroke="#6c43e0" stroke-width="2"/>
           <rect x="252" y="82" width="66" height="108" rx="4" fill="#1a1040"/>
           <circle cx="285" cy="200" r="5.5" fill="#6c43e0" opacity="0.5"/>
-          <line x1="180" y1="137" x2="240" y2="137" stroke="#a78bfa" stroke-width="2" stroke-dasharray="4 3"/>
-          <polygon points="235,131 248,137 235,143" fill="#a78bfa"/>
-          <line x1="330" y1="115" x2="390" y2="95" stroke="#a78bfa" stroke-width="2" stroke-dasharray="4 3"/>
-          <polygon points="385,90 398,100 384,104" fill="#a78bfa"/>
-          <line x1="330" y1="160" x2="390" y2="182" stroke="#a78bfa" stroke-width="2" stroke-dasharray="4 3"/>
-          <polygon points="383,175 397,187 388,163" fill="#a78bfa"/>
+          <line x1="180" y1="137" x2="240" y2="137" stroke="#ffb066" stroke-width="2" stroke-dasharray="4 3"/>
+          <polygon points="235,131 248,137 235,143" fill="#ffb066"/>
+          <line x1="330" y1="115" x2="390" y2="95" stroke="#ffb066" stroke-width="2" stroke-dasharray="4 3"/>
+          <polygon points="385,90 398,100 384,104" fill="#ffb066"/>
+          <line x1="330" y1="160" x2="390" y2="182" stroke="#ffb066" stroke-width="2" stroke-dasharray="4 3"/>
+          <polygon points="383,175 397,187 388,163" fill="#ffb066"/>
           <rect x="395" y="78" width="42" height="42" rx="9" fill="#3b1d8a" stroke="#6c43e0" stroke-width="1.5"/>
-          <text x="416" y="106" text-anchor="middle" font-size="20" fill="#a78bfa" font-family="sans-serif">D</text>
+          <text x="416" y="106" text-anchor="middle" font-size="20" fill="#ffb066" font-family="sans-serif">D</text>
           <rect x="395" y="162" width="42" height="36" rx="9" fill="#3b1d8a" stroke="#6c43e0" stroke-width="1.5"/>
-          <text x="416" y="184" text-anchor="middle" font-size="14" fill="#a78bfa" font-family="sans-serif">.txt</text>
+          <text x="416" y="184" text-anchor="middle" font-size="14" fill="#ffb066" font-family="sans-serif">.txt</text>
           <rect x="135" y="118" width="42" height="38" rx="6" fill="#3b1d8a" stroke="#6c43e0" stroke-width="1.5"/>
           <text x="156" y="141" text-anchor="middle" font-size="13" fill="#c4b5fd" font-family="sans-serif">MP3</text>
           <defs><linearGradient id="nh1" x1="0" y1="0" x2="0" y2="1"><stop offset="40%" stop-color="#1a1040" stop-opacity="0"/><stop offset="100%" stop-color="#1a1040" stop-opacity="0.95"/></linearGradient></defs>

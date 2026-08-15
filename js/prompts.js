@@ -1443,7 +1443,7 @@ function _renderPromptsResults() {
         <div class="prompt-card-icon">${iconLucide(p.icon || 'sparkles', 18, 'color:var(--accent)')}</div>
         <div class="prompt-card-name">
           ${escHtml(p.name)}
-          ${modified ? `<span style="font-size:0.62rem;background:rgba(108,99,255,0.15);color:var(--accent);padding:1px 5px;border-radius:8px;font-weight:600;margin-left:4px">angepasst</span>` : ''}
+          ${modified ? `<span style="font-size:0.62rem;background:color-mix(in srgb, var(--accent) 15%, transparent);color:var(--accent);padding:1px 5px;border-radius:8px;font-weight:600;margin-left:4px">angepasst</span>` : ''}
         </div>
       </div>
       ${p.description ? `<div class="prompt-card-desc">${escHtml(p.description)}</div>` : ''}
@@ -1555,7 +1555,7 @@ function _renderPromptsResults() {
         + '<div class="prompt-card-header">'
         + '<div class="prompt-card-icon">' + iconLucide(p.icon || 'layout', 18, 'color:var(--accent)') + '</div>'
         + '<div class="prompt-card-name">' + escHtml(p.name)
-        + (modified ? ' <span style="font-size:0.62rem;background:rgba(108,99,255,0.15);color:var(--accent);padding:1px 5px;border-radius:8px;font-weight:600;margin-left:4px">angepasst</span>' : '')
+        + (modified ? ' <span style="font-size:0.62rem;background:color-mix(in srgb, var(--accent) 15%, transparent);color:var(--accent);padding:1px 5px;border-radius:8px;font-weight:600;margin-left:4px">angepasst</span>' : '')
         + '</div>'
         + '</div>'
         + (p.description ? '<div class="prompt-card-desc">' + escHtml(p.description) + '</div>' : '')
@@ -2685,13 +2685,13 @@ const FIELD_TYPE_EXAMPLES = {
     title: 'Themen-Tags',
     problem: 'Du willst das Gespräch schnell kategorisieren.',
     promptGoal: '„Vergib 3–6 kurze Tags die das Gespräch beschreiben."',
-    outputHtml: '<div style="display:flex;flex-wrap:wrap;gap:5px"><span style="background:rgba(108,99,255,0.12);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Strategie</span><span style="background:rgba(108,99,255,0.12);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Q3</span><span style="background:rgba(108,99,255,0.12);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Planung</span></div>'
+    outputHtml: '<div style="display:flex;flex-wrap:wrap;gap:5px"><span style="background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Strategie</span><span style="background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Q3</span><span style="background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.76rem">Planung</span></div>'
   },
   list_with_person: {
     title: 'Todos mit Verantwortlichkeit',
     problem: 'Wer macht was? Nicht mehr nach dem Meeting fragen müssen.',
     promptGoal: '„Weise jede Aufgabe einer Person zu. Nur wenn eindeutig genannt."',
-    outputHtml: '<div style="font-size:0.78rem;line-height:2;color:var(--text)"><div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(108,99,255,0.15);color:var(--accent);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600">Anna</span>Angebot finalisieren bis Fr.</div><div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(108,99,255,0.15);color:var(--accent);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600">Max</span>Design-Review einplanen</div></div>'
+    outputHtml: '<div style="font-size:0.78rem;line-height:2;color:var(--text)"><div style="display:flex;align-items:center;gap:6px"><span style="background:color-mix(in srgb, var(--accent) 15%, transparent);color:var(--accent);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600">Anna</span>Angebot finalisieren bis Fr.</div><div style="display:flex;align-items:center;gap:6px"><span style="background:color-mix(in srgb, var(--accent) 15%, transparent);color:var(--accent);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600">Max</span>Design-Review einplanen</div></div>'
   },
   list_with_date: {
     title: 'Termine & Deadlines',
@@ -2881,7 +2881,7 @@ function _renderGenModal() {
           </div>
           <div style="font-size:0.78rem;color:var(--muted);line-height:1.5">Schritt für Schritt: Rolle, Tonalität, Kontext und Ausgabe-Format selbst definieren.</div>
         </button>
-        <button onclick="_genSetMode('ai')" style="text-align:left;padding:16px;border-radius:12px;border:1px solid rgba(108,99,255,0.3);background:rgba(108,99,255,0.05);cursor:pointer">
+        <button onclick="_genSetMode('ai')" style="text-align:left;padding:16px;border-radius:12px;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);background:color-mix(in srgb, var(--accent) 5%, transparent);cursor:pointer">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             ${icon('sparkles', 20, 'color:var(--accent)')}
             <span style="font-weight:700;font-size:0.9rem;color:var(--text)">KI-Assistent</span>
@@ -2987,7 +2987,7 @@ function _renderGenModal() {
     else if (s.step === 6) {
       const validSchema = s.schema.filter(f => f.label);
       html = `
-        <div style="padding:10px 12px;background:rgba(108,99,255,0.06);border-radius:8px;border:1px solid rgba(108,99,255,0.2);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <div style="padding:10px 12px;background:color-mix(in srgb, var(--accent) 6%, transparent);border-radius:8px;border:1px solid color-mix(in srgb, var(--accent) 20%, transparent);margin-bottom:14px;display:flex;align-items:center;gap:8px">
           ${icon('check-circle', 16, 'color:var(--accent)')}
           <span style="font-size:0.83rem;color:var(--accent);font-weight:600">Claude hat „${escHtml(s.name)}" erstellt – prüfe und passe an</span>
         </div>

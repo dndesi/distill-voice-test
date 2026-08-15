@@ -1662,7 +1662,7 @@ function renderCustomSchemaResult(session, promptId, data, schema) {
         <div id="${sectionId}" data-custom-section="${promptId}-${field}"
           style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">`;
       items.forEach((item, i) => {
-        html += `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(108,99,255,0.1);
+        html += `<span style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb, var(--accent) 10%, transparent);
           color:var(--accent);border-radius:20px;padding:3px 10px;font-size:0.8rem">
           ${escHtml(String(item))}${delItemBtn(i)}
         </span>`;
@@ -2494,7 +2494,7 @@ function _renderRoundtableAnswer(text, roles) {
     const content = _parseMarkdown(sec.lines.join('\n'));
     if (!sec.name) return content; // Präambel-Text
     if (sec.name === 'Synthese') {
-      return `<div style="margin-top:12px;padding:8px 10px;background:rgba(108,99,255,0.08);border-left:2px solid var(--accent);border-radius:0 6px 6px 0">` +
+      return `<div style="margin-top:12px;padding:8px 10px;background:color-mix(in srgb, var(--accent) 8%, transparent);border-left:2px solid var(--accent);border-radius:0 6px 6px 0">` +
         `<span style="font-size:0.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px">Synthese</span>` +
         `<div>${content}</div></div>`;
     }
@@ -2823,7 +2823,7 @@ function exportToClaudeDesign() {
       if (old) old.remove();
       const hint = document.createElement('div');
       hint.className = 'design-hint';
-      hint.style.cssText = 'margin-top:14px;padding:14px 16px;background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.3);border-radius:10px;font-size:0.83rem;line-height:1.8';
+      hint.style.cssText = 'margin-top:14px;padding:14px 16px;background:color-mix(in srgb, var(--accent) 8%, transparent);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);border-radius:10px;font-size:0.83rem;line-height:1.8';
       hint.innerHTML = `<strong style="color:var(--accent)">✓ claude.ai/design wurde geöffnet</strong><br>
         Füge den kopierten Prompt ein <strong>(⌘V / Strg+V)</strong>.<br>
         Nach der Erstellung: Share-Link kopieren und unten einfügen ↓`;
@@ -2954,7 +2954,7 @@ function renderDesignVersionTabs(session) {
         const time = new Date(v.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
         return `<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px 4px 12px;border-radius:20px;font-size:0.78rem;font-weight:${isActive ? '700' : '400'};cursor:pointer;
           border:1px solid ${isActive ? 'var(--accent)' : 'var(--border)'};
-          background:${isActive ? 'rgba(108,99,255,0.12)' : 'var(--surface2)'};
+          background:${isActive ? 'color-mix(in srgb, var(--accent) 12%, transparent)' : 'var(--surface2)'};
           color:${isActive ? 'var(--accent)' : 'var(--muted)'}">
           <span onclick="switchDesignVersion('${v.id}')" style="cursor:pointer">${escHtml(v.promptLabel)} ${time}</span>
           <span onclick="deleteDesignVersion('${v.id}')" style="margin-left:4px;opacity:0.5;font-size:1rem;line-height:1;cursor:pointer;padding:0 2px" title="Version löschen">×</span>
@@ -3023,7 +3023,7 @@ function renderDesignVersionTabs(session) {
                    </div>`
                 : `<div id="dlprev-${i}" onclick="activateDesignPaste('${active.id}',${i})"
                      style="width:120px;height:120px;border-radius:8px;border:1.5px dashed var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;cursor:pointer;transition:border-color 0.15s,background 0.15s;flex-shrink:0"
-                     onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(108,99,255,0.06)'"
+                     onmouseover="this.style.borderColor='var(--accent)';this.style.background='color-mix(in srgb, var(--accent) 6%, transparent)'"
                      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
                      <i data-lucide="clipboard" style="width:16px;height:16px;stroke:var(--muted);stroke-width:1.5;fill:none"></i>
                      <span style="font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.3">Screenshot<br>einfügen<br>(Klick → Cmd+V)</span>
@@ -3068,7 +3068,7 @@ function activateDesignPaste(versionId, linkIndex) {
   const el = document.getElementById(`dlprev-${linkIndex}`);
   if (el) {
     el.style.borderColor = 'var(--accent)';
-    el.style.background = 'rgba(108,99,255,0.1)';
+    el.style.background = 'color-mix(in srgb, var(--accent) 10%, transparent)';
     const span = el.querySelector('span');
     if (span) span.textContent = 'Bereit — jetzt Cmd+V drücken';
   }
@@ -4060,9 +4060,9 @@ function exportCustomResultPdf(blockId) {
     <title>${title}</title>
     <style>
       body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1a1a2e; }
-      h1 { font-size: 1.4rem; border-bottom: 2px solid #6c63ff; padding-bottom: 8px; margin-bottom: 24px; }
+      h1 { font-size: 1.4rem; border-bottom: 2px solid #e8630a; padding-bottom: 8px; margin-bottom: 24px; }
       .work-section { margin-bottom: 20px; }
-      .work-section-title { font-weight: 700; font-size: 0.85rem; color: #6c63ff; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+      .work-section-title { font-weight: 700; font-size: 0.85rem; color: #e8630a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
       .work-item { display: flex; gap: 8px; margin-bottom: 6px; }
       .work-item-content { flex: 1; }
       .custom-result-text { white-space: pre-wrap; line-height: 1.6; }

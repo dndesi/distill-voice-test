@@ -362,8 +362,8 @@ function _renderD3Mindmap(container, data) {
   const isDark   = document.documentElement.dataset.theme !== 'light';
   const clrText    = style.getPropertyValue('--text').trim()    || (isDark ? '#e2e8f0' : '#1a1a2e');
   const clrMuted   = style.getPropertyValue('--muted').trim()   || (isDark ? '#94a3b8' : '#64748b');
-  const clrAccent  = style.getPropertyValue('--accent').trim()  || '#6c63ff';
-  const clrAccent2 = style.getPropertyValue('--accent2').trim() || '#a78bfa';
+  const clrAccent  = style.getPropertyValue('--accent').trim()  || '#ff7a1a';
+  const clrAccent2 = style.getPropertyValue('--accent2').trim() || '#ffb066';
   const clrBorder  = style.getPropertyValue('--border').trim()  || (isDark ? '#2d3148' : '#e2e8f0');
 
   const branchColors = [clrAccent, clrAccent2, '#34d399', '#f59e0b', '#f472b6', '#60a5fa', '#fb923c'];

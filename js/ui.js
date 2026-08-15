@@ -518,7 +518,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.63';
+  const title = 'Distill Voice – Systemarchitektur v6.64';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -577,7 +577,7 @@ function renderArchView() {
       </div>
 
       <!-- Browser App -->
-      <div style="background:linear-gradient(135deg, rgba(108,99,255,0.12), rgba(167,139,250,0.06)); border:2px solid var(--accent); border-radius:12px; padding:18px; margin-bottom:16px; text-align:center">
+      <div style="background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), color-mix(in srgb, var(--accent2) 6%, transparent)); border:2px solid var(--accent); border-radius:12px; padding:18px; margin-bottom:16px; text-align:center">
         <div style="margin-bottom:8px; display:flex;justify-content:center">${icon('globe',28,'color:var(--accent)')}</div>
         <div style="font-weight:700; font-size:1rem; margin-bottom:6px">Distill Voice – Browser-App (GitHub Pages)</div>
         <div style="font-size:0.78rem; color:var(--muted); line-height:1.9">

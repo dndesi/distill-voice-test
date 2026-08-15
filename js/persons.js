@@ -278,8 +278,8 @@ function renderPersonsView() {
 
   const meinCard = `
     <div class="person-card" onclick="renderMeinProfil()" style="
-      border-color: rgba(108,99,255,0.4);
-      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(167,139,250,0.06));">
+      border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, transparent), color-mix(in srgb, var(--accent2) 6%, transparent));">
       <div style="font-size:0.67rem; font-weight:700; color:var(--accent2); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:4px">${escHtml(ownerName || 'Ich')}</div>
       <div class="person-card-name">${escHtml(ownerName || 'Mein Profil')}</div>
       <div class="person-card-meta">${meine.sessions.length} Gespräch${meine.sessions.length!==1?'e':''} · alle Sitzungen</div>
@@ -744,7 +744,7 @@ function renderCostsView() {
               : `$${(p.inputPerMToken / 1e6).toFixed(7)}/Token Input · $${(p.outputPerMToken / 1e6).toFixed(7)}/Token Output`;
           return costCard('✦ ' + p.name, p.model, fmtEur(totalByProvider[prov]), priceLine, p.source);
         }).join('')}
-      <div style="background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3);
+      <div style="background:color-mix(in srgb, var(--accent) 10%, transparent); border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
                   border-radius:12px; padding:18px; text-align:center">
         <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em">Gesamt</div>
         <div style="font-size:1.8rem; font-weight:800; color:var(--accent2)">${fmtEur(totalAllEur)}</div>
@@ -788,7 +788,7 @@ function renderCostsView() {
               return `
             <tr style="border-bottom:1px solid var(--border); cursor:pointer"
                 onclick="showTranscript(sessions.find(x=>x.id==='${s.id}'))"
-                onmouseover="this.style.background='rgba(108,99,255,0.05)'"
+                onmouseover="this.style.background='color-mix(in srgb, var(--accent) 5%, transparent)'"
                 onmouseout="this.style.background=''">
               <td style="padding:8px 8px; font-weight:600; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${escHtml(s.label)}</td>
               <td style="padding:8px 8px; color:var(--muted)">

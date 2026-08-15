@@ -337,7 +337,7 @@ function _assignProjectModalHtml(contactId) {
                 style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px;
                        cursor:pointer; border:1px solid var(--border); margin-bottom:8px;
                        transition:background 0.15s"
-                onmouseover="this.style.background='rgba(108,99,255,0.08)'"
+                onmouseover="this.style.background='color-mix(in srgb, var(--accent) 8%, transparent)'"
                 onmouseout="this.style.background=''">
                 <span style="width:10px; height:10px; border-radius:50%; background:${p.color || '#6b7280'}; flex-shrink:0"></span>
                 <span style="font-weight:600; font-size:0.88rem">${escHtml(p.name)}</span>
