@@ -648,11 +648,11 @@ function renderCostsView() {
 
   // Gesamtkosten – werden nach byMonth-Aufbau aus den Monatssummen aggregiert (weiter unten).
   // Vorläufige Initialisierung, Werte werden nach der Monatsgruppierung gesetzt.
-  let totalAsmEur = 0, totalClaudeEur = 0;
+  let totalAsmEur = 0;
 
   // Monatsgruppen:
   // AssemblyAI-Kosten  → Transkriptionsdatum (processedAt), Fallback date
-  // Claude-Kosten      → je Log-Eintrag einzeln mit eigenem Datum (claudeCostLog)
+  // KI-Kosten          → je Log-Eintrag einzeln mit eigenem Datum (claudeCostLog), providerbewusst (v6.59)
   //                      Fallback für alte Sitzungen: claudeLastCallAt / processedAt
   const byMonth = {};
 
@@ -660,15 +660,21 @@ function renderCostsView() {
     const d   = new Date(dateStr);
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     const lbl = d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-    if (!byMonth[key]) byMonth[key] = { label: lbl, sessions: new Map(), asmEur: 0, claudeEur: 0 };
+    if (!byMonth[key]) byMonth[key] = { label: lbl, sessions: new Map(), asmEur: 0, providerEur: {} }; // v6.59: providerEur statt claudeEur
     return key;
   };
 
   const getOrCreateEntry = (key, s) => {
     if (!byMonth[key].sessions.has(s.id))
-      byMonth[key].sessions.set(s.id, { s, asmEur: 0, claudeEur: 0 });
+      byMonth[key].sessions.set(s.id, { s, asmEur: 0, providerEur: {} }); // v6.59
     return byMonth[key].sessions.get(s.id);
   };
+
+  // v6.59: Kosten einem Anbieter zuschreiben (statt fest "claude")
+  const addProviderEur = (obj, provider, eur) => {
+    obj.providerEur[provider] = (obj.providerEur[provider] || 0) + eur;
+  };
+  const sumProviderEur = (providerEur) => Object.values(providerEur).reduce((a, b) => a + b, 0);
 
   done.forEach(s => {
     const rate = getSessionRate(s);
@@ -680,31 +686,36 @@ function renderCostsView() {
     byMonth[keyAsm].asmEur += asmEur;
     getOrCreateEntry(keyAsm, s).asmEur += asmEur;
 
-    // Claude → je Log-Eintrag einzeln
+    // KI-Anbieter → je Log-Eintrag einzeln, providerbewusst (v6.59)
     if (s.claudeCostLog && s.claudeCostLog.length > 0) {
       s.claudeCostLog.forEach(entry => {
-        const keyCla    = getOrCreateMonth(entry.date);
-        const claudeEur = calcLogEntryCost(entry) * rate;
-        byMonth[keyCla].claudeEur += claudeEur;
-        getOrCreateEntry(keyCla, s).claudeEur += claudeEur;
+        const keyCla   = getOrCreateMonth(entry.date);
+        const provider = entry.provider || 'claude'; // alte Einträge ohne provider-Feld = Claude
+        const eur      = calcLogEntryCost(entry) * rate;
+        addProviderEur(byMonth[keyCla], provider, eur);
+        addProviderEur(getOrCreateEntry(keyCla, s), provider, eur);
       });
     } else if (c.claude > 0) {
       // Fallback für alte Sitzungen ohne Log
-      const keyCla    = getOrCreateMonth(s.claudeLastCallAt || s.processedAt || s.date);
-      const claudeEur = c.claude * rate;
-      byMonth[keyCla].claudeEur += claudeEur;
-      getOrCreateEntry(keyCla, s).claudeEur += claudeEur;
+      const keyCla = getOrCreateMonth(s.claudeLastCallAt || s.processedAt || s.date);
+      const eur    = c.claude * rate;
+      addProviderEur(byMonth[keyCla], 'claude', eur);
+      addProviderEur(getOrCreateEntry(keyCla, s), 'claude', eur);
     }
   });
   // Map → Array für Rendering
   Object.values(byMonth).forEach(m => { m.sessions = Array.from(m.sessions.values()); });
 
   // Gesamtsummen aus Monatswerten ableiten (korrekte Zuordnung nach Kostenentstehungs-Zeitpunkt)
+  const totalByProvider = {}; // v6.59: { claude: eur, mistral: eur, … }
   Object.values(byMonth).forEach(m => {
-    totalAsmEur    += m.asmEur;
-    totalClaudeEur += m.claudeEur;
+    totalAsmEur += m.asmEur;
+    Object.entries(m.providerEur).forEach(([prov, eur]) => {
+      totalByProvider[prov] = (totalByProvider[prov] || 0) + eur;
+    });
   });
-  const totalAllEur = totalAsmEur + totalClaudeEur + totalGlobalEur;
+  const totalAiEur   = sumProviderEur(totalByProvider);
+  const totalAllEur  = totalAsmEur + totalAiEur + totalGlobalEur;
 
   const pricingUpdated = PRICING.assemblyai.updatedAt;
 
@@ -718,14 +729,19 @@ function renderCostsView() {
       </h2>
     </div>
 
-    <!-- Gesamtübersicht -->
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:28px">
+    <!-- Gesamtübersicht (v6.59: eine Card pro tatsächlich genutztem KI-Anbieter) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:28px">
       ${costCard(icon('mic',13,'margin-right:4px') + ' AssemblyAI', PRICING.assemblyai.model, fmtEur(totalAsmEur),
           `$${(PRICING.assemblyai.perMinute + PRICING.assemblyai.diarizationPerMin).toFixed(4)}/min (inkl. Diarization)`,
           PRICING.assemblyai.source)}
-      ${costCard('✦ Claude', PRICING.claude.model, fmtEur(totalClaudeEur),
-          `$${(PRICING.claude.inputPerMToken / 1e6).toFixed(7)}/Token Input · $${(PRICING.claude.outputPerMToken / 1e6).toFixed(7)}/Token Output`,
-          PRICING.claude.source)}
+      ${Object.keys(totalByProvider).sort().map(prov => {
+          const p = PRICING[prov];
+          if (!p) return '';
+          const priceLine = prov === 'mistral' && p.originalEur
+            ? `${p.originalEur.input.toFixed(2)} €/1M Input · ${p.originalEur.output.toFixed(2)} €/1M Output`
+            : `$${(p.inputPerMToken / 1e6).toFixed(7)}/Token Input · $${(p.outputPerMToken / 1e6).toFixed(7)}/Token Output`;
+          return costCard('✦ ' + p.name, p.model, fmtEur(totalByProvider[prov]), priceLine, p.source);
+        }).join('')}
       <div style="background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3);
                   border-radius:12px; padding:18px; text-align:center">
         <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em">Gesamt</div>
@@ -740,7 +756,8 @@ function renderCostsView() {
     <!-- Monatsweise Aufschlüsselung -->
     ${Object.keys(byMonth).sort().reverse().map(key => {
       const m = byMonth[key];
-      const mTotalEur = m.asmEur + m.claudeEur;
+      const mAiEur    = sumProviderEur(m.providerEur);
+      const mTotalEur = m.asmEur + mAiEur;
       return `
       <div style="margin-bottom:24px">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
@@ -754,13 +771,14 @@ function renderCostsView() {
               <th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border)">Datum</th>
               <th style="text-align:right; padding:6px 8px; border-bottom:1px solid var(--border)">Dauer</th>
               <th style="text-align:right; padding:6px 8px; border-bottom:1px solid var(--border)">AssemblyAI</th>
-              <th style="text-align:right; padding:6px 8px; border-bottom:1px solid var(--border)">Claude</th>
+              <th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border)">Modell(e)</th>
               <th style="text-align:right; padding:6px 8px; border-bottom:1px solid var(--border)">Gesamt</th>
             </tr>
           </thead>
           <tbody>
-            ${m.sessions.map(({s, asmEur, claudeEur}) => {
-              const rowTotal = asmEur + claudeEur;
+            ${m.sessions.map(({s, asmEur, providerEur}) => {
+              const aiEur    = sumProviderEur(providerEur);
+              const rowTotal = asmEur + aiEur;
               // Tooltip zeigt alle Log-Einträge dieser Session
               const logTip = (s.claudeCostLog && s.claudeCostLog.length > 1)
                 ? `${s.claudeCostLog.length} Analyse-Aufrufe`
@@ -777,13 +795,13 @@ function renderCostsView() {
               </td>
               <td style="padding:8px 8px; text-align:right; color:var(--muted)">${s.duration ? formatDuration(s.duration) : '?'}</td>
               <td style="padding:8px 8px; text-align:right">${asmEur > 0 ? fmtEur(asmEur) : '—'}</td>
-              <td style="padding:8px 8px; text-align:right">${claudeEur > 0 ? fmtEur(claudeEur) : '—'}</td>
+              <td style="padding:8px 8px">${_providerChips(providerEur)}</td>
               <td style="padding:8px 8px; text-align:right; font-weight:700; color:var(--green)">${fmtEur(rowTotal)}</td>
             </tr>`;}).join('')}
             <tr style="font-weight:700; font-size:0.78rem; color:var(--muted); background:rgba(255,255,255,0.02)">
               <td colspan="3" style="padding:8px 8px">Monatssumme</td>
               <td style="padding:8px 8px; text-align:right">${fmtEur(m.asmEur)}</td>
-              <td style="padding:8px 8px; text-align:right">${fmtEur(m.claudeEur)}</td>
+              <td style="padding:8px 8px; text-align:left">${fmtEur(mAiEur)}</td>
               <td style="padding:8px 8px; text-align:right; color:var(--green)">${fmtEur(mTotalEur)}</td>
             </tr>
           </tbody>
@@ -836,6 +854,21 @@ function renderCostsView() {
       Bestehende Sitzungen ohne Token-Daten zeigen nur AssemblyAI-Kosten.
     </div>
   </div>`;
+}
+
+// v6.59: Modell-Chips für die Kosten-Tabelle – ein Chip pro tatsächlich genutztem Anbieter dieser Sitzung
+const _PROVIDER_CHIP_COLORS = {
+  claude:  { bg: '#EEEDFE', fg: '#26215C' },
+  mistral: { bg: '#FAEEDA', fg: '#412402' },
+};
+function _providerChips(providerEur) {
+  const entries = Object.entries(providerEur || {}).filter(([, eur]) => eur > 0);
+  if (!entries.length) return '<span style="color:var(--muted)">—</span>';
+  return entries.map(([prov, eur]) => {
+    const c = _PROVIDER_CHIP_COLORS[prov] || { bg: 'var(--surface2)', fg: 'var(--text)' };
+    const label = PRICING[prov]?.name || prov;
+    return `<span style="background:${c.bg}; color:${c.fg}; border-radius:999px; padding:2px 9px; font-size:0.68rem; font-weight:600; white-space:nowrap; display:inline-block; margin:1px 4px 1px 0">${escHtml(label)} · ${fmtEur(eur)}</span>`;
+  }).join('');
 }
 
 function costCard(title, model, amount, pricing, source) {

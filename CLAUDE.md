@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.58** (Stand: 15.08.2026)
+**v6.59** (Stand: 15.08.2026)
+- Kosten-Seite providerbewusst: `renderCostsView()` (persons.js) zeigt eine Card pro tatsächlich genutztem KI-Anbieter statt einer fest verdrahteten Claude-Card (Anbieter ohne Nutzung erscheinen nicht). Sitzungstabelle: Spalte "Claude" ersetzt durch "Modell(e)" – farbige Chips pro tatsächlich für diese Sitzung genutztem Anbieter samt Betrag (z.B. Claude-Kernbefund + spätere Mistral-Folgeanalyse nebeneinander sichtbar). Intern: `providerEur`-Objekt (je Monat und je Sitzung) ersetzt das bisherige feste `claudeEur`-Feld, neue Helfer `addProviderEur()`/`sumProviderEur()`/`_providerChips()`. Rechengrundlage bleibt die seit v6.58 providerbewusste `calcLogEntryCost()` – hier wurde nur die Darstellung nachgezogen. Teil 2 von 3 der KI-Anbieter-Neutralität (siehe KI-ANBIETER-LEITFADEN.md) – v6.60 verhindert als letzter Teil, dass eine erneute Analyse mit anderem Modell das vorherige Ergebnis überschreibt.
+
+## v6.58 (Stand: 15.08.2026)
 - KI-Anbieter-Wahl: Mistral Large 3 als Alternative zu Claude im Analysen-Tab. Neues js/aiProvider.js als Vermittlungsschicht – callClaudeAPI()/callClaudeAPIVision() bleiben die einzigen Aufrufstellen, callClaudeAPI() routet über `_effectiveProvider()` an Claude oder Mistral. Ohne explizite Auswahl (neuer Modell-Dropdown links neben "Starten" im Analysen-Tab) läuft alles unverändert über Claude – kein globaler Zwangswechsel, andere Features (Semantiksuche, Kalender, Fotoanalyse, Projekt-Assistent) bleiben bewusst Claude-only, bis sie einzeln angebunden werden. API-Modal: neues Feld "Mistral API-Key" + "Standard-KI-Anbieter"-Auswahl (nur Vorauswahl fürs Dropdown). Kosten-Log (`session.claudeCostLog`) bekommt `provider`/`model`-Feld pro Eintrag, `calcLogEntryCost()`/`calculateSessionCost()` rechnen providerbewusst (config.js: neue `PRICING.mistral`, 0,50 €/1,50 € pro 1M Token, intern als USD-Äquivalent gespeichert). Vision bleibt bewusst Claude-only (Scan-Import läuft standardmäßig über lokales PaddleOCR, siehe KI-ANBIETER-LEITFADEN.md Abschnitt 6). Teil 1 von 3 der KI-Anbieter-Neutralität (siehe KI-ANBIETER-LEITFADEN.md) – v6.59 macht die Kosten-Seite providerbewusst, v6.60 verhindert dass eine erneute Analyse mit anderem Modell das vorherige Ergebnis überschreibt.
 
 ## v6.57 (Stand: 14.08.2026)
@@ -234,6 +237,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.59 | 15.08.2026 | Feature: Kosten-Seite providerbewusst – Cards + Modell-Chips pro Sitzung statt fester Claude-Spalte (persons.js) |
 | v6.58 | 15.08.2026 | Feature: Mistral Large 3 als Anbieter-Alternative im Analysen-Tab (js/aiProvider.js, Modell-Dropdown, providerbewusstes Kosten-Log) |
 | v6.47 | 08.08.2026 | Fix: Keine AssemblyAI-Kosten für scan_import – calculateSessionCost() prüft jetzt source |
 | v6.46 | 08.08.2026 | Fix: Scan-Sitzungen zeigen "Dokument · X Seiten" statt Teilnehmer/Dauer, pageCount im Datenmodell |
