@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#6c63ff" />
-  <link rel="stylesheet" href="css/styles.css?v=6.59" />
+  <link rel="stylesheet" href="css/styles.css?v=6.60" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -44,7 +44,7 @@
     <i data-lucide="mic" style="width:20px;height:20px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0"></i>
     <div>
       <div style="font-size:0.95rem; font-weight:700; letter-spacing:-0.01em; color:var(--text); line-height:1.2">Distill Voice Multi-KI</div>
-      <div id="appSubtitle" style="font-size:0.65rem; color:var(--muted); line-height:1">AssemblyAI &amp; Claude</div>
+      <div id="appSubtitle" style="font-size:0.65rem; color:var(--muted); line-height:1">AssemblyAI &amp; KI-Anbieter frei wählbar</div>
     </div>
   </div>
 
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.59</button>
+        onmouseout="this.style.color='var(--muted)'">v6.60</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -1707,15 +1707,15 @@
           <div class="sdc-sidebar-modes">
             <button class="sdc-mode-btn sdc-mode-active" id="sdcMode-analysechat" onclick="setSidebarMode('analysechat')">
               <i data-lucide="messages-square" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none"></i> Analyse-Chat
-              <button class="help-icon" data-help="Führe ein freies Chat-Gespräch mit Claude über diese Sitzung. Claude kennt alle bisherigen Analyse-Ergebnisse als Kontext und erinnert sich an den Gesprächsverlauf." onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
+              <button class="help-icon" data-help="Führe ein freies Chat-Gespräch mit deiner KI über diese Sitzung. Sie kennt alle bisherigen Analyse-Ergebnisse als Kontext und erinnert sich an den Gesprächsverlauf." onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
             </button>
             <button class="sdc-mode-btn" id="sdcMode-gespraechschat" onclick="setSidebarMode('gespraechschat')">
               <i data-lucide="message-circle" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none"></i> Gesprächs-Chat
-              <button class="help-icon" data-help="Stelle beliebige Fragen direkt zum Transkript. Claude antwortet mit dem vollen Gesprächskontext – z.B. 'Was hat Max über das Budget gesagt?'" onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
+              <button class="help-icon" data-help="Stelle beliebige Fragen direkt zum Transkript. Deine KI antwortet mit dem vollen Gesprächskontext – z.B. 'Was hat Max über das Budget gesagt?'" onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
             </button>
             <button class="sdc-mode-btn" id="sdcMode-email" onclick="openGmailModal()">
               <i data-lucide="mail" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none"></i> E-Mail
-              <button class="help-icon" data-help="Erstelle eine E-Mail auf Basis dieser Sitzung und sende sie direkt über Gmail. Claude formuliert einen Entwurf – du kannst ihn vor dem Senden bearbeiten." onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
+              <button class="help-icon" data-help="Erstelle eine E-Mail auf Basis dieser Sitzung und sende sie direkt über Gmail. Deine KI formuliert einen Entwurf – du kannst ihn vor dem Senden bearbeiten." onclick="showHelpTooltip(this)" style="margin-left:2px">?</button>
             </button>
             <button class="sdc-mode-btn" id="sdcMode-kalender" onclick="openCalendarModal()">
               <i data-lucide="calendar" style="width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none"></i> Kalender
@@ -1729,7 +1729,7 @@
             <!-- Analyse-Chat-Panel (v5.73: war Folgefragen) -->
             <div class="sdc-sidebar-panel sdc-panel-active" id="sdc-sb-analysechat">
               <div style="padding:10px 12px 8px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)">
-                <span style="font-size:0.78rem;color:var(--muted);flex:1">Claude kennt alle Analyse-Ergebnisse als Kontext.</span>
+                <span style="font-size:0.78rem;color:var(--muted);flex:1">Deine KI kennt alle Analyse-Ergebnisse als Kontext.</span>
                 <button onclick="clearFollowUp()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:3px 8px;font-size:0.75rem;cursor:pointer">Löschen</button>
               </div>
               <!-- Experten-Runde (v5.90) -->
@@ -1878,6 +1878,19 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.60 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.60</span><span class="cl-date">15.08.2026</span></div>
+        <div class="cl-title">Standard-KI-Anbieter gilt jetzt für die ganze App, nicht mehr nur für den Analysen-Tab</div>
+        <ul class="cl-list">
+          <li>_effectiveProvider() (aiProvider.js) fällt ohne explizite Auswahl nicht mehr hart auf Claude zurück, sondern auf die globale "Standard-KI-Anbieter"-Einstellung aus dem API-Modal. Stellst du dort Mistral ein, nutzen jetzt auch Analyse-Chat (inkl. Experten-Runde), Gesprächs-Chat, Mindmap, Kalender-Termine, E-Mail-Entwürfe, Projekt-Assistent, Personen-Synthese ("Mein Profil"/Beziehungskontext), Semantiksuche, Präsentations-Generator, Kapitel-Tiefenanalyse und der KI-Prompt-Generator automatisch Mistral – ohne eigenes Dropdown.</li>
+          <li>Rund 15 Stellen, die bisher nur auf einen gesetzten Anthropic-Key geprüft haben, prüfen jetzt providerbewusst über die neuen Helfer _hasActiveAiKey()/_missingAiKeyMessage() (aiProvider.js) – sonst hätte z.B. die Semantiksuche fälschlich "Kein Anthropic API-Key" gemeldet, obwohl Mistral korrekt eingerichtet war.</li>
+          <li>Bewusst ausgenommen: Vision (Foto-Analyse photos.js, Scan-Import scan.js) bleibt Claude-only, bis Mistrals Vision-Modell (Pixtral) geprüft ist. "Senden an Claude"/"In Claude Design öffnen" (Design-Tab) bleibt ebenfalls Claude-spezifisch – das ist eine Weiterleitung zu claude.ai selbst, keine API-Vervollständigung, dafür gibt es kein Mistral-Äquivalent.</li>
+          <li>Kosmetische Texte, die "Claude" fest benannt haben, obwohl die Funktion jetzt providerneutral ist, wurden mit angepasst (Header-Untertitel, Ladetexte, Hilfe-Tooltips bei Analyse-/Gesprächs-Chat und E-Mail, Semantiksuche-Button/-Ergebnis, Architektur-Seite).</li>
+        </ul>
+        <div class="cl-tech">js/aiProvider.js: _effectiveProvider() mit globalem Fallback, neue _hasActiveAiKey()/_missingAiKeyMessage(). Geänderte Gates in: claude.js (runAnalysisFromModal, runAnalysisFromChecks, startChaptersDeepAnalysis, askFollowUp, generatePresentation, _kernbefundMiniCall, _generateTagsMiniCall), persons.js (synthesizeMeinProfil, synthesizePerson), calendar.js (extractCalendarEvents, extractEmailDrafts), projects.js (sendProjectChatMessage), search.js (runClaudeSearch). photos.js/scan.js unverändert (Vision-Ausnahme).</div>
+      </div>
 
       <!-- ── v6.59 ── -->
       <div class="cl-entry">
@@ -5727,36 +5740,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.59"></script>
-<script src="js/storage.js?v=6.59"></script>
-<script src="js/config.js?v=6.59"></script>
-<script src="js/aiProvider.js?v=6.59"></script>
-<script src="js/auth.js?v=6.59"></script>
-<script src="js/drive.js?v=6.59"></script>
-<script src="js/sessions.js?v=6.59"></script>
-<script src="js/assemblyai.js?v=6.59"></script>
-<script src="js/claude.js?v=6.59"></script>
-<script src="js/ui.js?v=6.59"></script>
-<script src="js/tags.js?v=6.59"></script>
-<script src="js/notes.js?v=6.59"></script>
-<script src="js/photos.js?v=6.59"></script>
-<script src="js/persons.js?v=6.59"></script>
-<script src="js/audio.js?v=6.59"></script>
-<script src="js/recorder.js?v=6.59"></script>
-<script src="js/contacts.js?v=6.59"></script>
-<script src="js/app.js?v=6.59"></script>
+<script src="js/icons.js?v=6.60"></script>
+<script src="js/storage.js?v=6.60"></script>
+<script src="js/config.js?v=6.60"></script>
+<script src="js/aiProvider.js?v=6.60"></script>
+<script src="js/auth.js?v=6.60"></script>
+<script src="js/drive.js?v=6.60"></script>
+<script src="js/sessions.js?v=6.60"></script>
+<script src="js/assemblyai.js?v=6.60"></script>
+<script src="js/claude.js?v=6.60"></script>
+<script src="js/ui.js?v=6.60"></script>
+<script src="js/tags.js?v=6.60"></script>
+<script src="js/notes.js?v=6.60"></script>
+<script src="js/photos.js?v=6.60"></script>
+<script src="js/persons.js?v=6.60"></script>
+<script src="js/audio.js?v=6.60"></script>
+<script src="js/recorder.js?v=6.60"></script>
+<script src="js/contacts.js?v=6.60"></script>
+<script src="js/app.js?v=6.60"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.59"></script>
-<script src="js/search.js?v=6.59"></script>
-<script src="js/embeddings.js?v=6.59"></script>
-<script src="js/calendar.js?v=6.59"></script>
-<script src="js/templateLibrary.js?v=6.59"></script>
-<script src="js/prompts.js?v=6.59"></script>
-<script src="js/projects.js?v=6.59"></script>
-<script src="js/import.js?v=6.59"></script>
-<script src="js/scan.js?v=6.59"></script>
+<script src="js/features.js?v=6.60"></script>
+<script src="js/search.js?v=6.60"></script>
+<script src="js/embeddings.js?v=6.60"></script>
+<script src="js/calendar.js?v=6.60"></script>
+<script src="js/templateLibrary.js?v=6.60"></script>
+<script src="js/prompts.js?v=6.60"></script>
+<script src="js/projects.js?v=6.60"></script>
+<script src="js/import.js?v=6.60"></script>
+<script src="js/scan.js?v=6.60"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
@@ -5787,16 +5800,16 @@
             ⚡ Lokale Suche
           </button>
           <button id="searchClaudeBtn" onclick="runClaudeSearch()" class="btn btn-primary" style="font-size:0.8rem; padding:5px 14px">
-            ✦ Claude fragen
+            ✦ KI fragen
           </button>
         </div>
       </div>
       <div id="searchResults">
         <div class="search-hint">Tippe um in allen Aufnahmen zu suchen · <kbd style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-size:0.75rem">⌘K</kbd> öffnet diese Suche</div>
       </div>
-      <!-- Claude-Suchergebnis -->
+      <!-- KI-Suchergebnis -->
       <div id="searchClaudeResult" style="display:none; margin-top:14px; padding:14px; background:var(--surface2); border:1px solid var(--border); border-radius:10px;">
-        <div style="font-size:0.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px">✦ Claude-Antwort</div>
+        <div style="font-size:0.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px">✦ KI-Antwort</div>
         <div id="searchClaudeContent" style="font-size:0.85rem; color:var(--text); line-height:1.7"></div>
       </div>
     </div>
@@ -5804,7 +5817,7 @@
     <p style="font-size:0.72rem; color:var(--muted); margin-top:10px; flex-shrink:0">
       Sofortsuche durchsucht Titel · Transkript · Notizen · Tags · Themen · Personen · Sprecher &nbsp;·&nbsp;
       ⚡ Lokale Suche: semantisch, kein Token-Verbrauch (erstes Laden ~30s) &nbsp;·&nbsp;
-      ✦ Claude fragen: analytische Fragen
+      ✦ KI fragen: analytische Fragen
     </p>
   </div>
 </div>

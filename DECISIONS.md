@@ -33,10 +33,10 @@ git push origin HEAD:refs/heads/update/vX.Y
 - **Transkripte nach Verarbeitung sofort löschen** → `deleteFromAssemblyAI()` wird nach jedem Job aufgerufen
 - AssemblyAI ist DSGVO-konform (EU-Server), daher dürfen echte Namen dorthin
 
-### Claude / Anthropic API (Analyse)
-- **Claude API ist NICHT DSGVO-konform** → echte Namen dürfen nie rein
+### KI-Analyse (Claude / Mistral, seit v6.58 über aiProvider.js wählbar)
+- **Weder Claude noch Mistral sind für diesen Zweck als DSGVO-konform anzunehmen** → echte Namen dürfen nie rein, unabhängig vom gewählten Anbieter
 - **Anonymisierung ist immer aktiv – kein Opt-in, keine Ausnahmen**
-- Pflicht-Pattern bei JEDEM Claude-API-Call:
+- Pflicht-Pattern bei JEDEM KI-Call (gilt für `callClaudeAPI()`, das seit v6.58 providerabhängig an Claude oder Mistral routet – der Name blieb aus Kompatibilitätsgründen bestehen):
   ```javascript
   const { forward, reverse } = buildAnonMap(session);
   const prompt = anonymizeText(rawPrompt, forward);
@@ -52,13 +52,14 @@ git push origin HEAD:refs/heads/update/vX.Y
 | Parameter | Wert | Begründung |
 |---|---|---|
 | Transkript-Limit (Input) | **300.000 Zeichen** | Entspricht ~5h Gespräch; Claude Sonnet hat 200k Token Kontext (~800k Zeichen) |
-| Claude Output-Limit | **8.192 Tokens** | Verhindert abgeschnittene JSON-Antworten bei vielen Kapiteln |
+| KI Output-Limit | **32.000 Tokens** (seit v6.26, war 8.192) | Verhindert abgeschnittene JSON-Antworten bei vielen Kapiteln |
 | Claude-Modell | **claude-sonnet-4-6** (neueste) | In `config.js` definiert |
+| Mistral-Modell | **mistral-large-latest** (seit v6.58, optional) | In `aiProvider.js` definiert |
 | Icons | **Lucide Icons** | Keine Emojis im Code – werden nicht konsistent dargestellt |
 | AssemblyAI Sprache | `de` (Deutsch) | Kann pro Session überschrieben werden |
 
 > **Achtung:** `trimTranscript(transcript, X)` — X muss immer **300.000** sein.
-> `max_tokens` in `callClaudeAPI` muss immer **8.192** sein.
+> `max_tokens` in `callClaudeAPI` muss immer **32.000** sein (seit v6.26 – nicht mehr 8.192).
 > Niemals auf niedrigere Werte zurücksetzen.
 
 ---

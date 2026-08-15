@@ -17,8 +17,23 @@ let mistralModel = localStorage.getItem('mistral_model') || 'mistral-large-lates
 // über Claude (siehe callClaudeAPI/callClaudeAPIVision in claude.js).
 let _aiProviderOverride = null;
 
+// v6.60: ohne Override zählt der globale Standard-Anbieter (nicht mehr hart Claude) –
+// damit gilt "Standard-KI-Anbieter" aus dem API-Modal wirklich für die ganze App.
 function _effectiveProvider() {
-  return _aiProviderOverride || { provider: 'claude', model: 'claude-sonnet-4-6' };
+  if (_aiProviderOverride) return _aiProviderOverride;
+  if (aiProvider === 'mistral') return { provider: 'mistral', model: mistralModel };
+  return { provider: 'claude', model: 'claude-sonnet-4-6' };
+}
+
+// v6.60: gemeinsame Key-Prüfung für alle ~15 Aufrufstellen, die vorher nur anthropicKey
+// geprüft haben – ersetzt "if (!anthropicKey) {...}" durch "if (!_hasActiveAiKey()) {...}".
+function _hasActiveAiKey() {
+  const { provider } = _effectiveProvider();
+  return provider === 'mistral' ? !!mistralKey : !!anthropicKey;
+}
+function _missingAiKeyMessage() {
+  const { provider } = _effectiveProvider();
+  return provider === 'mistral' ? 'Kein Mistral API-Key gesetzt.' : 'Kein Anthropic API-Key gesetzt.';
 }
 
 // Letzter tatsächlich genutzter Anbieter/Modell – von callClaudeAPI() gesetzt,

@@ -769,7 +769,7 @@ async function runProjectAnalysis(projId) {
       <div class="acc-panel-header" style="cursor:default">
         ${icon('cpu',14,'margin-right:6px')} ${escHtml(promptDef.name)} – wird analysiert…
       </div>
-      <div class="acc-panel-body" style="color:var(--muted);font-size:0.83rem">Claude analysiert…</div>`;
+      <div class="acc-panel-body" style="color:var(--muted);font-size:0.83rem">Deine KI analysiert…</div>`;
     accordion.prepend(loadingPanel);
   }
 
@@ -1182,7 +1182,7 @@ function _buildProjectAnalysisContext(projectId, question = '') {
 async function sendProjectChatMessage() {
   const proj = getProjectById(_currentProjectDetailId);
   if (!proj) { showToast('Kein Projekt aktiv.', 'warning'); return; }
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'warning'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'warning'); return; } // v6.60
 
   // v6.14: pro-Projekt Rollen speichern + global aktualisieren
   _saveProjRollenById(_currentProjectDetailId);

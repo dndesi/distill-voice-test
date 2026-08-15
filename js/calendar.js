@@ -12,9 +12,9 @@ let calendarSession  = null; // Session für die gerade analysiert wird
 // GOOGLE CALENDAR
 // ═══════════════════════════════════════════════════
 
-// ── Termine aus Transkript extrahieren (via Claude) ──
+// ── Termine aus Transkript extrahieren (via KI) ──
 async function extractCalendarEvents(session) {
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   const transcript = (session.utterances || [])
     .map(u => `[${u.speaker}] ${u.text}`).join('\n');
@@ -276,7 +276,7 @@ function openCalendarModalAndExtract(session) {
 
 // ── E-Mail-Entwürfe aus Transkript extrahieren ───────
 async function extractEmailDrafts(session) {
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   const transcript = (session.utterances || [])
     .map(u => `[${u.speaker}] ${u.text}`).join('\n');

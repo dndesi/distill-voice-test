@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.59** (Stand: 15.08.2026)
+**v6.60** (Stand: 15.08.2026)
+- Standard-KI-Anbieter gilt jetzt für die ganze App: `_effectiveProvider()` (aiProvider.js) fällt ohne explizite Auswahl nicht mehr hart auf Claude zurück, sondern auf die globale "Standard-KI-Anbieter"-Einstellung. Stellst du Mistral als Standard ein, nutzen automatisch auch Analyse-Chat (inkl. Experten-Runde), Gesprächs-Chat, Mindmap, Kalender, E-Mail-Entwürfe, Projekt-Assistent, Personen-Synthese (Mein Profil/Beziehungskontext), Semantiksuche, Präsentations-Generator, Kapitel-Tiefenanalyse und der KI-Prompt-Generator Mistral – ohne eigenes Dropdown in jeder dieser Funktionen (die kommen selektiv erst in v6.61 für die drei Chat-/Assistenten-Bereiche). Rund 15 Stellen, die bisher hart `if (!anthropicKey)` geprüft haben, prüfen jetzt providerbewusst über die neuen Helfer `_hasActiveAiKey()`/`_missingAiKeyMessage()` (aiProvider.js) – sonst hätten sie fälschlich einen fehlenden Anthropic-Key gemeldet, obwohl Mistral korrekt eingerichtet war. Bewusst ausgenommen: Vision (Foto-Analyse, Scan-Import) bleibt Claude-only bis Pixtral geprüft ist; "Senden an Claude"/"In Claude Design öffnen" (Design-Tab) bleibt Claude-spezifisch, da reine Weiterleitung zu claude.ai (Artifacts), kein Mistral-Äquivalent vorhanden. Kosmetische "Claude"-Texte bei jetzt providerneutralen Funktionen wurden mit angepasst. Teil 3 der KI-Anbieter-Neutralität (siehe KI-ANBIETER-LEITFADEN.md) – v6.61 ergänzt eigene Modell-Dropdowns für Analyse-Chat/Gesprächs-Chat/Projekt-Assistent, v6.62 bringt Modell-Historie + Pillen-Switcher (verhindert dass eine erneute Analyse mit anderem Modell das vorherige Ergebnis überschreibt).
+
+## v6.59 (Stand: 15.08.2026)
 - Kosten-Seite providerbewusst: `renderCostsView()` (persons.js) zeigt eine Card pro tatsächlich genutztem KI-Anbieter statt einer fest verdrahteten Claude-Card (Anbieter ohne Nutzung erscheinen nicht). Sitzungstabelle: Spalte "Claude" ersetzt durch "Modell(e)" – farbige Chips pro tatsächlich für diese Sitzung genutztem Anbieter samt Betrag (z.B. Claude-Kernbefund + spätere Mistral-Folgeanalyse nebeneinander sichtbar). Intern: `providerEur`-Objekt (je Monat und je Sitzung) ersetzt das bisherige feste `claudeEur`-Feld, neue Helfer `addProviderEur()`/`sumProviderEur()`/`_providerChips()`. Rechengrundlage bleibt die seit v6.58 providerbewusste `calcLogEntryCost()` – hier wurde nur die Darstellung nachgezogen. Teil 2 von 3 der KI-Anbieter-Neutralität (siehe KI-ANBIETER-LEITFADEN.md) – v6.60 verhindert als letzter Teil, dass eine erneute Analyse mit anderem Modell das vorherige Ergebnis überschreibt.
 
 ## v6.58 (Stand: 15.08.2026)
@@ -237,6 +240,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.60 | 15.08.2026 | Feature: Standard-KI-Anbieter gilt global – ~15 Key-Gates providerbewusst, Vision + Claude-Design-Export bewusst ausgenommen |
 | v6.59 | 15.08.2026 | Feature: Kosten-Seite providerbewusst – Cards + Modell-Chips pro Sitzung statt fester Claude-Spalte (persons.js) |
 | v6.58 | 15.08.2026 | Feature: Mistral Large 3 als Anbieter-Alternative im Analysen-Tab (js/aiProvider.js, Modell-Dropdown, providerbewusstes Kosten-Log) |
 | v6.47 | 08.08.2026 | Fix: Keine AssemblyAI-Kosten für scan_import – calculateSessionCost() prüft jetzt source |

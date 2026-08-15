@@ -2531,7 +2531,7 @@ async function _genGenerateWithAI() {
   document.getElementById('genStepContent').innerHTML = `
     <div style="text-align:center; padding:48px 24px">
       <div style="margin-bottom:14px">${icon('loader-2', 32, 'color:var(--accent)')}</div>
-      <div style="font-size:0.88rem; color:var(--muted)">Claude erstellt deinen Prompt…</div>
+      <div style="font-size:0.88rem; color:var(--muted)">Deine KI erstellt deinen Prompt…</div>
     </div>`;
   document.getElementById('genNavigation').innerHTML = '';
   if (window.lucide) lucide.createIcons({ nodes: [document.getElementById('promptGeneratorModal')] });
@@ -2966,7 +2966,7 @@ function _renderGenModal() {
 
     if (s.step === 2) {
       html = `
-        <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px">Beschreibe kurz was dein Prompt analysieren oder tun soll. Claude erstellt den vollständigen Prompt für dich.</p>
+        <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px">Beschreibe kurz was dein Prompt analysieren oder tun soll. Deine KI erstellt den vollständigen Prompt für dich.</p>
         <textarea id="genAiDesc" rows="6" placeholder="Ich brauche einen Prompt der aus einem Gespräch alle offenen Fragen extrahiert und als Checkliste auflistet, damit ich nach dem Meeting sofort weiß was noch zu klären ist…"
           style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:0.88rem;resize:vertical;box-sizing:border-box;line-height:1.5">${escHtml(s.aiDesc)}</textarea>`;
     }

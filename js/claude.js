@@ -473,7 +473,7 @@ async function runAnalysisFromModal() {
   }
 
   if (!types.length) { showAnalyseError('Bitte mindestens eine Option wählen.'); return; }
-  if (!anthropicKey) { showAnalyseError('Kein Anthropic API-Key gesetzt — bitte unter 🔑 eintragen.'); return; }
+  if (!_hasActiveAiKey()) { showAnalyseError(_missingAiKeyMessage() + ' Bitte unter 🔑 eintragen.'); return; } // v6.60
   const s = getSession();
   if (!s) { showAnalyseError('Kein Transkript aktiv — bitte erst ein Gespräch öffnen.'); return; }
   if (!s.utterances?.length) { showAnalyseError('Keine Sprecherabschnitte vorhanden.'); return; }
@@ -558,10 +558,10 @@ function runAnalysisFromChecks() {
   if (document.getElementById('chkTopics')?.checked)    types.push('topics');
   if (document.getElementById('chk360')?.checked)       types.push('360');
 
-  console.log('[Analyse] Gewählte Typen:', types, '| anthropicKey gesetzt:', !!anthropicKey, '| Session:', currentSessionId);
+  console.log('[Analyse] Gewählte Typen:', types, '| Key gesetzt:', _hasActiveAiKey(), '| Session:', currentSessionId);
 
   if (!types.length) { showAnalyseError('Bitte mindestens eine Option anhaken.'); return; }
-  if (!anthropicKey) { showAnalyseError('Kein Anthropic API-Key gesetzt — bitte oben rechts unter 🔑 eintragen.'); return; }
+  if (!_hasActiveAiKey()) { showAnalyseError(_missingAiKeyMessage() + ' Bitte oben rechts unter 🔑 eintragen.'); return; } // v6.60
   const s = getSession();
   if (!s) { showAnalyseError('Kein Transkript aktiv — bitte erst ein Gespräch öffnen.'); return; }
   if (!s.utterances?.length) { showAnalyseError('Keine Sprecherabschnitte vorhanden.'); return; }
@@ -765,7 +765,7 @@ function extractChapterUtterances(session, idx) {
 async function startChaptersDeepAnalysis(sessionId) {
   const s = sessions.find(x => x.id === sessionId);
   if (!s?.claudeChapters?.length) return;
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   const btn = document.getElementById(`chapDeepBtn-${sessionId}`);
   if (btn) { btn.disabled = true; btn.innerHTML = icon('loader',12,'margin-right:5px') + ' Analysiere…'; }
@@ -1880,7 +1880,7 @@ async function _getKernbefund(type, session) {
 
 // Mini-Call für kernaussage beim Transkript und fehlende kernbefunde
 async function _kernbefundMiniCall(type, session) {
-  if (!anthropicKey) return '<unbekannt>';
+  if (!_hasActiveAiKey()) return '<unbekannt>'; // v6.60
   try {
     const isTranscript = (type === 'transcript');
     const content = isTranscript
@@ -1905,7 +1905,7 @@ async function _kernbefundMiniCall(type, session) {
 
 // v6.20: Tags per Mini-Call generieren (SeBr-Regeln)
 async function _generateTagsMiniCall(session) {
-  if (!anthropicKey) return [];
+  if (!_hasActiveAiKey()) return []; // v6.60
   try {
     const content = (typeof buildTranscriptText === 'function' ? buildTranscriptText(session) : '').slice(0, 6000) || session.label || '';
     if (!content) return [];
@@ -2537,7 +2537,7 @@ async function askFollowUp() {
   const btn   = document.getElementById('askSendBtn'); // v4.77: war followUpSendBtn (altes Modal)
   const question = input?.value?.trim();
   if (!question) { showToast('Bitte erst eine Frage eingeben.', 'warning'); return; }
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'warning'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'warning'); return; } // v6.60
 
   let analysisContext = _buildFollowUpContext(session);
   if (!analysisContext) { showToast('Noch keine Analysen vorhanden – bitte erst Analysen durchführen.', 'warning'); return; }
@@ -3200,7 +3200,7 @@ function clearFollowUp() {
 async function generatePresentation() {
   const session = getSession(currentSessionId);
   if (!session) { showToast('Keine aktive Sitzung.', 'warning'); return; }
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'warning'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'warning'); return; } // v6.60
 
   const rawSelectVal = document.getElementById('canvaPromptSelect')?.value || 'builtin_canva_presentation';
   const isCustom     = rawSelectVal.startsWith('custom_');

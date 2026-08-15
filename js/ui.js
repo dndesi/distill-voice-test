@@ -546,7 +546,7 @@ function renderArchView() {
         <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:4px; display:flex;align-items:center;gap:8px">${icon('layers',18)} Systemarchitektur</h2>
         <p style="font-size:0.82rem; color:var(--muted); line-height:1.6; margin:0">
           Alle Komponenten laufen vollständig im Browser – kein Backend-Server. API-Keys bleiben lokal.
-          <span style="color:var(--accent); font-weight:600">Version 6.59</span> · 27 JS-Module
+          <span style="color:var(--accent); font-weight:600">Version 6.60</span> · 27 JS-Module
         </p>
       </div>
       <button onclick="exportArchPdf()" class="btn btn-ghost" style="font-size:0.8rem;padding:6px 14px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0">
@@ -635,10 +635,10 @@ function renderArchView() {
     <div style="margin-bottom:14px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted)">Wichtige Datenflüsse</div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; margin-bottom:24px">
       ${flowCard('Mic / Datei → AssemblyAI', 'Transkription', 'Audio → Upload → Polling → Utterances mit Speaker-Labels (A/B/C…)', '#fbbf24')}
-      ${flowCard('Browser → Claude Sonnet', 'KI-Analyse', 'Transkript (opt. anonymisiert) → Analyse: Gesprächs/Arbeit/Gedanken, 360°, Kapitel, Mindmap', '#a78bfa')}
+      ${flowCard('Browser → Claude/Mistral', 'KI-Analyse', 'Transkript (opt. anonymisiert) → aiProvider.js wählt Anbieter → Analyse: Gesprächs/Arbeit/Gedanken, 360°, Kapitel, Mindmap', '#a78bfa')}
       ${flowCard('Browser → Google Drive', 'Cloud-Speicherung', 'Sitzung als JSON + Audio-Datei → Drive-Ordner → geladen beim nächsten Login', '#34d399')}
-      ${flowCard('Browser → Google Calendar', 'Termine eintragen', 'Claude erkennt Termine im Transkript → RFC3339 Event → Calendar API v3 (POST)', '#60a5fa')}
-      ${flowCard('Browser → Gmail', 'Entwürfe erstellen', 'Claude generiert E-Mails → Base64url → Gmail Drafts API → User sendet selbst ab', '#f472b6')}
+      ${flowCard('Browser → Google Calendar', 'Termine eintragen', 'Gewählte KI erkennt Termine im Transkript → RFC3339 Event → Calendar API v3 (POST)', '#60a5fa')}
+      ${flowCard('Browser → Gmail', 'Entwürfe erstellen', 'Gewählte KI generiert E-Mails → Base64url → Gmail Drafts API → User sendet selbst ab', '#f472b6')}
       ${flowCard('Worker → AssemblyAI', 'Transkript löschen', 'DELETE via Cloudflare Worker (CORS-Bypass) → AssemblyAI entfernt Transkript', '#94a3b8')}
     </div>
 

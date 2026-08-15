@@ -441,12 +441,12 @@ function renderMeinProfil() {
 async function synthesizeMeinProfil() {
   const btn    = document.getElementById('syntheseBtn');
   const result = document.getElementById('syntheseResult');
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   btn.disabled = true;
   btn.innerHTML = '<span class="synthese-spin">✦</span> Wird erstellt…';
   result.style.display = 'block';
-  result.innerHTML = `<div class="synthese-box" style="color:var(--muted)">Claude analysiert deine Gespräche und Gedanken…</div>`;
+  result.innerHTML = `<div class="synthese-box" style="color:var(--muted)">Deine KI analysiert deine Gespräche und Gedanken…</div>`;
 
   const data = getMeinProfilData();
   const lines = [];
@@ -577,12 +577,12 @@ function renderPersonProfile(name) {
 async function synthesizePerson(name) {
   const btn = document.getElementById('syntheseBtn');
   const result = document.getElementById('syntheseResult');
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   btn.disabled = true;
   btn.innerHTML = '<span class="synthese-spin">✦</span> Wird erstellt…';
   result.style.display = 'block';
-  result.innerHTML = `<div class="synthese-box" style="color:var(--muted)">Claude analysiert alle Gespräche mit ${escHtml(name)}…</div>`;
+  result.innerHTML = `<div class="synthese-box" style="color:var(--muted)">Deine KI analysiert alle Gespräche mit ${escHtml(name)}…</div>`;
 
   const data = getPersonData(name);
   const firstDate = data.firstContact ? new Date(data.firstContact).toLocaleDateString('de-DE') : '–';

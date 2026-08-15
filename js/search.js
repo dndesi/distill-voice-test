@@ -185,11 +185,11 @@ function openSessionById(id, jumpToMs) {
   });
 }
 
-// ── Claude Semantiksuche über alle Aufnahmen ──────────
+// ── KI-Semantiksuche über alle Aufnahmen ──────────
 async function runClaudeSearch() {
   const query = document.getElementById('searchInput')?.value.trim();
   if (!query) { showToast('Bitte zuerst eine Frage eingeben', 'error'); return; }
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt', 'error'); return; }
+  if (!_hasActiveAiKey()) { showToast(_missingAiKeyMessage(), 'error'); return; } // v6.60
 
   const allSessions = (sessions || []).filter(s => s.utterances?.length || s.privateAnalysis || s.workAnalysis);
   if (!allSessions.length) { showToast('Keine Aufnahmen mit Inhalt gefunden', 'error'); return; }
@@ -225,9 +225,9 @@ async function runClaudeSearch() {
 
     renderClaudeSearchResult(text, allSessions);
   } catch(e) {
-    showToast('Claude-Suche fehlgeschlagen: ' + e.message, 'error');
+    showToast('KI-Suche fehlgeschlagen: ' + e.message, 'error');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '✦ Claude fragen'; }
+    if (btn) { btn.disabled = false; btn.textContent = '✦ KI fragen'; }
   }
 }
 
