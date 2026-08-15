@@ -38,9 +38,9 @@
       --speaker-extra: #6d28d9;
     }
 
-    /* ── Header: bleibt dunkel ── */
+    /* ── Header: bleibt magenta (auch im Light Mode) ── */
     [data-theme="light"] header {
-      background: #1a1d27;
+      background: #a21caf;
       border-bottom-color: #2e3250;
       box-shadow: 0 2px 16px rgba(0,0,0,0.28);
       --border: #2e3250;
@@ -195,7 +195,7 @@
 
     /* ─── HEADER ─────────────────────────────────── */
     header {
-      background: var(--surface);
+      background: #a21caf;
       border-bottom: 1px solid var(--border);
       padding: 14px 28px;
       display: flex;

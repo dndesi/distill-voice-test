@@ -363,6 +363,8 @@ async function runSingleAnalysis(type) {
   document.getElementById('analyseLoadingArea').style.display = 'block';
   document.getElementById('analyseCancelBtn').disabled = true;
   document.getElementById('analyseModal').classList.add('open');
+  const titleEl = document.getElementById('analyseModalTitle'); // v6.58: Titel zeigt tatsächlich genutzten Anbieter
+  if (titleEl) titleEl.textContent = _gateProvider === 'mistral' ? 'Mistral-Analyse' : 'Claude-Analyse';
 
   const typeNames = {
     work: 'Arbeits-Analyse', private: 'Gesprächs-Analyse',
