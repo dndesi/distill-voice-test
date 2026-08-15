@@ -604,6 +604,29 @@ async function runAnalysis(types) {
   }
 }
 
+// v6.62: Modell-Historie – vorherigen Analyse-Stand archivieren, bevor er überschrieben wird
+function _archiveAnalysisRun(session, key) {
+  if (session[key] === undefined || session[key] === null || !session[key + 'Meta']) return;
+  if (!session[key + 'Runs']) session[key + 'Runs'] = [];
+  session[key + 'Runs'].push({ ...session[key + 'Meta'], data: session[key] });
+}
+
+// v6.62: Pillen-Switcher-HTML für archivierte Modell-Läufe (Claude/Mistral) einer Analyse
+function _renderRunPills(session, key) {
+  const runs = session[key + 'Runs'];
+  const meta = session[key + 'Meta'];
+  if (!runs?.length || !meta) return '';
+  const sid = session.id;
+  const label = m => m.provider === 'mistral' ? 'Mistral' : 'Claude';
+  let html = '<div class="ai-run-pills">';
+  html += `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(meta))}</span>`;
+  runs.forEach((r, i) => {
+    html += `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="switchAnalysisRun('${sid}','${key}',${i})">${escHtml(label(r))}</span>`;
+  });
+  html += '</div>';
+  return html;
+}
+
 async function analysePrivate(session, transcript) {
   const { forward, reverse } = buildAnonMap(session);
   const isThoughts = session.type === 'gedanken';
@@ -630,6 +653,7 @@ async function analysePrivate(session, transcript) {
   const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward));
   addTokensToSession(session, inputTokens, outputTokens);
   const json = deanonymizeObject(JSON.parse(extractJSON(text, '{')), reverse);
+  _archiveAnalysisRun(session, 'privateAnalysis'); // v6.62
   session.privateAnalysis = {
     agreements:    Array.isArray(json.agreements)  ? json.agreements  : [],
     wishes:        Array.isArray(json.wishes)       ? json.wishes      : [],
@@ -641,6 +665,7 @@ async function analysePrivate(session, transcript) {
     summary:       json.summary       || '',
     kernbefund:    json.kernbefund    || '', // v6.19
   };
+  session.privateAnalysisMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
   // v6.20: Tags auto-speichern wenn Session noch keine hat
   if (Array.isArray(json.tags) && json.tags.length && (!session.tags || !session.tags.length)) {
     session.tags = json.tags.map(t => String(t).toLowerCase().replace(/\s+/g, '-')).filter(Boolean);
@@ -664,6 +689,7 @@ async function analyseWork(session, transcript) {
   const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward));
   addTokensToSession(session, inputTokens, outputTokens);
   const json = deanonymizeObject(JSON.parse(extractJSON(text, '{')), reverse);
+  _archiveAnalysisRun(session, 'workAnalysis'); // v6.62
   session.workAnalysis = {
     tasks:          Array.isArray(json.tasks)         ? json.tasks         : [],
     decisions:      Array.isArray(json.decisions)     ? json.decisions     : [],
@@ -673,6 +699,7 @@ async function analyseWork(session, transcript) {
     summary:        json.summary || '',
     kernbefund:     json.kernbefund || '', // v6.19
   };
+  session.workAnalysisMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
 
 async function analyseSentiment(session, transcript) {
@@ -686,7 +713,9 @@ async function analyseSentiment(session, transcript) {
   const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward));
   addTokensToSession(session, inputTokens, outputTokens);
   const json = deanonymizeObject(JSON.parse(extractJSON(text, '{')), reverse);
+  _archiveAnalysisRun(session, 'claudeSentiment'); // v6.62
   session.claudeSentiment = { ...json, kernbefund: json.kernbefund || '' }; // v6.19
+  session.claudeSentimentMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
 
 async function analyseChapters(session, transcript) {
@@ -725,7 +754,9 @@ Antworte NUR mit einem JSON-Array (kein Markdown, keine Erklärungen):
   const { text: chapText, inputTokens: chapIn, outputTokens: chapOut } = await callClaudeAPI(anonymizeText(promptText, forward));
   addTokensToSession(session, chapIn, chapOut);
   const json = deanonymizeObject(JSON.parse(extractJSON(chapText, '[')), reverse);
+  _archiveAnalysisRun(session, 'claudeChapters'); // v6.62
   session.claudeChapters = json;
+  session.claudeChaptersMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
 
 // ── Kapitel-Auswahl & Tiefenanalyse ─────────────────
@@ -848,9 +879,11 @@ Antworte NUR mit einem JSON-Array aus kurzen Themen-Tags auf Deutsch (max. 10 Ta
   const { text: topText, inputTokens: topIn, outputTokens: topOut } = await callClaudeAPI(anonymizeText(promptText, forward));
   addTokensToSession(session, topIn, topOut);
   const json = JSON.parse(extractJSON(topText, '['));
+  _archiveAnalysisRun(session, 'claudeTopics'); // v6.62
   session.claudeTopics = Array.isArray(json)
     ? json.map(t => ({ text: String(t), status: 'default' }))
     : [];
+  session.claudeTopicsMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
 
 // Hilfsfunktion: extrahiert den ersten vollständigen JSON-Block aus einer Claude-Antwort
@@ -953,6 +986,8 @@ function renderInsights(session) {
   if (pa) {
     let html = '';
     const sid = session.id;
+
+    html += _renderRunPills(session, 'privateAnalysis'); // v6.62
 
     const editFieldBtn = (aKey, field) =>
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
@@ -1064,6 +1099,7 @@ function renderInsights(session) {
     let html = '';
 
     const wSid = session.id;
+    html += _renderRunPills(session, 'workAnalysis'); // v6.62
     const wDel = (field, i) =>
       `<button class="work-item-del" title="Eintrag löschen"
         onclick="deleteAnalysisItem('${wSid}','workAnalysis','${field}',${i})">${icon('trash-2',12)}</button>`;
@@ -1158,6 +1194,7 @@ function renderInsights(session) {
 
   if (cs?.speakers?.length) {
     let html = '';
+    html += _renderRunPills(session, 'claudeSentiment'); // v6.62
     cs.speakers.forEach(sp => {
       const color = getSpeakerColor(sp.speaker);
       const posP = Math.max(0, Math.min(100, sp.posP || 0));
@@ -1193,7 +1230,8 @@ function renderInsights(session) {
 
   if (chapters.length > 0) {
     const sid = session.id;
-    chapContent.innerHTML = chapters.map((ch, i) => {
+    chapContent.innerHTML = _renderRunPills(session, 'claudeChapters'); // v6.62
+    chapContent.innerHTML += chapters.map((ch, i) => {
       const tsMs = ch.timestamp ? (() => {
         const parts = ch.timestamp.split(':').map(Number);
         return parts.length === 2 ? (parts[0]*60 + parts[1]) * 1000
@@ -1249,7 +1287,8 @@ function renderInsights(session) {
 
   if (topics.length > 0) {
     const tSid = session.id;
-    topicsContent.innerHTML = `<div>${topics.map((t, i) => {
+    topicsContent.innerHTML = _renderRunPills(session, 'claudeTopics'); // v6.62
+    topicsContent.innerHTML += `<div>${topics.map((t, i) => {
       const txt = typeof t === 'object' ? t.text : t;
       return `<span class="topic-chip">
         ${escHtml(txt)}
@@ -1287,6 +1326,17 @@ function renderInsights(session) {
         }
         if (!bodyHtml) return ''; // Kein Inhalt → Block überspringen
         const sid = session.id;
+        // v6.62: Pillen-Switcher für archivierte Modell-Läufe dieses Prompts
+        const cRuns = session.customResultsRuns?.[pid];
+        const cMeta = session.customResultsMeta?.[pid];
+        let pillsHtml = '';
+        if (cRuns?.length && cMeta) {
+          const label = m => m.provider === 'mistral' ? 'Mistral' : 'Claude';
+          pillsHtml = '<div class="ai-run-pills">' +
+            `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(cMeta))}</span>` +
+            cRuns.map((r, i) => `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="event.stopPropagation();switchCustomResultRun('${sid}','${pid}',${i})">${escHtml(label(r))}</span>`).join('') +
+            '</div>';
+        }
         // Pencil nur für Freitext-Analysen (kein Schema) – edit-2 Icon (in icons.js registriert)
         const hasSchema = !!(res.structured && res.schema);
         const editBtn = !hasSchema
@@ -1311,7 +1361,7 @@ function renderInsights(session) {
                 <span class="insights-block-chevron">▾</span>
               </span>
             </div>
-            <div class="insights-block-body">${bodyHtml}</div>
+            <div class="insights-block-body">${pillsHtml}${bodyHtml}</div>
           </div>`;
       }).filter(Boolean).join('');
       customContainer.innerHTML = blocks;
@@ -3950,6 +4000,8 @@ function deleteCustomAnalysis(btn, promptId) {
   const s = getSession();
   if (!s || !s.customResults) return;
   delete s.customResults[promptId];
+  if (s.customResultsMeta) delete s.customResultsMeta[promptId]; // v6.62
+  if (s.customResultsRuns) delete s.customResultsRuns[promptId]; // v6.62
   saveSessions();
   saveToArchive(s).catch(() => {});
   renderInsights(s);

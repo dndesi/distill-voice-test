@@ -2096,6 +2096,16 @@ async function runCustomPrompt(session, promptObj, transcript, extraPhotos = [])
 
   if (!session.customResults) session.customResults = {};
 
+  // v6.62: Vorherigen Stand archivieren (Modell-Historie), bevor er überschrieben wird
+  if (session.customResults[promptObj.id] && session.customResultsMeta?.[promptObj.id]) {
+    if (!session.customResultsRuns) session.customResultsRuns = {};
+    if (!session.customResultsRuns[promptObj.id]) session.customResultsRuns[promptObj.id] = [];
+    session.customResultsRuns[promptObj.id].push({
+      ...session.customResultsMeta[promptObj.id],
+      data: session.customResults[promptObj.id]
+    });
+  }
+
   // Strukturiertes Ergebnis parsen wenn Schema vorhanden
   if (Array.isArray(schema) && schema.length > 0) {
     let structured = null;
@@ -2132,6 +2142,9 @@ async function runCustomPrompt(session, promptObj, transcript, extraPhotos = [])
       createdAt:  new Date().toISOString()
     };
   }
+  // v6.62: Modell-Tag für den neuen aktiven Stand
+  if (!session.customResultsMeta) session.customResultsMeta = {};
+  session.customResultsMeta[promptObj.id] = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() };
 }
 
 // ── Editable-Prompt Editor öffnen ───────────────

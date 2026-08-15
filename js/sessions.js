@@ -403,6 +403,45 @@ function safeFilename(str) {
 }
 
 // ── Analyse-Item löschen ─────────────────────────────────────────────────
+// v6.62: Zwischen archivierten Modell-Läufen einer der 6 eingebauten Analysen wechseln
+function switchAnalysisRun(sessionId, key, runIdx) {
+  const s = sessions.find(x => x.id === sessionId);
+  if (!s) return;
+  if (!s[key + 'Runs']) s[key + 'Runs'] = [];
+  const runs = s[key + 'Runs'];
+  const chosen = runs[runIdx];
+  if (!chosen) return;
+  if (s[key] !== undefined && s[key] !== null && s[key + 'Meta']) {
+    runs.push({ ...s[key + 'Meta'], data: s[key] });
+  }
+  runs.splice(runIdx, 1);
+  s[key] = chosen.data;
+  s[key + 'Meta'] = { provider: chosen.provider, model: chosen.model, ts: chosen.ts };
+  saveSessions();
+  saveToArchive(s).catch(() => {});
+  renderInsights(s);
+  if (key === 'claude360' && typeof render360Block === 'function') render360Block(s);
+}
+
+// v6.62: Zwischen archivierten Modell-Läufen eines eigenen Prompts (customResults) wechseln
+function switchCustomResultRun(sessionId, promptId, runIdx) {
+  const s = sessions.find(x => x.id === sessionId);
+  if (!s?.customResultsRuns?.[promptId]) return;
+  const runs = s.customResultsRuns[promptId];
+  const chosen = runs[runIdx];
+  if (!chosen) return;
+  if (s.customResults?.[promptId] && s.customResultsMeta?.[promptId]) {
+    runs.push({ ...s.customResultsMeta[promptId], data: s.customResults[promptId] });
+  }
+  runs.splice(runIdx, 1);
+  s.customResults[promptId] = chosen.data;
+  if (!s.customResultsMeta) s.customResultsMeta = {};
+  s.customResultsMeta[promptId] = { provider: chosen.provider, model: chosen.model, ts: chosen.ts };
+  saveSessions();
+  saveToArchive(s).catch(() => {});
+  renderInsights(s);
+}
+
 function deleteAnalysisItem(sessionId, analysisKey, field, idx) {
   const s = sessions.find(x => x.id === sessionId);
   if (!s?.[analysisKey]?.[field]) return;

@@ -2956,6 +2956,32 @@ mark.search-highlight {
   .ai-mini-select { max-width: 96px; font-size: 0.68rem; padding: 3px 4px; }
 }
 
+/* v6.62: Pillen-Switcher – archivierte Modell-Läufe (Claude/Mistral) einer Analyse */
+.ai-run-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.ai-run-pill {
+  font-size: 0.7rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  background: var(--surface2);
+  white-space: nowrap;
+  user-select: none;
+}
+.ai-run-pill:hover { border-color: var(--accent); color: var(--text); }
+.ai-run-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  cursor: default;
+}
+
 .runden-hint {
   font-size: 0.7rem;
   color: var(--muted);

@@ -54,6 +54,7 @@ Antworte NUR mit einem JSON-Objekt (kein Markdown, keine Erklärungen):
   const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward));
   addTokensToSession(session, inputTokens, outputTokens);
   const json = deanonymizeObject(JSON.parse(extractJSON(text, '{')), reverse);
+  if (typeof _archiveAnalysisRun === 'function') _archiveAnalysisRun(session, 'claude360'); // v6.62
   session.claude360 = {
     meineAufgaben:       json.meineAufgaben       || { titel: `Perspektive: ${speakerA}`, punkte: [] },
     andereErwartungen:   json.andereErwartungen   || { titel: `Perspektive: ${speakerB}`, punkte: [] },
@@ -61,6 +62,7 @@ Antworte NUR mit einem JSON-Objekt (kein Markdown, keine Erklärungen):
     strategischeEbene:   json.strategischeEbene   || { titel: 'Strategische Perspektive',  punkte: [] },
     kernbefund:          json.kernbefund           || '', // v6.19
   };
+  session.claude360Meta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
 
 function render360Block(session) {
@@ -84,7 +86,8 @@ function render360Block(session) {
     { key: 'strategischeEbene', color: 'var(--green)' }
   ];
 
-  let html = '<div class="perspectives-grid">';
+  let html = typeof _renderRunPills === 'function' ? _renderRunPills(session, 'claude360') : ''; // v6.62
+  html += '<div class="perspectives-grid">';
   perspectives.forEach(p => {
     const data = d[p.key];
     if (!data) return;

@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#6c63ff" />
-  <link rel="stylesheet" href="css/styles.css?v=6.61" />
+  <link rel="stylesheet" href="css/styles.css?v=6.62" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.61</button>
+        onmouseout="this.style.color='var(--muted)'">v6.62</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -1888,6 +1888,18 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.62 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.62</span><span class="cl-date">15.08.2026</span></div>
+        <div class="cl-title">Modell-Historie + Pillen-Switcher – erneute Analyse mit anderem Anbieter überschreibt das vorherige Ergebnis nicht mehr</div>
+        <ul class="cl-list">
+          <li>Alle 6 eingebauten Analysetypen (Gesprächs-/Arbeits-Analyse, Stimmung, Kapitel, Themen, 360°) sowie eigene Prompts (customResults) archivieren jetzt den bisherigen Stand, statt ihn zu überschreiben, wenn erneut mit einem anderen KI-Anbieter analysiert wird. Über kleine Pillen ("Claude"/"Mistral") direkt im jeweiligen Analyse-Block lässt sich zwischen den archivierten Ständen umschalten – der aktive Stand bleibt wie gewohnt editierbar.</li>
+          <li>Datenmodell: pro Analysetyp ein neues *Meta-Feld (Provider/Modell/Zeitstempel des aktiven Standes, z.B. session.privateAnalysisMeta) und ein *Runs-Array für archivierte Stände (session.privateAnalysisRuns[]). Bewusst kein Referenz-Trick zwischen aktivem Feld und Archiv-Eintrag, da das bei jedem Neuladen aus IndexedDB/Drive (JSON-Serialisierung dupliziert Objekte) stillschweigend die Kopplung gebrochen hätte – stattdessen ein expliziter Swap beim Pillen-Klick (switchAnalysisRun() in sessions.js), verifiziert per Node-Testskript inkl. des Falls "Bearbeitung nach Wechsel darf archivierten Stand nicht verändern".</li>
+          <li>Bestehender Inline-Edit-Code (editAnalysisItem, saveAnalysisField u.a.) bleibt unverändert – er kennt die neuen Meta-/Runs-Felder nicht und schreibt weiterhin direkt auf das aktive Feld.</li>
+        </ul>
+        <div class="cl-tech">js/claude.js: _archiveAnalysisRun(), _renderRunPills(), Meta-Tagging in analysePrivate/analyseWork/analyseSentiment/analyseChapters/analyseTopics via _lastAiCallMeta. js/features.js: analyse360() + render360Block() analog. js/prompts.js: Archivierung + Meta-Tagging für customResults (nested per promptId). js/sessions.js: switchAnalysisRun(), switchCustomResultRun(). css/styles.css: .ai-run-pills, .ai-run-pill.</div>
+      </div>
 
       <!-- ── v6.61 ── -->
       <div class="cl-entry">
@@ -5762,36 +5774,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.61"></script>
-<script src="js/storage.js?v=6.61"></script>
-<script src="js/config.js?v=6.61"></script>
-<script src="js/aiProvider.js?v=6.61"></script>
-<script src="js/auth.js?v=6.61"></script>
-<script src="js/drive.js?v=6.61"></script>
-<script src="js/sessions.js?v=6.61"></script>
-<script src="js/assemblyai.js?v=6.61"></script>
-<script src="js/claude.js?v=6.61"></script>
-<script src="js/ui.js?v=6.61"></script>
-<script src="js/tags.js?v=6.61"></script>
-<script src="js/notes.js?v=6.61"></script>
-<script src="js/photos.js?v=6.61"></script>
-<script src="js/persons.js?v=6.61"></script>
-<script src="js/audio.js?v=6.61"></script>
-<script src="js/recorder.js?v=6.61"></script>
-<script src="js/contacts.js?v=6.61"></script>
-<script src="js/app.js?v=6.61"></script>
+<script src="js/icons.js?v=6.62"></script>
+<script src="js/storage.js?v=6.62"></script>
+<script src="js/config.js?v=6.62"></script>
+<script src="js/aiProvider.js?v=6.62"></script>
+<script src="js/auth.js?v=6.62"></script>
+<script src="js/drive.js?v=6.62"></script>
+<script src="js/sessions.js?v=6.62"></script>
+<script src="js/assemblyai.js?v=6.62"></script>
+<script src="js/claude.js?v=6.62"></script>
+<script src="js/ui.js?v=6.62"></script>
+<script src="js/tags.js?v=6.62"></script>
+<script src="js/notes.js?v=6.62"></script>
+<script src="js/photos.js?v=6.62"></script>
+<script src="js/persons.js?v=6.62"></script>
+<script src="js/audio.js?v=6.62"></script>
+<script src="js/recorder.js?v=6.62"></script>
+<script src="js/contacts.js?v=6.62"></script>
+<script src="js/app.js?v=6.62"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.61"></script>
-<script src="js/search.js?v=6.61"></script>
-<script src="js/embeddings.js?v=6.61"></script>
-<script src="js/calendar.js?v=6.61"></script>
-<script src="js/templateLibrary.js?v=6.61"></script>
-<script src="js/prompts.js?v=6.61"></script>
-<script src="js/projects.js?v=6.61"></script>
-<script src="js/import.js?v=6.61"></script>
-<script src="js/scan.js?v=6.61"></script>
+<script src="js/features.js?v=6.62"></script>
+<script src="js/search.js?v=6.62"></script>
+<script src="js/embeddings.js?v=6.62"></script>
+<script src="js/calendar.js?v=6.62"></script>
+<script src="js/templateLibrary.js?v=6.62"></script>
+<script src="js/prompts.js?v=6.62"></script>
+<script src="js/projects.js?v=6.62"></script>
+<script src="js/import.js?v=6.62"></script>
+<script src="js/scan.js?v=6.62"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
