@@ -2936,6 +2936,26 @@ mark.search-highlight {
   font-family: inherit;
 }
 .rolle-select.empty { color: var(--muted); }
+
+/* v6.61: kompaktes KI-Modell-Dropdown in Chat-/Assistenten-Headern (Analyse-Chat, Gesprächs-Chat, Projekt-Assistent) */
+.ai-mini-select {
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 132px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 3px 6px;
+  font-size: 0.72rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+@media (max-width: 480px) {
+  .ai-mini-select { max-width: 96px; font-size: 0.68rem; padding: 3px 4px; }
+}
+
 .runden-hint {
   font-size: 0.7rem;
   color: var(--muted);

@@ -518,7 +518,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.47';
+  const title = 'Distill Voice – Systemarchitektur v6.61';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -546,7 +546,7 @@ function renderArchView() {
         <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:4px; display:flex;align-items:center;gap:8px">${icon('layers',18)} Systemarchitektur</h2>
         <p style="font-size:0.82rem; color:var(--muted); line-height:1.6; margin:0">
           Alle Komponenten laufen vollständig im Browser – kein Backend-Server. API-Keys bleiben lokal.
-          <span style="color:var(--accent); font-weight:600">Version 6.60</span> · 27 JS-Module
+          <span style="color:var(--accent); font-weight:600">Version 6.61</span> · 27 JS-Module
         </p>
       </div>
       <button onclick="exportArchPdf()" class="btn btn-ghost" style="font-size:0.8rem;padding:6px 14px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0">
@@ -605,8 +605,8 @@ function renderArchView() {
       ${flowCard('assemblyai.js', 'Transkription', 'AssemblyAI Upload → Polling → Utterances mit Speaker-Labels und Timestamps', '#fbbf24')}
       ${flowCard('claude.js', 'KI-Analyse', 'Privat/Arbeit/Gedanken-Analyse, Kapitel, Themen, Stimmung, Anonymisierung, Token-Tracking · v4.81: renderInsights() ruft _refreshAnalysenSubtabs() am Ende – Subtabs aktualisieren sich nach jeder Analyse · v6.26: max_tokens 32000, Freitext-Ergebnisse eigener Prompts über _parseMarkdown() mit Anker-Links (_jumpToAnchor())', '#a78bfa')}
       ${flowCard('drive.js', 'Cloud Storage', 'Google Drive OAuth, Ordner anlegen, Sessions als JSON speichern/laden/löschen', '#34d399')}
-      ${flowCard('features.js', 'Erweiterte Features', '360°-Analyse, Aufnahme befragen (Chat), Mind Map (D3.js v7, JSON-Format, horizontal LTR, Zoom/Pan, SVG/PDF-Export)', '#f59e0b')}
-      ${flowCard('claude.js (Follow-Up)', 'Folgegespräch', 'Analyse-Kontext aufbauen (_buildFollowUpContext), Folgefragen stellen (askFollowUp), Verlauf in session.claudeFollowUp[] speichern · v5.83: Feldnamen-Fix (entry.text + entry.promptName statt result/name)', '#06b6d4')}
+      ${flowCard('features.js', 'Erweiterte Features', '360°-Analyse, Aufnahme befragen (Chat, sendAskQuestion) · Mind Map (D3.js v7, JSON-Format, horizontal LTR, Zoom/Pan, SVG/PDF-Export) · v6.61: eigenes Claude/Mistral-Dropdown im Gesprächs-Chat, populatePersonaSelects() synct alle 3 Modell-Dropdowns auf den globalen Standard-Anbieter', '#f59e0b')}
+      ${flowCard('claude.js (Follow-Up)', 'Folgegespräch', 'Analyse-Kontext aufbauen (_buildFollowUpContext), Folgefragen stellen (askFollowUp), Verlauf in session.claudeFollowUp[] speichern · v5.83: Feldnamen-Fix (entry.text + entry.promptName statt result/name) · v6.61: eigenes Claude/Mistral-Dropdown im Panel-Header (_aiProviderOverride pro Call)', '#06b6d4')}
       ${flowCard('ui.js (Navigation)', 'Sidenav', 'openUploadPanel/closeUploadPanel, toggleSidenav/closeSidenav, setSidenavActive – neue linke Navigation ersetzt 340px Upload-Sidebar', '#8b5cf6')}
       ${flowCard('claude.js (Präsentation)', 'Präsentation erstellen', 'generatePresentation(), _renderPresentationPreview(), exportPresentationPptx() via PptxGenJS. 3 Prompt-Typen wählbar. session.claudePresentation[] speichert Ergebnis', '#f43f5e')}
       ${flowCard('prompts.js', 'Prompt-Bibliothek', 'System/Standard/Feature-Prompts, editierbare Overrides in localStorage, eigene Prompts · v6.26: duplicatePromptById() – eigene Prompts duplizieren · v6.27: Icon-Feld nutzt volles Lucide-Set via iconLucide() · v6.29: Vorlagen-Datenbank-Tab (_renderTemplateLibrary), useTemplateAsPrompt() befüllt KI-Generator · v6.30: deutsche Kategorien, Kategorie-Picker vor Prompt-Erstellung, Vorlagen bearbeiten/löschen (_effectiveTemplates)', '#a78bfa')}
@@ -623,7 +623,7 @@ function renderArchView() {
       ${flowCard('import.js', 'Datei-Import', 'parseSamsungTranscript() (UTF-16 BOM), parsePlainText(), extractPdfText() (PDF.js). Multi-File: _importParsedDataList[], handleImportFileSelect() iteriert alle Dateien, startSamsungImport() erstellt eine Session pro Datei. Transkript-Editor: toggleTranscriptEdit(), saveTranscriptEdits() in claude.js', '#34d399')}
       ${flowCard('scan.js', 'Scan-Import', 'Standard-Engine: PaddleOCR (Tiny, lokal, models/paddleocr/, kein API-Key). Alternative: Claude Vision (auch Handschrift). Fotos + PDFs werden automatisch erkannt – PDF.js → _pdfToImageFiles() (Scale 2.0, JPEG). _reflowOcrText() fügt buchzeilenweisen Text zu Fließtext zusammen. Doppelseiten-Split (_splitImageHalves), manuelles Umsortieren. source=scan_import, pageCount statt duration, kein AssemblyAI.', '#2dd4bf')}
       ${flowCard('notes.js', 'Notizen', 'Persönliche Notizen pro Sitzung, Auto-Save', '#94a3b8')}
-      ${flowCard('projects.js', 'Projektarbeit', 'Projekt-Browser (Kacheln, Anlegen/Bearbeiten/Archivieren), Detailansicht, Dashboard mit Statistiken, Aufgaben-Tracking (checklistItem), Projekt-Analyse via Claude (builtin_project_analysis) · BUILTIN_PROJECT_ID = Allgemeines Projekt · _buildProjectAnalysisContext(projectId, question): v5.87: smarte Session-Erkennung (Sitzungsname in Frage → nur diese laden, kein Limit), Fallback: MAX_CHARS=100.000, pro-Sitzung-Budget, neueste zuerst', '#f59e0b')}
+      ${flowCard('projects.js', 'Projektarbeit', 'Projekt-Browser (Kacheln, Anlegen/Bearbeiten/Archivieren), Detailansicht, Dashboard mit Statistiken, Aufgaben-Tracking (checklistItem), Projekt-Analyse via Claude (builtin_project_analysis) · BUILTIN_PROJECT_ID = Allgemeines Projekt · _buildProjectAnalysisContext(projectId, question): v5.87: smarte Session-Erkennung (Sitzungsname in Frage → nur diese laden, kein Limit), Fallback: MAX_CHARS=100.000, pro-Sitzung-Budget, neueste zuerst · v6.61: eigenes Claude/Mistral-Dropdown im Projekt-Assistent-Header', '#f59e0b')}
       ${flowCard('app.js', 'Initialisierung', 'async init() → await initStorage() → IndexedDB laden vor UI-Start · Theme-Toggle · Upload-Schrittvalidierung · Drag & Drop', '#c084fc')}
       ${flowCard('auth.js', 'Google Auth', 'Progressive Auth: App startet ohne Login · GIS-Client initialisieren (initGoogleAuth) · Stille Token-Anfrage beim Laden · Werbeblocker-Fallback nach 15s', '#34d399')}
       ${flowCard('icons.js', 'Icon-Helfer', 'Inline Lucide SVG via icon(name, size, style) · Kein CDN-Aufruf zur Laufzeit · Icons als SVG-Strings direkt ins DOM injiziert', '#94a3b8')}

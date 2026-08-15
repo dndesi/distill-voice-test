@@ -154,6 +154,12 @@ async function sendAskQuestion() {
   askHistory.push({ role: 'user', text: question });
   renderAskHistory();
 
+  // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
+  const _askProv = document.getElementById('askProviderSelect')?.value || 'claude';
+  _aiProviderOverride = _askProv === 'mistral'
+    ? { provider: 'mistral', model: mistralModel }
+    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+
   try {
     const { forward, reverse } = buildAnonMap(s);
     const transcript = buildTranscriptText(s);
@@ -180,6 +186,7 @@ async function sendAskQuestion() {
   } catch(e) {
     askHistory.push({ role: 'error', text: e.message });
   } finally {
+    _aiProviderOverride = null; // v6.61
     renderAskHistory();
     input.disabled = false;
     if (sendBtn) sendBtn.disabled = false;
@@ -739,6 +746,12 @@ function populatePersonaSelects() {
 
   // v5.94: Gespeicherte Rollen wiederherstellen
   _restoreRollenAuswahl();
+
+  // v6.61: KI-Modell-Auswahl (Analyse-Chat, Gesprächs-Chat, Projekt-Assistent) auf globalen Standard-Anbieter setzen
+  ['followUpProviderSelect', 'askProviderSelect', 'projAssistProviderSelect'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (typeof aiProvider !== 'undefined' ? aiProvider : 'claude');
+  });
 }
 
 // v5.94: Rollen-Auswahl in localStorage speichern

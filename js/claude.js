@@ -2624,6 +2624,11 @@ async function askFollowUp() {
     .replace(/\{\{transcript\}\}/g, '')
     .replace(/\{\{question\}\}/g, _historyPrefix + cleanQuestion);
 
+  // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
+  const _fuProv = document.getElementById('followUpProviderSelect')?.value || 'claude';
+  _aiProviderOverride = _fuProv === 'mistral'
+    ? { provider: 'mistral', model: mistralModel }
+    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
   try {
     const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward), systemPrompt);
     addTokensToSession(session, inputTokens, outputTokens);
@@ -2641,6 +2646,7 @@ async function askFollowUp() {
   } catch (e) {
     showToast('Fehler: ' + (e.message || 'Unbekannt'), 'error');
   } finally {
+    _aiProviderOverride = null;
     btn.disabled = false;
     btn.innerHTML = icon('send', 13, 'margin-right:5px') + ' Senden';
   }

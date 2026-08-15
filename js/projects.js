@@ -1273,6 +1273,12 @@ async function sendProjectChatMessage() {
     .replace(/\{\{chatHistory\}\}/g, chatHistory)
     .replace(/\{\{question\}\}/g, cleanQuestion);
 
+  // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
+  const _projProv = document.getElementById('projAssistProviderSelect')?.value || 'claude';
+  _aiProviderOverride = _projProv === 'mistral'
+    ? { provider: 'mistral', model: mistralModel }
+    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+
   try {
     const { text, inputTokens, outputTokens } = await callClaudeAPI(prompt, systemPrompt);
 
@@ -1296,6 +1302,7 @@ async function sendProjectChatMessage() {
     showToast('Fehler: ' + (e.message || 'Unbekannt'), 'error');
     if (input) input.disabled = false;
   } finally {
+    _aiProviderOverride = null; // v6.61
     if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Senden'; }
   }
 }
