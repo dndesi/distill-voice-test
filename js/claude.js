@@ -74,9 +74,13 @@ function _restoreAnalyseRollenById(sessionId) {
 }
 
 async function callClaudeAPI(prompt, systemPrompt = null) {
+  // v6.58: Provider-Layer – ohne explizite Auswahl (Analysen-Tab-Dropdown) unverändert Claude
+  const { provider, model } = _effectiveProvider();
+  _lastAiCallMeta = { provider, model };
+  if (provider === 'mistral') return callMistralAPI(prompt, systemPrompt, model);
   if (!anthropicKey) throw new Error('Kein Anthropic API-Key gesetzt. Bitte unter 🔑 API-Keys eintragen.');
   const body = {
-    model: 'claude-sonnet-4-6',
+    model,
     max_tokens: 32000, // v6.26: von 8192 erhöht – lange Analysen (viele Themen) wurden abgeschnitten
     messages: [{ role: 'user', content: prompt }]
   };
@@ -158,9 +162,11 @@ function addTokensToSession(session, inputTokens, outputTokens) {
   // Neues Format: Log-Array (ein Eintrag pro API-Call)
   if (!session.claudeCostLog) session.claudeCostLog = [];
   session.claudeCostLog.push({
-    date:   new Date().toISOString(),
-    input:  inputTokens,
-    output: outputTokens,
+    date:     new Date().toISOString(),
+    input:    inputTokens,
+    output:   outputTokens,
+    provider: _lastAiCallMeta.provider, // v6.58: welcher Anbieter für diesen Call
+    model:    _lastAiCallMeta.model,    // v6.58
   });
   // Legacy-Felder beibehalten (Abwärtskompatibilität mit bestehenden Sitzungen)
   if (!session.claudeTokens) session.claudeTokens = { input: 0, output: 0 };
@@ -286,6 +292,9 @@ function updateAnalyseStartBtn() {
 function updateAnalyseDropdown() {
   const s = document.getElementById('analyseTypeSelect');
   if (!s) return;
+  // v6.58: Modell-Dropdown auf globalen Default vorbelegen
+  const provSel = document.getElementById('analyseProviderSelect');
+  if (provSel) provSel.value = aiProvider;
   // Beide Analyse-Optionen immer sichtbar – unabhängig vom Gesprächstyp
   const optPrivate = document.getElementById('analyseOptPrivate');
   const optWork    = document.getElementById('analyseOptWork');
@@ -316,7 +325,17 @@ function updateAnalyseDropdown() {
 async function startSelectedAnalysis() {
   const type = document.getElementById('analyseTypeSelect')?.value;
   if (!type) return;
-  await runSingleAnalysis(type);
+  // v6.58: Modell-Auswahl aus dem Analysen-Tab für diesen Lauf aktivieren
+  const provSel = document.getElementById('analyseProviderSelect');
+  const prov = provSel?.value || 'claude';
+  _aiProviderOverride = prov === 'mistral'
+    ? { provider: 'mistral', model: mistralModel }
+    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+  try {
+    await runSingleAnalysis(type);
+  } finally {
+    _aiProviderOverride = null;
+  }
 }
 
 async function runSingleAnalysis(type) {
@@ -333,7 +352,10 @@ async function runSingleAnalysis(type) {
     showToast('Bitte erst die Sprecher benennen.', 'warning');
     return;
   }
-  if (!anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'warning'); return; }
+  // v6.58: Key-Check providerbewusst (Mistral-Lauf braucht keinen Anthropic-Key)
+  const { provider: _gateProvider } = _effectiveProvider();
+  if (_gateProvider === 'mistral' && !mistralKey)  { showToast('Kein Mistral API-Key gesetzt.', 'warning'); return; }
+  if (_gateProvider === 'claude'  && !anthropicKey) { showToast('Kein Anthropic API-Key gesetzt.', 'warning'); return; }
   if (!s.utterances?.length) { showToast('Keine Sprecherabschnitte vorhanden.', 'warning'); return; }
 
   // Analyse-Modal im Lade-Zustand öffnen

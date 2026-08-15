@@ -30,6 +30,20 @@ const PRICING = {
     updatedAt: '2026-06-03',
     source: 'https://platform.claude.com/docs/en/about-claude/models/all-models',
   },
+  // v6.58: Mistral-Preise sind nativ in EUR (0,50 €/1,50 € pro 1M Token, verifiziert 15.08.2026).
+  // Intern als USD-Äquivalent (Kurs 0,922) gespeichert, damit calcLogEntryCost()/calculateSessionCost()
+  // unverändert weiterrechnen (die multiplizieren am Ende mit dem USD→EUR-Tageskurs). Echter
+  // EUR-Originalpreis steht in originalEur für die Kosten-UI (v6.59).
+  mistral: {
+    name: 'Mistral Large 3',
+    model: 'mistral-large-latest',
+    inputPerMToken: 0.5423,
+    outputPerMToken: 1.6269,
+    currency: 'USD',
+    originalEur: { input: 0.50, output: 1.50 },
+    updatedAt: '2026-08-15',
+    source: 'https://mistral.ai/pricing',
+  },
 };
 
 function calculateSessionCost(session) {
@@ -41,11 +55,10 @@ function calculateSessionCost(session) {
     const mins = session.duration / 60;
     assemblyai = mins * (PRICING.assemblyai.perMinute + PRICING.assemblyai.diarizationPerMin);
   }
-  // Claude: aus Cost-Log summieren (neues Format); Fallback auf claudeTokens (altes Format)
+  // Claude/Mistral: aus Cost-Log summieren (neues Format, v6.58 providerbewusst); Fallback auf claudeTokens (altes Format)
   if (session.claudeCostLog && session.claudeCostLog.length > 0) {
     session.claudeCostLog.forEach(entry => {
-      claude += (entry.input  / 1e6) * PRICING.claude.inputPerMToken
-              + (entry.output / 1e6) * PRICING.claude.outputPerMToken;
+      claude += calcLogEntryCost(entry);
     });
   } else {
     const inp = session.claudeTokens?.input  || 0;
@@ -56,10 +69,11 @@ function calculateSessionCost(session) {
   return { assemblyai, claude, total: assemblyai + claude };
 }
 
-// Claude-Kosten eines einzelnen Log-Eintrags berechnen
+// Kosten eines einzelnen Log-Eintrags berechnen (v6.58: providerbewusst, Default Claude für alte Einträge ohne provider-Feld)
 function calcLogEntryCost(entry) {
-  return (entry.input  / 1e6) * PRICING.claude.inputPerMToken
-       + (entry.output / 1e6) * PRICING.claude.outputPerMToken;
+  const pricing = entry.provider === 'mistral' ? PRICING.mistral : PRICING.claude;
+  return (entry.input  / 1e6) * pricing.inputPerMToken
+       + (entry.output / 1e6) * pricing.outputPerMToken;
 }
 
 // Fallback-Wechselkurs falls API nicht erreichbar

@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.57** (Stand: 14.08.2026)
+**v6.58** (Stand: 15.08.2026)
+- KI-Anbieter-Wahl: Mistral Large 3 als Alternative zu Claude im Analysen-Tab. Neues js/aiProvider.js als Vermittlungsschicht – callClaudeAPI()/callClaudeAPIVision() bleiben die einzigen Aufrufstellen, callClaudeAPI() routet über `_effectiveProvider()` an Claude oder Mistral. Ohne explizite Auswahl (neuer Modell-Dropdown links neben "Starten" im Analysen-Tab) läuft alles unverändert über Claude – kein globaler Zwangswechsel, andere Features (Semantiksuche, Kalender, Fotoanalyse, Projekt-Assistent) bleiben bewusst Claude-only, bis sie einzeln angebunden werden. API-Modal: neues Feld "Mistral API-Key" + "Standard-KI-Anbieter"-Auswahl (nur Vorauswahl fürs Dropdown). Kosten-Log (`session.claudeCostLog`) bekommt `provider`/`model`-Feld pro Eintrag, `calcLogEntryCost()`/`calculateSessionCost()` rechnen providerbewusst (config.js: neue `PRICING.mistral`, 0,50 €/1,50 € pro 1M Token, intern als USD-Äquivalent gespeichert). Vision bleibt bewusst Claude-only (Scan-Import läuft standardmäßig über lokales PaddleOCR, siehe KI-ANBIETER-LEITFADEN.md Abschnitt 6). Teil 1 von 3 der KI-Anbieter-Neutralität (siehe KI-ANBIETER-LEITFADEN.md) – v6.59 macht die Kosten-Seite providerbewusst, v6.60 verhindert dass eine erneute Analyse mit anderem Modell das vorherige Ergebnis überschreibt.
+
+## v6.57 (Stand: 14.08.2026)
 - Sitzungssuche filtert jetzt auch nach Sprechern: Sofortsuche (search.js: `runInstantSearch()`) durchsucht zusätzlich `speakerA`/`speakerB`/`speakers[]` (C/D) – unabhängig vom `persons`-Feld. Eigenes Treffer-Feld "Sprecher" in den Suchergebnissen.
 - Profilbilder für Personen: Klick auf den Avatar im Personen-Profil (`_avatarHtml()`, persons.js) öffnet `#personPhotoInput` (index.html), Bild wird per Canvas auf 200×200 zugeschnitten (Cover-Crop, JPEG q=0.85) und als rundes Vorschaubild auf Personen-Karte + Profil-Header angezeigt (ohne Foto: Initialen-Kreis). Speicherung in `localStorage.personPhotos` (Schlüssel = Anzeigename, gleiches Muster wie `personRelationships`), per `queueSettingsSave()`/`loadSettingsFromDrive()` mit Drive synchronisiert (`distill_settings.json`, lokal hat beim Merge Priorität). Neue Funktionen: `loadPersonPhotos()`, `savePersonPhoto()`, `getPersonPhoto()`, `removePersonPhoto()`, `triggerPersonPhotoUpload()`, `handlePersonPhotoSelected()`.
 
@@ -124,11 +127,12 @@
 - **KI-Modell:** claude-sonnet-4-6 (Browser-Fetch, direkt)
 - **Speicher:** IndexedDB (Sessions + Projekte via `storage.js`), localStorage (API-Keys, Prompts, Theme)
 
-## JS-Module (26 Dateien)
+## JS-Module (27 Dateien)
 | Datei | Aufgabe |
 |---|---|
 | `app.js` | Initialisierung, Theme, Drag & Drop |
 | `config.js` | Globaler State: API-Keys, Sessions[], Drive-Token, Preise |
+| `aiProvider.js` | KI-Anbieter-Vermittlungsschicht (v6.58): Claude/Mistral-Auswahl, callMistralAPI() |
 | `storage.js` | IndexedDB: initStorage(), saveSessions(), saveProjects(), Auto-Migration |
 | `auth.js` | Google OAuth 2.0 (GIS), progressive Auth, Werbeblocker-Fallback |
 | `claude.js` | KI-Analyse, _buildFollowUpContext(), askFollowUp(), Präsentation, Anonymisierung |
@@ -230,6 +234,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.58 | 15.08.2026 | Feature: Mistral Large 3 als Anbieter-Alternative im Analysen-Tab (js/aiProvider.js, Modell-Dropdown, providerbewusstes Kosten-Log) |
 | v6.47 | 08.08.2026 | Fix: Keine AssemblyAI-Kosten für scan_import – calculateSessionCost() prüft jetzt source |
 | v6.46 | 08.08.2026 | Fix: Scan-Sitzungen zeigen "Dokument · X Seiten" statt Teilnehmer/Dauer, pageCount im Datenmodell |
 | v6.45 | 08.08.2026 | Feature: PDF-Upload im Scan-Import – automatische Seitenkonvertierung via PDF.js |
@@ -298,6 +303,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Externe Dienste
 - **AssemblyAI** – Transkription (EU-Endpunkt, REST API v2)
 - **Claude Sonnet** – `claude-sonnet-4-6` via Browser-Fetch
+- **Mistral Large 3** – `mistral-large-latest` via Browser-Fetch (v6.58, optional, Analysen-Tab)
 - **Google Drive API v3** – Session-Archiv als JSON
 - **Google Calendar API v3** – Termine eintragen
 - **Gmail API v1** – E-Mail-Entwürfe (Base64url)

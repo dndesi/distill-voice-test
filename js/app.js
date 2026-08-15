@@ -456,6 +456,10 @@ function openApiModal() {
   if (ownerEl) ownerEl.value = ownerName;
   document.getElementById('apiKeyInput').value = apiKey;
   document.getElementById('anthropicKeyInput').value = anthropicKey;
+  const mistralEl = document.getElementById('mistralKeyInput');
+  if (mistralEl) mistralEl.value = mistralKey;
+  const providerEl = document.getElementById('aiProviderSelect');
+  if (providerEl) providerEl.value = aiProvider;
   document.getElementById('proxyUrlInput').value = proxyUrl;
   const regionEl = document.getElementById('assemblyRegionSelect');
   if (regionEl) regionEl.value = assemblyRegion;
@@ -483,6 +487,14 @@ function saveApiKey() {
   anthropicKey = antVal;
   if (antVal) localStorage.setItem('anthropic_key', antVal);
   else localStorage.removeItem('anthropic_key');
+  // v6.58: Mistral-Key + Standard-Anbieter
+  const mistralVal = document.getElementById('mistralKeyInput')?.value.trim() || '';
+  mistralKey = mistralVal;
+  if (mistralVal) localStorage.setItem('mistral_key', mistralVal);
+  else localStorage.removeItem('mistral_key');
+  const providerVal = document.getElementById('aiProviderSelect')?.value || 'claude';
+  aiProvider = providerVal;
+  localStorage.setItem('ai_provider', aiProvider);
   const pxVal = document.getElementById('proxyUrlInput').value.trim();
   proxyUrl = pxVal;
   if (pxVal) localStorage.setItem('proxy_url', pxVal);
@@ -504,6 +516,7 @@ async function testApiKeys() {
   const resultEl = document.getElementById('apiTestResult');
   const asmKey = document.getElementById('apiKeyInput').value.trim();
   const antKey = document.getElementById('anthropicKeyInput').value.trim();
+  const mstKey = document.getElementById('mistralKeyInput')?.value.trim() || '';
   resultEl.style.display = 'block';
   resultEl.style.background = 'rgba(107,114,128,0.15)';
   resultEl.style.border = '1px solid var(--border)';
@@ -555,6 +568,30 @@ async function testApiKeys() {
     } catch (e) { entries.push({ status:'error', text:'Anthropic: Netzwerkfehler — ' + e.message }); }
   } else {
     entries.push({ status:'none', text:'Anthropic: Kein Key eingegeben' });
+  }
+
+  // Mistral testen (v6.58)
+  if (mstKey) {
+    try {
+      const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${mstKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: mistralModel || 'mistral-large-latest',
+          max_tokens: 10,
+          messages: [{ role: 'user', content: 'Antworte nur: ok' }]
+        })
+      });
+      entries.push(res.ok
+        ? { status:'ok',    text:'Mistral: Verbunden' }
+        : res.status === 401 ? { status:'error', text:'Mistral: Key ungültig (401)' }
+        : { status:'warn', text:`Mistral: HTTP ${res.status}` });
+    } catch (e) { entries.push({ status:'error', text:'Mistral: Netzwerkfehler — ' + e.message }); }
+  } else {
+    entries.push({ status:'none', text:'Mistral: Kein Key eingegeben' });
   }
 
   const allOk    = entries.every(e => e.status === 'ok');

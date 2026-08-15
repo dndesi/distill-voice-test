@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#6c63ff" />
-  <link rel="stylesheet" href="css/styles.css?v=6.57" />
+  <link rel="stylesheet" href="css/styles.css?v=6.58" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.57</button>
+        onmouseout="this.style.color='var(--muted)'">v6.58</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -1489,6 +1489,10 @@
                 </optgroup>
                 <optgroup label="Eigene Prompts" id="customPromptsOptgroup" style="display:none"></optgroup>
               </select>
+              <select id="analyseProviderSelect" class="sdh-analyse-select" title="KI-Anbieter für diesen Lauf" style="max-width:170px">
+                <option value="claude">✦ Claude Sonnet 4.6</option>
+                <option value="mistral">✦ Mistral Large 3</option>
+              </select>
               <button class="btn btn-primary" onclick="startSelectedAnalysis()" id="analyseDropdownStartBtn"
                 disabled style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;font-size:0.85rem">
                 <i data-lucide="play" style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none"></i> Starten
@@ -1874,6 +1878,20 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.58 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.58</span><span class="cl-date">15.08.2026</span></div>
+        <div class="cl-title">KI-Anbieter-Wahl: Mistral Large 3 als Alternative zu Claude im Analysen-Tab</div>
+        <ul class="cl-list">
+          <li>Neues js/aiProvider.js: Vermittlungsschicht zwischen den Analyse-Funktionen und dem gewählten KI-Anbieter. callClaudeAPI() bleibt der unveränderte Standardpfad für alle bestehenden Aufrufstellen (Semantiksuche, Kalender, Fotoanalyse, Projekt-Assistent u.a.) – nur der neue Modell-Dropdown im Analysen-Tab kann Mistral gezielt für einen einzelnen Lauf aktivieren, kein globaler Zwangswechsel.</li>
+          <li>Neues Dropdown "✦ Claude Sonnet 4.6 / ✦ Mistral Large 3" links neben dem "Starten"-Button im Analysen-Tab, Vorauswahl aus dem neuen Standard-KI-Anbieter-Setting (API-Modal).</li>
+          <li>API-Modal: neues Feld "Mistral API-Key" (console.mistral.ai) + Auswahl "Standard-KI-Anbieter".</li>
+          <li>Kosten-Log (session.claudeCostLog) bekommt ein provider- und model-Feld pro Eintrag. calcLogEntryCost()/calculateSessionCost() rechnen jetzt providerbewusst (config.js: neue PRICING.mistral – 0,50 €/1,50 € pro 1M Token).</li>
+          <li>Vision (callClaudeAPIVision, Foto-/Scan-Analyse) bleibt bewusst Claude-only – Scan-Import läuft standardmäßig über lokales PaddleOCR, Mistral-Vision ist laut Leitfaden kein dringender Fall.</li>
+        </ul>
+        <div class="cl-tech">js/aiProvider.js (neu): aiProvider/mistralKey/mistralModel State, callMistralAPI(), _mistralFetchWithRetry() (429-Retry). js/claude.js: callClaudeAPI() routet über _effectiveProvider(), addTokensToSession() schreibt provider/model ins Log, startSelectedAnalysis() setzt/löscht _aiProviderOverride, runSingleAnalysis() prüft providerbewusst auf vorhandenen Key. js/config.js: PRICING.mistral, calcLogEntryCost() providerbewusst. index.html: analyseProviderSelect, mistralKeyInput, aiProviderSelect. js/app.js: openApiModal()/saveApiKey()/testApiKeys() um Mistral erweitert.</div>
+      </div>
 
       <!-- ── v6.57 ── -->
       <div class="cl-entry">
@@ -5299,6 +5317,18 @@
       <p style="font-size:0.78rem; color:var(--muted); margin-bottom:6px">Für Stimmung, Kapitel &amp; Themen — <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com → API Keys</a></p>
       <input type="password" id="anthropicKeyInput" placeholder="sk-ant-…" style="font-family: monospace;" />
     </div>
+    <div class="field" style="margin-top:14px">
+      <label>Mistral API-Key <span style="font-weight:400; font-size:0.72rem; color:var(--muted)">(optional – Alternative zu Claude im Analysen-Tab)</span></label>
+      <p style="font-size:0.78rem; color:var(--muted); margin-bottom:6px">Für Analysen mit Mistral Large 3 — <a href="https://console.mistral.ai" target="_blank" style="color:var(--accent)">console.mistral.ai → API Keys</a></p>
+      <input type="password" id="mistralKeyInput" placeholder="…" style="font-family: monospace;" />
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>Standard-KI-Anbieter <span style="font-weight:400; font-size:0.72rem; color:var(--muted)">(Vorauswahl im Analysen-Tab, dort pro Lauf änderbar)</span></label>
+      <select id="aiProviderSelect" style="width:100%; padding:8px 10px; border-radius:6px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:0.85rem">
+        <option value="claude">Claude Sonnet 4.6</option>
+        <option value="mistral">Mistral Large 3</option>
+      </select>
+    </div>
     <div class="field" style="margin-top:14px" id="settingsSection">
       <label>Cloudflare Worker Proxy-URL <span style="font-weight:400; font-size:0.75rem; color:var(--muted)">(optional – für AssemblyAI Löschen)</span></label>
       <p style="font-size:0.78rem; color:var(--muted); margin-bottom:6px">
@@ -5685,35 +5715,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.57"></script>
-<script src="js/storage.js?v=6.57"></script>
-<script src="js/config.js?v=6.57"></script>
-<script src="js/auth.js?v=6.57"></script>
-<script src="js/drive.js?v=6.57"></script>
-<script src="js/sessions.js?v=6.57"></script>
-<script src="js/assemblyai.js?v=6.57"></script>
-<script src="js/claude.js?v=6.57"></script>
-<script src="js/ui.js?v=6.57"></script>
-<script src="js/tags.js?v=6.57"></script>
-<script src="js/notes.js?v=6.57"></script>
-<script src="js/photos.js?v=6.57"></script>
-<script src="js/persons.js?v=6.57"></script>
-<script src="js/audio.js?v=6.57"></script>
-<script src="js/recorder.js?v=6.57"></script>
-<script src="js/contacts.js?v=6.57"></script>
-<script src="js/app.js?v=6.57"></script>
+<script src="js/icons.js?v=6.58"></script>
+<script src="js/storage.js?v=6.58"></script>
+<script src="js/config.js?v=6.58"></script>
+<script src="js/aiProvider.js?v=6.58"></script>
+<script src="js/auth.js?v=6.58"></script>
+<script src="js/drive.js?v=6.58"></script>
+<script src="js/sessions.js?v=6.58"></script>
+<script src="js/assemblyai.js?v=6.58"></script>
+<script src="js/claude.js?v=6.58"></script>
+<script src="js/ui.js?v=6.58"></script>
+<script src="js/tags.js?v=6.58"></script>
+<script src="js/notes.js?v=6.58"></script>
+<script src="js/photos.js?v=6.58"></script>
+<script src="js/persons.js?v=6.58"></script>
+<script src="js/audio.js?v=6.58"></script>
+<script src="js/recorder.js?v=6.58"></script>
+<script src="js/contacts.js?v=6.58"></script>
+<script src="js/app.js?v=6.58"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.57"></script>
-<script src="js/search.js?v=6.57"></script>
-<script src="js/embeddings.js?v=6.57"></script>
-<script src="js/calendar.js?v=6.57"></script>
-<script src="js/templateLibrary.js?v=6.57"></script>
-<script src="js/prompts.js?v=6.57"></script>
-<script src="js/projects.js?v=6.57"></script>
-<script src="js/import.js?v=6.57"></script>
-<script src="js/scan.js?v=6.57"></script>
+<script src="js/features.js?v=6.58"></script>
+<script src="js/search.js?v=6.58"></script>
+<script src="js/embeddings.js?v=6.58"></script>
+<script src="js/calendar.js?v=6.58"></script>
+<script src="js/templateLibrary.js?v=6.58"></script>
+<script src="js/prompts.js?v=6.58"></script>
+<script src="js/projects.js?v=6.58"></script>
+<script src="js/import.js?v=6.58"></script>
+<script src="js/scan.js?v=6.58"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
