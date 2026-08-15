@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.64** (Stand: 15.08.2026)
+**v6.65** (Stand: 15.08.2026)
+- Fix: PWA-Startadresse zeigte auf das alte Original-Repo (`Transkriptions-Dashboard-Cloud`) statt auf diese Kopie (`distill-voice-test`). `manifest.json` (`start_url`, `share_target.action`), `js/app.js` (Service-Worker-Registrierung) und `sw.js` (`APP_PATH`) hatten den alten Repo-Pfad fest verdrahtet – als App/PWA installiert öffnete sich dadurch tatsächlich das alte Original-Projekt ohne Mistral/Ollama, nicht diese Version. Behoben mit relativen/dynamischen Pfaden statt eines erneut hart codierten Namens: `start_url: "."`, `share_target.action: "share"`, Service-Worker-Registrierung relativ (`sw.js`), `APP_PATH` in `sw.js` zur Laufzeit aus `self.registration.scope` abgeleitet (Funktion `getAppPath()`) – funktioniert damit unabhängig vom tatsächlichen Deploy-Pfad/Repo-Namen, auch bei künftigen Forks/Umzügen.
+
+## v6.64 (Stand: 15.08.2026)
 - Neue Markenfarbe: Orange statt Violett. `--accent`/`--accent2` in `css/styles.css` (Dark: `#ff7a1a`/`#ffb066`, Light: `#e8630a`/`#fb923c`, vorher `#6c63ff`/`#a78bfa` bzw. `#5148d4`/`#7c3aed`). Alle ~60 hartkodierten `rgba(108,99,255,…)`/`rgba(139,92,246,…)`-Transparenzwerte durch `color-mix(in srgb, var(--accent[2]) N%, transparent)` ersetzt statt einer zusätzlichen `--accent-rgb`-Variable – eine Variable weniger, kein Sync-Risiko zwischen zwei Farbwerten. Nebeneffekt (Bugfix): diese Stellen nutzten vorher immer den Dark-Theme-Hex unabhängig vom aktiven Theme, `color-mix()` mit `var(--accent)` passt sich jetzt korrekt an. Gleiches Muster in `help.html`, `news.html`, `index.html`, `js/ui.js`, `js/persons.js`, `js/features.js`, `js/claude.js`, `js/prompts.js`, `js/contacts.js` angewendet. Bewusst **unverändert** gelassen: Farben, die nur zufällig denselben Hex-Wert wie der alte Akzent hatten, aber eine eigene kategoriale Bedeutung tragen – Sprecherfarbe `--speaker-extra` (Dark-Theme, `#a78bfa`), die violette "Schlüsselbegriff"-Markierung in Notizen/Hervorhebungen (`.hl-*-schluessel`, `js/notes.js`), die Sitzungstyp-Farbverläufe in `js/audio.js` (arbeit/privat/wissen/gedanken), die Kategorie-Farben im Systemarchitektur-Diagramm (`js/ui.js`, `archBox`/`flowCard`-Aufrufe) und die 3 Rollenfarben der Experten-Runde (`js/claude.js`, `_renderRoundtableAnswer`).
 - Header-Hintergrund von Magenta (`#a21caf`) auf Schwarz (`#0f1117`) umgestellt – wie zuvor in Dark und Light Mode identisch (`header { }` + `[data-theme="light"] header` in `css/styles.css`).
 - `img/icon-192.png`, `img/icon-512.png`, `img/apple-touch-icon.png` neu erzeugt (Python/Pillow, gleiche Maße, gleiches Mikrofon-Motiv, jetzt Orange statt Violett) – wirkt automatisch auch auf die Social-Preview-Bilder (`og:image`/`twitter:image` in `news.html`), da diese dieselben Dateien referenzieren. `theme-color`-Meta-Tag (`index.html`) und `manifest.json` (`theme_color`) ebenfalls auf `#ff7a1a`.
@@ -254,6 +257,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.65 | 15.08.2026 | Fix: PWA start_url/SW-Pfade zeigten auf altes Original-Repo statt auf diese Kopie – jetzt relativ/dynamisch (getAppPath()) |
 | v6.64 | 15.08.2026 | Neue Markenfarbe Orange statt Violett – --accent/--accent2, color-mix() statt --accent-rgb, Header schwarz, Favicon/Icons neu |
 | v6.63 | 15.08.2026 | Feature: Ollama als dritter KI-Anbieter – lokal, 0€, kein API-Key (callOllamaAPI, _providerLabel) |
 | v6.62 | 15.08.2026 | Feature: Modell-Historie + Pillen-Switcher – erneute Analyse mit anderem Anbieter überschreibt Ergebnis nicht mehr (_archiveAnalysisRun, switchAnalysisRun) |

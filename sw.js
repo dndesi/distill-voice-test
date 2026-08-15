@@ -5,8 +5,12 @@
 //          zur App weiterleiten
 // ═══════════════════════════════════════════════════
 
-const SW_VERSION = 'distill-voice-sw-v5.2';
-const APP_PATH   = '/Transkriptions-Dashboard-Cloud/';
+const SW_VERSION = 'distill-voice-sw-v6.65';
+// v6.64: APP_PATH nicht mehr fest verdrahtet – wird aus dem tatsächlichen Registrierungs-Scope
+// abgeleitet, damit diese Datei unabhängig vom Repo-Namen/Deploy-Pfad korrekt funktioniert.
+function getAppPath() {
+  return new URL(self.registration.scope).pathname;
+}
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
@@ -16,18 +20,19 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   // Nur POST an /share Route abfangen
-  if (event.request.method === 'POST' && url.pathname === APP_PATH + 'share') {
+  if (event.request.method === 'POST' && url.pathname === getAppPath() + 'share') {
     event.respondWith(handleShare(event.request));
   }
 });
 
 async function handleShare(request) {
+  const appPath = getAppPath();
   try {
     const formData = await request.formData();
     const files    = formData.getAll('files');
 
     if (!files || files.length === 0) {
-      return Response.redirect(APP_PATH, 303);
+      return Response.redirect(appPath, 303);
     }
 
     // Dateien als ArrayBuffer vorbereiten
@@ -45,11 +50,11 @@ async function handleShare(request) {
     await storePendingShares(pending);
 
     // Zur App weiterleiten mit Flag
-    return Response.redirect(APP_PATH + '?shared=1', 303);
+    return Response.redirect(appPath + '?shared=1', 303);
 
   } catch (e) {
     console.error('[SW] Share-Fehler:', e);
-    return Response.redirect(APP_PATH, 303);
+    return Response.redirect(appPath, 303);
   }
 }
 

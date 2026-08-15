@@ -33,8 +33,10 @@ async function init() {
   if (typeof initFeatures === 'function') initFeatures();
 
   // Service Worker registrieren (v5.2 – Web Share Target)
+  // v6.64: relativer Pfad statt fest verdrahtetem Repo-Namen – funktioniert unabhängig davon,
+  // unter welchem Pfad/Repo diese Kopie tatsächlich gehostet wird
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/Transkriptions-Dashboard-Cloud/sw.js')
+    navigator.serviceWorker.register('sw.js')
       .catch(e => console.warn('[SW] Registrierung fehlgeschlagen:', e));
   }
 

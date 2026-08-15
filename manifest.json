@@ -2,7 +2,7 @@
   "name": "Distill Voice",
   "short_name": "Distill Voice",
   "description": "Transkription & KI-Zusammenfassungen",
-  "start_url": "/Transkriptions-Dashboard-Cloud/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0f1117",
   "theme_color": "#ff7a1a",
@@ -11,7 +11,7 @@
     { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "share_target": {
-    "action": "/Transkriptions-Dashboard-Cloud/share",
+    "action": "share",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
