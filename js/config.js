@@ -44,6 +44,15 @@ const PRICING = {
     updatedAt: '2026-08-15',
     source: 'https://mistral.ai/pricing',
   },
+  ollama: { // v6.63: lokal, kein API-Preis
+    name: 'Ollama (lokal)',
+    model: 'llama3.1:latest',
+    inputPerMToken: 0,
+    outputPerMToken: 0,
+    currency: 'USD',
+    updatedAt: '2026-08-15',
+    source: 'lokal – kein API-Preis',
+  },
 };
 
 function calculateSessionCost(session) {
@@ -71,7 +80,10 @@ function calculateSessionCost(session) {
 
 // Kosten eines einzelnen Log-Eintrags berechnen (v6.58: providerbewusst, Default Claude für alte Einträge ohne provider-Feld)
 function calcLogEntryCost(entry) {
-  const pricing = entry.provider === 'mistral' ? PRICING.mistral : PRICING.claude;
+  // v6.63: 3-Wege statt Ternary – Ollama ist lokal (0 Kosten)
+  const pricing = entry.provider === 'mistral' ? PRICING.mistral
+                 : entry.provider === 'ollama'  ? PRICING.ollama
+                 : PRICING.claude;
   return (entry.input  / 1e6) * pricing.inputPerMToken
        + (entry.output / 1e6) * pricing.outputPerMToken;
 }

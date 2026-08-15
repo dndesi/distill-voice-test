@@ -159,9 +159,7 @@ async function sendAskQuestion() {
 
   // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
   const _askProv = document.getElementById('askProviderSelect')?.value || 'claude';
-  _aiProviderOverride = _askProv === 'mistral'
-    ? { provider: 'mistral', model: mistralModel }
-    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+  _aiProviderOverride = _providerOverrideFromValue(_askProv); // v6.63
 
   try {
     const { forward, reverse } = buildAnonMap(s);

@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.62** (Stand: 15.08.2026)
+**v6.63** (Stand: 15.08.2026)
+- Ollama als dritter KI-Anbieter neben Claude und Mistral: lokal (Standard-Endpunkt `http://localhost:11434`), kein API-Key, keine Kosten. Neuer Adapter `callOllamaAPI()` (aiProvider.js) nach demselben Muster wie `callMistralAPI()` – spricht Ollamas `/api/chat`-Endpunkt (kein Auth-Header, kein Retry nötig da lokal/kein Rate-Limit), liest Token-Zahlen aus `prompt_eval_count`/`eval_count`. `_effectiveProvider()`/`_hasActiveAiKey()` um den dritten Zweig erweitert (Ollama braucht nie einen Key). Neue gemeinsame Helfer `_providerLabel(provider)` und `_providerOverrideFromValue(value)` (aiProvider.js) ersetzen ~5 bzw. 4 bisher verstreute Claude/Mistral-Ternaries in claude.js/features.js/projects.js – Ollama musste dadurch nur an einer Stelle (dem Helfer selbst) ergänzt werden statt an jeder einzelnen. Dritte Option in allen bestehenden Provider-Dropdowns (Standard-KI-Anbieter, Analysen-Tab, Analyse-Chat, Gesprächs-Chat, Projekt-Assistent) sowie neue Endpunkt-/Modell-Felder + Erreichbarkeits-Test im API-Modal. `PRICING.ollama` mit 0€, Kosten-Seite zeigt Ollama-Card + farbige Chips (dabei einen Bug behoben: `_providerChips()` filterte bisher auf `eur > 0`, wodurch ein 0€-Ollama-Lauf nie als genutztes Modell sichtbar geworden wäre). Wichtig für den Eigenbetrieb: Ollama muss mit `OLLAMA_ORIGINS` gestartet werden, sonst blockt der Browser die Anfrage per CORS. Qualitäts-Hinweis: lokale Modelle sind bei Deutsch/strikten JSON-Analysen tendenziell unzuverlässiger als Claude/Mistral – bewusst kostenlose Zusatzoption, kein Ersatz. Vision bleibt weiterhin bewusst außen vor.
+
+## v6.62 (Stand: 15.08.2026)
 - Modell-Historie + Pillen-Switcher: Läuft eine der 6 eingebauten Analysen (Gesprächs-/Arbeits-Analyse, Stimmung, Kapitel, Themen, 360°) oder ein eigener Prompt (`customResults`) erneut mit einem anderen KI-Anbieter, wird der bisherige Stand nicht mehr überschrieben, sondern archiviert. Kleine Pillen ("Claude"/"Mistral") direkt im jeweiligen Analyse-Block erlauben das Umschalten zwischen den archivierten Ständen – der jeweils aktive Stand bleibt wie gewohnt über den bestehenden Inline-Edit-Code editierbar. Datenmodell pro Analysetyp: unverändertes aktives Feld (z.B. `session.privateAnalysis`) + neues `*Meta`-Feld (Provider/Modell/Zeitstempel des aktiven Standes) + neues `*Runs`-Array (archivierte Stände). Bewusst **kein** Referenz-Trick zwischen aktivem Feld und Archiv-Eintrag – das hätte bei jedem Neuladen aus IndexedDB/Drive (JSON dupliziert Objekte beim Serialisieren) die Kopplung stillschweigend gebrochen. Stattdessen ein expliziter Swap beim Pillen-Klick (`switchAnalysisRun()`/`switchCustomResultRun()`, sessions.js), verifiziert per Node-Testskript inkl. des Falls "Bearbeitung nach Wechsel darf den archivierten Stand nicht verändern". Gemeinsamer Helfer `_archiveAnalysisRun()` (claude.js) archiviert an allen 6 Schreibstellen + `customResults` (prompts.js, verschachtelt pro Prompt-ID). Bestehender Edit-Code (`editAnalysisItem` u.a.) bleibt komplett unangetastet.
 
 ## v6.61 (Stand: 15.08.2026)
@@ -246,6 +249,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.63 | 15.08.2026 | Feature: Ollama als dritter KI-Anbieter – lokal, 0€, kein API-Key (callOllamaAPI, _providerLabel) |
 | v6.62 | 15.08.2026 | Feature: Modell-Historie + Pillen-Switcher – erneute Analyse mit anderem Anbieter überschreibt Ergebnis nicht mehr (_archiveAnalysisRun, switchAnalysisRun) |
 | v6.61 | 15.08.2026 | Feature: Eigenes Claude/Mistral-Dropdown in Analyse-Chat, Gesprächs-Chat, Projekt-Assistent (.ai-mini-select, _aiProviderOverride) |
 | v6.60 | 15.08.2026 | Feature: Standard-KI-Anbieter gilt global – ~15 Key-Gates providerbewusst, Vision + Claude-Design-Export bewusst ausgenommen |
@@ -320,6 +324,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 - **AssemblyAI** – Transkription (EU-Endpunkt, REST API v2)
 - **Claude Sonnet** – `claude-sonnet-4-6` via Browser-Fetch
 - **Mistral Large 3** – `mistral-large-latest` via Browser-Fetch (v6.58, optional, Analysen-Tab)
+- **Ollama** – lokales Modell (Standard `llama3.1:latest`), `http://localhost:11434` via Browser-Fetch (v6.63, optional, kein API-Key, 0€) – kein externer Dienst, läuft auf dem eigenen Rechner
 - **Google Drive API v3** – Session-Archiv als JSON
 - **Google Calendar API v3** – Termine eintragen
 - **Gmail API v1** – E-Mail-Entwürfe (Base64url)

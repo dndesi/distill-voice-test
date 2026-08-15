@@ -518,7 +518,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.62';
+  const title = 'Distill Voice – Systemarchitektur v6.63';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -546,7 +546,7 @@ function renderArchView() {
         <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:4px; display:flex;align-items:center;gap:8px">${icon('layers',18)} Systemarchitektur</h2>
         <p style="font-size:0.82rem; color:var(--muted); line-height:1.6; margin:0">
           Alle Komponenten laufen vollständig im Browser – kein Backend-Server. API-Keys bleiben lokal.
-          <span style="color:var(--accent); font-weight:600">Version 6.62</span> · 27 JS-Module
+          <span style="color:var(--accent); font-weight:600">Version 6.63</span> · 27 JS-Module
         </p>
       </div>
       <button onclick="exportArchPdf()" class="btn btn-ghost" style="font-size:0.8rem;padding:6px 14px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0">
@@ -562,10 +562,13 @@ function renderArchView() {
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px">
         ${archBox(icon('mic',18,'color:#fbbf24'), 'AssemblyAI', 'Transkription + Speaker Diarization', '#fbbf24', 'REST API v2 (EU)')}
         ${archBox(icon('cpu',18,'color:#a78bfa'), 'Claude Sonnet', 'KI-Analyse · 360° · Mind Map · Chat', '#a78bfa', 'claude-sonnet-4-6')}
-        ${archBox(icon('sparkles',18,'color:#fb923c'), 'Mistral Large 3', 'Alternative im Analysen-Tab (v6.58)', '#fb923c', 'mistral-large-latest')}
+        ${archBox(icon('sparkles',18,'color:#fb923c'), 'Mistral Large 3', 'Alternative zu Claude (v6.58)', '#fb923c', 'mistral-large-latest')}
         ${archBox(icon('cloud',18,'color:#34d399'), 'Google Drive', 'Sitzungs-Archiv als JSON-Dateien', '#34d399', 'Drive API v3')}
         ${archBox(icon('calendar',18,'color:#60a5fa'), 'Google Calendar', 'Termine direkt eingetragen', '#60a5fa', 'Calendar API v3')}
         ${archBox(icon('mail',18,'color:#f472b6'), 'Gmail', 'E-Mail-Entwürfe gespeichert', '#f472b6', 'Gmail API v1')}
+      </div>
+      <div style="text-align:center; font-size:0.72rem; color:var(--muted); margin-bottom:16px">
+        + optional lokal (kein externer Dienst, v6.63): <span style="color:#22c55e; font-weight:600">Ollama</span> – läuft auf deinem eigenen Rechner, kein API-Key
       </div>
 
       <!-- Pfeile -->
@@ -635,7 +638,7 @@ function renderArchView() {
     <div style="margin-bottom:14px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted)">Wichtige Datenflüsse</div>
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; margin-bottom:24px">
       ${flowCard('Mic / Datei → AssemblyAI', 'Transkription', 'Audio → Upload → Polling → Utterances mit Speaker-Labels (A/B/C…)', '#fbbf24')}
-      ${flowCard('Browser → Claude/Mistral', 'KI-Analyse', 'Transkript (opt. anonymisiert) → aiProvider.js wählt Anbieter → Analyse: Gesprächs/Arbeit/Gedanken, 360°, Kapitel, Mindmap', '#a78bfa')}
+      ${flowCard('Browser → Claude/Mistral/Ollama', 'KI-Analyse', 'Transkript (opt. anonymisiert) → aiProvider.js wählt Anbieter (v6.63: auch lokales Ollama) → Analyse: Gesprächs/Arbeit/Gedanken, 360°, Kapitel, Mindmap', '#a78bfa')}
       ${flowCard('Browser → Google Drive', 'Cloud-Speicherung', 'Sitzung als JSON + Audio-Datei → Drive-Ordner → geladen beim nächsten Login', '#34d399')}
       ${flowCard('Browser → Google Calendar', 'Termine eintragen', 'Gewählte KI erkennt Termine im Transkript → RFC3339 Event → Calendar API v3 (POST)', '#60a5fa')}
       ${flowCard('Browser → Gmail', 'Entwürfe erstellen', 'Gewählte KI generiert E-Mails → Base64url → Gmail Drafts API → User sendet selbst ab', '#f472b6')}

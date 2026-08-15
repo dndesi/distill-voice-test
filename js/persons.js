@@ -737,9 +737,11 @@ function renderCostsView() {
       ${Object.keys(totalByProvider).sort().map(prov => {
           const p = PRICING[prov];
           if (!p) return '';
-          const priceLine = prov === 'mistral' && p.originalEur
-            ? `${p.originalEur.input.toFixed(2)} €/1M Input · ${p.originalEur.output.toFixed(2)} €/1M Output`
-            : `$${(p.inputPerMToken / 1e6).toFixed(7)}/Token Input · $${(p.outputPerMToken / 1e6).toFixed(7)}/Token Output`;
+          const priceLine = prov === 'ollama'
+            ? 'Lokal – keine API-Kosten'
+            : prov === 'mistral' && p.originalEur
+              ? `${p.originalEur.input.toFixed(2)} €/1M Input · ${p.originalEur.output.toFixed(2)} €/1M Output`
+              : `$${(p.inputPerMToken / 1e6).toFixed(7)}/Token Input · $${(p.outputPerMToken / 1e6).toFixed(7)}/Token Output`;
           return costCard('✦ ' + p.name, p.model, fmtEur(totalByProvider[prov]), priceLine, p.source);
         }).join('')}
       <div style="background:rgba(108,99,255,0.1); border:1px solid rgba(108,99,255,0.3);
@@ -860,9 +862,11 @@ function renderCostsView() {
 const _PROVIDER_CHIP_COLORS = {
   claude:  { bg: '#EEEDFE', fg: '#26215C' },
   mistral: { bg: '#FAEEDA', fg: '#412402' },
+  ollama:  { bg: '#E3F5E9', fg: '#0B4222' }, // v6.63
 };
 function _providerChips(providerEur) {
-  const entries = Object.entries(providerEur || {}).filter(([, eur]) => eur > 0);
+  // v6.63: kein eur>0-Filter mehr – Ollama kostet 0€, soll aber trotzdem als genutztes Modell erscheinen
+  const entries = Object.entries(providerEur || {});
   if (!entries.length) return '<span style="color:var(--muted)">—</span>';
   return entries.map(([prov, eur]) => {
     const c = _PROVIDER_CHIP_COLORS[prov] || { bg: 'var(--surface2)', fg: 'var(--text)' };

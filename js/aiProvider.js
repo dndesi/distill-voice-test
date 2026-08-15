@@ -11,6 +11,8 @@
 let aiProvider   = localStorage.getItem('ai_provider')   || 'claude'; // nur Vorauswahl im Analysen-Tab-Dropdown
 let mistralKey   = localStorage.getItem('mistral_key')   || '';
 let mistralModel = localStorage.getItem('mistral_model') || 'mistral-large-latest';
+let ollamaEndpoint = localStorage.getItem('ollama_endpoint') || 'http://localhost:11434'; // v6.63
+let ollamaModel     = localStorage.getItem('ollama_model')    || 'llama3.1:latest'; // v6.63
 
 // Von startSelectedAnalysis() (claude.js) gesetzt, solange eine Analyse mit
 // explizit gewähltem Anbieter läuft. Ohne Override läuft alles wie bisher
@@ -22,6 +24,7 @@ let _aiProviderOverride = null;
 function _effectiveProvider() {
   if (_aiProviderOverride) return _aiProviderOverride;
   if (aiProvider === 'mistral') return { provider: 'mistral', model: mistralModel };
+  if (aiProvider === 'ollama')  return { provider: 'ollama',  model: ollamaModel }; // v6.63
   return { provider: 'claude', model: 'claude-sonnet-4-6' };
 }
 
@@ -29,11 +32,29 @@ function _effectiveProvider() {
 // geprüft haben – ersetzt "if (!anthropicKey) {...}" durch "if (!_hasActiveAiKey()) {...}".
 function _hasActiveAiKey() {
   const { provider } = _effectiveProvider();
+  if (provider === 'ollama') return true; // v6.63: lokal, kein Key nötig
   return provider === 'mistral' ? !!mistralKey : !!anthropicKey;
 }
 function _missingAiKeyMessage() {
   const { provider } = _effectiveProvider();
   return provider === 'mistral' ? 'Kein Mistral API-Key gesetzt.' : 'Kein Anthropic API-Key gesetzt.';
+}
+
+// v6.63: einheitliches Anzeige-Label für einen Provider-String – ersetzt die bisher an
+// ~5 Stellen verstreuten "provider === 'mistral' ? 'Mistral' : 'Claude'"-Ternaries.
+function _providerLabel(provider) {
+  if (provider === 'mistral') return 'Mistral';
+  if (provider === 'ollama')  return 'Ollama';
+  return 'Claude';
+}
+
+// v6.63: gemeinsamer Helfer – Wert eines Provider-Dropdowns (claude/mistral/ollama) in ein
+// _aiProviderOverride-Objekt übersetzen. Ersetzt die an 4 Stellen (Analysen-Tab, Analyse-Chat,
+// Gesprächs-Chat, Projekt-Assistent) identische Ternary-Kette.
+function _providerOverrideFromValue(value) {
+  if (value === 'mistral') return { provider: 'mistral', model: mistralModel };
+  if (value === 'ollama')  return { provider: 'ollama',  model: ollamaModel };
+  return { provider: 'claude', model: 'claude-sonnet-4-6' };
 }
 
 // Letzter tatsächlich genutzter Anbieter/Modell – von callClaudeAPI() gesetzt,
@@ -92,4 +113,35 @@ async function callMistralAPI(prompt, systemPrompt, model) {
   if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
   messages.push({ role: 'user', content: prompt });
   return _mistralFetchWithRetry({ model, max_tokens: 32000, messages }, 'callMistralAPI');
+}
+
+// v6.63: Lokales Ollama – kein Key, kein Retry nötig (lokaler Server, kein Rate-Limit).
+// Übersetzt Anfrage/Antwort auf dasselbe Format wie callClaudeAPI(): { text, inputTokens, outputTokens }
+async function callOllamaAPI(prompt, systemPrompt, model) {
+  const messages = [];
+  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+  messages.push({ role: 'user', content: prompt });
+
+  let res;
+  try {
+    res = await fetch(`${ollamaEndpoint}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model, messages, stream: false })
+    });
+  } catch (e) {
+    throw new Error(`Ollama nicht erreichbar unter ${ollamaEndpoint}. Läuft "ollama serve"? Falls die Seite nicht von localhost geladen wird, zusätzlich OLLAMA_ORIGINS setzen (CORS).`);
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Ollama HTTP ${res.status}: ${err.error || 'Unbekannter Fehler'}`);
+  }
+  const data = await res.json();
+  const textVal = data?.message?.content;
+  if (!textVal) throw new Error('Ollama hat keine Antwort zurückgegeben (leerer Content). Bitte erneut versuchen.');
+  return {
+    text: textVal.trim(),
+    inputTokens:  data.prompt_eval_count || 0,
+    outputTokens: data.eval_count        || 0,
+  };
 }

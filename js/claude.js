@@ -78,6 +78,7 @@ async function callClaudeAPI(prompt, systemPrompt = null) {
   const { provider, model } = _effectiveProvider();
   _lastAiCallMeta = { provider, model };
   if (provider === 'mistral') return callMistralAPI(prompt, systemPrompt, model);
+  if (provider === 'ollama')  return callOllamaAPI(prompt, systemPrompt, model); // v6.63
   if (!anthropicKey) throw new Error('Kein Anthropic API-Key gesetzt. Bitte unter 🔑 API-Keys eintragen.');
   const body = {
     model,
@@ -328,9 +329,7 @@ async function startSelectedAnalysis() {
   // v6.58: Modell-Auswahl aus dem Analysen-Tab für diesen Lauf aktivieren
   const provSel = document.getElementById('analyseProviderSelect');
   const prov = provSel?.value || 'claude';
-  _aiProviderOverride = prov === 'mistral'
-    ? { provider: 'mistral', model: mistralModel }
-    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+  _aiProviderOverride = _providerOverrideFromValue(prov); // v6.63
   try {
     await runSingleAnalysis(type);
   } finally {
@@ -364,7 +363,7 @@ async function runSingleAnalysis(type) {
   document.getElementById('analyseCancelBtn').disabled = true;
   document.getElementById('analyseModal').classList.add('open');
   const titleEl = document.getElementById('analyseModalTitle'); // v6.58: Titel zeigt tatsächlich genutzten Anbieter
-  if (titleEl) titleEl.textContent = _gateProvider === 'mistral' ? 'Mistral-Analyse' : 'Claude-Analyse';
+  if (titleEl) titleEl.textContent = _providerLabel(_gateProvider) + '-Analyse'; // v6.63
 
   const typeNames = {
     work: 'Arbeits-Analyse', private: 'Gesprächs-Analyse',
@@ -617,7 +616,7 @@ function _renderRunPills(session, key) {
   const meta = session[key + 'Meta'];
   if (!runs?.length || !meta) return '';
   const sid = session.id;
-  const label = m => m.provider === 'mistral' ? 'Mistral' : 'Claude';
+  const label = m => _providerLabel(m.provider); // v6.63
   let html = '<div class="ai-run-pills">';
   html += `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(meta))}</span>`;
   runs.forEach((r, i) => {
@@ -1331,7 +1330,7 @@ function renderInsights(session) {
         const cMeta = session.customResultsMeta?.[pid];
         let pillsHtml = '';
         if (cRuns?.length && cMeta) {
-          const label = m => m.provider === 'mistral' ? 'Mistral' : 'Claude';
+          const label = m => _providerLabel(m.provider); // v6.63
           pillsHtml = '<div class="ai-run-pills">' +
             `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(cMeta))}</span>` +
             cRuns.map((r, i) => `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="event.stopPropagation();switchCustomResultRun('${sid}','${pid}',${i})">${escHtml(label(r))}</span>`).join('') +
@@ -2676,9 +2675,7 @@ async function askFollowUp() {
 
   // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
   const _fuProv = document.getElementById('followUpProviderSelect')?.value || 'claude';
-  _aiProviderOverride = _fuProv === 'mistral'
-    ? { provider: 'mistral', model: mistralModel }
-    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+  _aiProviderOverride = _providerOverrideFromValue(_fuProv); // v6.63
   try {
     const { text, inputTokens, outputTokens } = await callClaudeAPI(anonymizeText(prompt, forward), systemPrompt);
     addTokensToSession(session, inputTokens, outputTokens);

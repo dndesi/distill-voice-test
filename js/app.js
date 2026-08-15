@@ -458,6 +458,11 @@ function openApiModal() {
   document.getElementById('anthropicKeyInput').value = anthropicKey;
   const mistralEl = document.getElementById('mistralKeyInput');
   if (mistralEl) mistralEl.value = mistralKey;
+  // v6.63: Ollama-Endpunkt + -Modell
+  const ollamaEndEl = document.getElementById('ollamaEndpointInput');
+  if (ollamaEndEl) ollamaEndEl.value = ollamaEndpoint;
+  const ollamaModEl = document.getElementById('ollamaModelInput');
+  if (ollamaModEl) ollamaModEl.value = ollamaModel;
   const providerEl = document.getElementById('aiProviderSelect');
   if (providerEl) providerEl.value = aiProvider;
   document.getElementById('proxyUrlInput').value = proxyUrl;
@@ -492,6 +497,13 @@ function saveApiKey() {
   mistralKey = mistralVal;
   if (mistralVal) localStorage.setItem('mistral_key', mistralVal);
   else localStorage.removeItem('mistral_key');
+  // v6.63: Ollama-Endpunkt + -Modell
+  const ollamaEndVal = document.getElementById('ollamaEndpointInput')?.value.trim() || 'http://localhost:11434';
+  ollamaEndpoint = ollamaEndVal;
+  localStorage.setItem('ollama_endpoint', ollamaEndpoint);
+  const ollamaModVal = document.getElementById('ollamaModelInput')?.value.trim() || 'llama3.1:latest';
+  ollamaModel = ollamaModVal;
+  localStorage.setItem('ollama_model', ollamaModel);
   const providerVal = document.getElementById('aiProviderSelect')?.value || 'claude';
   aiProvider = providerVal;
   localStorage.setItem('ai_provider', aiProvider);
@@ -592,6 +604,17 @@ async function testApiKeys() {
     } catch (e) { entries.push({ status:'error', text:'Mistral: Netzwerkfehler — ' + e.message }); }
   } else {
     entries.push({ status:'none', text:'Mistral: Kein Key eingegeben' });
+  }
+
+  // Ollama testen (v6.63) – kein Key nötig, nur Erreichbarkeit
+  const ollamaEndVal = document.getElementById('ollamaEndpointInput')?.value.trim() || 'http://localhost:11434';
+  try {
+    const res = await fetch(`${ollamaEndVal}/api/tags`, { method: 'GET' });
+    entries.push(res.ok
+      ? { status:'ok',   text:'Ollama: Verbunden (' + ollamaEndVal + ')' }
+      : { status:'warn', text:`Ollama: HTTP ${res.status}` });
+  } catch (e) {
+    entries.push({ status:'warn', text:'Ollama: Nicht erreichbar unter ' + ollamaEndVal + ' — läuft "ollama serve"?' });
   }
 
   const allOk    = entries.every(e => e.status === 'ok');

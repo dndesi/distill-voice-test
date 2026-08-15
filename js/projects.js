@@ -1275,9 +1275,7 @@ async function sendProjectChatMessage() {
 
   // v6.61: KI-Modell für diesen Chat (überschreibt den globalen Standard-Anbieter nur für diesen Call)
   const _projProv = document.getElementById('projAssistProviderSelect')?.value || 'claude';
-  _aiProviderOverride = _projProv === 'mistral'
-    ? { provider: 'mistral', model: mistralModel }
-    : { provider: 'claude',  model: 'claude-sonnet-4-6' };
+  _aiProviderOverride = _providerOverrideFromValue(_projProv); // v6.63
 
   try {
     const { text, inputTokens, outputTokens } = await callClaudeAPI(prompt, systemPrompt);
