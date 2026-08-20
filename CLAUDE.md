@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.65** (Stand: 15.08.2026)
+**v6.66** (Stand: 21.08.2026)
+- Feature: Bis zu 4 Sprecher pro Sitzung statt fest 2. AssemblyAI erkennt bei der Diarization (`speaker_labels`) tatsächlich beliebig viele Stimmen (A, B, C, D, …) – bisher wurde alles über Sprecher C hinaus verworfen, nicht umbenennbar. Neue Funktion `_applyExtraSpeaker()` (`js/assemblyai.js`, aufgerufen in `processFile()` und `resumePendingTranscriptions()` direkt nach dem Setzen von `session.utterances`) übernimmt erkannte Sprecher C/D ins bereits bestehende `session.speakers`-Array – dasselbe Datenmodell, das der Samsung-Mehrsprecher-Import schon länger nutzt. Dadurch greift die gesamte vorhandene Infrastruktur automatisch mit: `renderExtraSpeakerFields()` zeigt Umbenennungsfelder inkl. Namensvorschlägen, `getSpeakerName()`/`getSpeakerColor()`/`renameSpeaker()` sind bereits generisch für beliebige Sprecher-IDs geschrieben. `speakerA`/`speakerB` bleiben unangetastet, kein Sonderfall für den normalen 2-Sprecher-Fall (kein `speakers`-Array wird angelegt, wenn nur A/B vorkommen). `checkSpeakersNamed()` (`js/claude.js`) prüft jetzt zusätzlich, ob erkannte Sprecher C/D benannt sind. `toggleUtteranceSpeaker()` (Klick auf den Sprecher-Namen einer Passage, `js/claude.js`) war bisher ein starrer A↔B-Tausch – schaltet jetzt reihum durch das feste Sprecher-Roster der Sitzung (A→B→C→D→A…). Bewusst als festes Roster aus A/B + `session.speakers` und nicht live aus den aktuell in den Utterances vorkommenden Sprechern abgeleitet – sonst würde ein Sprecher aus dem Zyklus verschwinden, sobald sein letzter Abschnitt gerade umgeschaltet wird (per Test verifiziert). `swapAllSpeakers()`/`swapSpeakersFromIndex()` bleiben bewusst unverändert auf A↔B beschränkt – für ein Mehr-Sprecher-„alles tauschen" gibt es keine eindeutige Logik, deckt aber weiterhin den häufigsten Fall ab.
+
+## v6.65 (Stand: 15.08.2026)
 - Fix: PWA-Startadresse zeigte auf das alte Original-Repo (`Transkriptions-Dashboard-Cloud`) statt auf diese Kopie (`distill-voice-test`). `manifest.json` (`start_url`, `share_target.action`), `js/app.js` (Service-Worker-Registrierung) und `sw.js` (`APP_PATH`) hatten den alten Repo-Pfad fest verdrahtet – als App/PWA installiert öffnete sich dadurch tatsächlich das alte Original-Projekt ohne Mistral/Ollama, nicht diese Version. Behoben mit relativen/dynamischen Pfaden statt eines erneut hart codierten Namens: `start_url: "."`, `share_target.action: "share"`, Service-Worker-Registrierung relativ (`sw.js`), `APP_PATH` in `sw.js` zur Laufzeit aus `self.registration.scope` abgeleitet (Funktion `getAppPath()`) – funktioniert damit unabhängig vom tatsächlichen Deploy-Pfad/Repo-Namen, auch bei künftigen Forks/Umzügen.
 
 ## v6.64 (Stand: 15.08.2026)
@@ -257,6 +260,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.66 | 21.08.2026 | Feature: Bis zu 4 Sprecher statt fest 2 – C/D aus AssemblyAI-Diarization ins bestehende speakers-Array (_applyExtraSpeaker), checkSpeakersNamed()/toggleUtteranceSpeaker() erweitert |
 | v6.65 | 15.08.2026 | Fix: PWA start_url/SW-Pfade zeigten auf altes Original-Repo statt auf diese Kopie – jetzt relativ/dynamisch (getAppPath()) |
 | v6.64 | 15.08.2026 | Neue Markenfarbe Orange statt Violett – --accent/--accent2, color-mix() statt --accent-rgb, Header schwarz, Favicon/Icons neu |
 | v6.63 | 15.08.2026 | Feature: Ollama als dritter KI-Anbieter – lokal, 0€, kein API-Key (callOllamaAPI, _providerLabel) |

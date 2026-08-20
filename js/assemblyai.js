@@ -294,6 +294,7 @@ async function processFile(file) {
 
     // Schritt 4: Ergebnis speichern
     session.utterances = result.utterances || [];
+    _applyExtraSpeakers(session); // v6.66: Sprecher C/D erkennen und umbenennbar machen
     session.status = 'done';
     session.duration = result.audio_duration;
     session.processedAt = new Date().toISOString(); // Zeitpunkt der Transkription
@@ -373,6 +374,21 @@ async function uploadAudio(file) {
   }
   const data = await res.json();
   return data.upload_url;
+}
+
+// v6.66: Sprecher C/D (und ggf. weitere) aus dem AssemblyAI-Diarization-Ergebnis ins
+// session.speakers-Array übernehmen, damit sie – genau wie beim Samsung-Import – über
+// renderExtraSpeakerFields() umbenennbar werden. speakerA/speakerB bleiben unangetastet.
+function _applyExtraSpeakers(session) {
+  const extraIds = [...new Set((session.utterances || []).map(u => u.speaker))]
+    .filter(id => id !== 'A' && id !== 'B');
+  if (!extraIds.length) return;
+  if (!session.speakers) session.speakers = [];
+  extraIds.forEach(id => {
+    if (!session.speakers.some(sp => sp.id === id)) {
+      session.speakers.push({ id, label: `Sprecher ${id}`, name: '' });
+    }
+  });
 }
 
 async function requestTranscription(audioUrl) {
@@ -481,6 +497,7 @@ async function resumePendingTranscriptions() {
       setProgress(90, 'Recovery: Ergebnis laden…', icon('check-circle',12,'margin-right:5px;color:var(--green)') + ' Transkription fertig\n' + icon('save',12,'margin-right:5px') + ' Speichere…');
 
       session.utterances = result.utterances || [];
+      _applyExtraSpeakers(session); // v6.66: Sprecher C/D erkennen und umbenennbar machen
       session.status = 'done';
       session.duration = result.audio_duration;
       session.processedAt = new Date().toISOString();

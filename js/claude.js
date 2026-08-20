@@ -269,6 +269,9 @@ function checkSpeakersNamed() {
   const isGedanken = s.type === 'gedanken' || s.source === 'scan_import';
   if (!s.speakerA) return false;
   if (!isGedanken && !s.speakerB) return false;
+  // v6.66: zusätzliche Sprecher (C, D, …) müssen ebenfalls benannt sein
+  const extra = (s.speakers || []).filter(sp => sp.id !== 'A' && sp.id !== 'B');
+  if (extra.some(sp => !sp.name)) return false;
   return true;
 }
 
@@ -3582,7 +3585,7 @@ function renderUtterances(session) {
 
     div.innerHTML = `
       <div class="utterance-speaker-wrap">
-        <div class="utterance-speaker" title="Nur diese Passage tauschen"
+        <div class="utterance-speaker" title="Sprecher für diese Passage wechseln"
              style="cursor:pointer; user-select:none;"
              onclick="toggleUtteranceSpeaker(${idx})">
           <span class="utterance-speaker-dot" style="background:${color}"></span>
@@ -3782,7 +3785,13 @@ function swapSpeakersFromIndex(idx) {
 function toggleUtteranceSpeaker(idx) {
   const s = getSession();
   if (!s || !s.utterances[idx]) return;
-  s.utterances[idx].speaker = s.utterances[idx].speaker === 'A' ? 'B' : 'A';
+  // v6.66: bei mehr als 2 Sprechern durch alle in der Sitzung bekannten Sprecher schalten
+  // (bisher starr A↔B). Roster kommt aus A/B + session.speakers (C/D), NICHT live aus den
+  // Utterances – sonst würde ein Sprecher aus dem Zyklus verschwinden, sobald sein letzter
+  // Abschnitt gerade umgeschaltet wird.
+  const ids = ['A', 'B', ...(s.speakers || []).map(sp => sp.id).filter(id => id !== 'A' && id !== 'B')];
+  const cur = ids.indexOf(s.utterances[idx].speaker);
+  s.utterances[idx].speaker = ids[(cur + 1) % ids.length] || 'A';
   saveSessions();
   saveToArchive(s);
   showTranscript(s);
