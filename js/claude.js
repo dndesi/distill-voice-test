@@ -1777,6 +1777,44 @@ function _buildSectionText(type, session) {
             lines.push(cells.map(c => String(c ?? '')).join(' | '));
           });
           lines.push('');
+        } else if (s.type === 'boolean') { // v6.67: fehlte bisher komplett
+          const boolVal = val === true || String(val).toLowerCase() === 'true' || String(val).toLowerCase() === 'ja';
+          lines.push(boolVal ? 'Ja' : 'Nein', '');
+        } else if (s.type === 'rating') { // v6.67
+          const wert = typeof val === 'object' ? Number(val.wert || 0) : Number(val) || 0;
+          const begr = typeof val === 'object' ? (val.begruendung || '') : '';
+          const stars = Array.from({length: 5}, (_, i) => i < wert ? '★' : '☆').join('');
+          lines.push(`${stars} (${wert}/5)`);
+          if (begr) lines.push(begr);
+          lines.push('');
+        } else if (s.type === 'quote') { // v6.67
+          const arr = Array.isArray(val) ? val : [];
+          arr.forEach(item => {
+            const text   = typeof item === 'object' ? (item.text   || String(item)) : String(item);
+            const person = typeof item === 'object' ? (item.person || '') : '';
+            lines.push('„' + text + '"' + (person ? ' — ' + person : ''));
+          });
+          lines.push('');
+        } else if (s.type === 'key_value') { // v6.67
+          const arr = Array.isArray(val) ? val : [];
+          arr.forEach(item => {
+            const k = typeof item === 'object' ? (item.key   || '') : String(item);
+            const v = typeof item === 'object' ? (item.value || '') : '';
+            lines.push(k + ': ' + v);
+          });
+          lines.push('');
+        } else if (s.type === 'list_with_date') { // v6.67
+          const arr = Array.isArray(val) ? val : [];
+          arr.forEach(item => {
+            const datum = typeof item === 'object' ? (item.datum || '') : '';
+            const text  = typeof item === 'object' ? (item.text  || String(item)) : String(item);
+            lines.push(datum + ': ' + text);
+          });
+          lines.push('');
+        } else if (s.type === 'tag_list') { // v6.67
+          const arr = Array.isArray(val) ? val : [];
+          arr.forEach(item => lines.push('• ' + String(item)));
+          lines.push('');
         }
       });
     } else {
@@ -2286,6 +2324,41 @@ function _buildAnalysisMdContent(type, session) {
             const cells = Array.isArray(row) ? row : [row];
             lines.push('| ' + cells.map(c => String(c ?? '').replace(/\|/g, '\\|')).join(' | ') + ' |');
           });
+          lines.push('');
+        } else if (s.type === 'boolean') { // v6.67: fehlte bisher komplett im MD-Export
+          const boolVal = val === true || String(val).toLowerCase() === 'true' || String(val).toLowerCase() === 'ja';
+          lines.push(boolVal ? '**Ja**' : '**Nein**', '');
+        } else if (s.type === 'rating') { // v6.67
+          const wert = typeof val === 'object' ? Number(val.wert || 0) : Number(val) || 0;
+          const begr = typeof val === 'object' ? (val.begruendung || '') : '';
+          const stars = Array.from({length: 5}, (_, i) => i < wert ? '★' : '☆').join('');
+          lines.push(`${stars} (${wert}/5)`);
+          if (begr) lines.push(begr);
+          lines.push('');
+        } else if (s.type === 'quote') { // v6.67
+          (Array.isArray(val) ? val : []).forEach(item => {
+            const text   = typeof item === 'object' ? (item.text   || String(item)) : String(item);
+            const person = typeof item === 'object' ? (item.person || '') : '';
+            lines.push(`> ${text}`);
+            if (person) lines.push(`> — ${person}`);
+            lines.push('');
+          });
+        } else if (s.type === 'key_value') { // v6.67
+          (Array.isArray(val) ? val : []).forEach(item => {
+            const k = typeof item === 'object' ? (item.key   || '') : String(item);
+            const v = typeof item === 'object' ? (item.value || '') : '';
+            lines.push(`- **${k}:** ${v}`);
+          });
+          lines.push('');
+        } else if (s.type === 'list_with_date') { // v6.67
+          (Array.isArray(val) ? val : []).forEach(item => {
+            const datum = typeof item === 'object' ? (item.datum || '') : '';
+            const text  = typeof item === 'object' ? (item.text  || String(item)) : String(item);
+            lines.push(`- **${datum}:** ${text}`);
+          });
+          lines.push('');
+        } else if (s.type === 'tag_list') { // v6.67
+          (Array.isArray(val) ? val : []).forEach(item => lines.push(`- ${String(item)}`));
           lines.push('');
         }
       });
