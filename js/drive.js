@@ -215,7 +215,6 @@ function onSubfolderSelectChange(sel) {
   // Sync anderen Select
   const other = document.getElementById(sel.id === 'driveSubfolderSelect' ? 'importFolderSelect' : 'driveSubfolderSelect');
   if (other) other.value = id;
-  updateFolderDropdown();
   checkUploadReady();
   if (name) showToast(`Ordner „${name}" ausgewählt`, 'success');
 }
@@ -234,7 +233,6 @@ function selectDriveSubfolder(id, name) {
   if (selA) selA.value = id;
   if (selB) selB.value = id;
   if (selC) selC.value = id;
-  updateFolderDropdown();
   checkUploadReady();
   showToast(`Ordner „${name}" ausgewählt`, 'success');
 }

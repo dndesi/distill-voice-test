@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.71" />
+  <link rel="stylesheet" href="css/styles.css?v=6.72" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.71</button>
+        onmouseout="this.style.color='var(--muted)'">v6.72</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -1335,11 +1335,8 @@
     <div class="browser-view" id="browserView">
       <div class="browser-toolbar" id="browserToolbar">
         <h2 style="display:inline-flex;align-items:center;gap:7px"><i data-lucide="folder" style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0"></i> Sitzungs-Archiv <button class="help-icon" data-help="Alle gespeicherten Sitzungen – als Kacheln (Sitzungen) oder Zeitliste (Sitzungschronik). Klicke eine Sitzung um Transkript, Analysen, Notizen und Tags zu öffnen." onclick="showHelpTooltip(this)">?</button></h2>
-        <select id="folderFilter" onchange="filterBrowser()">
-          <option value="">Alle Ordner</option>
-        </select>
-        <select id="tagFilter" onchange="filterBrowser()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 12px;font-size:0.82rem;outline:none;cursor:pointer;">
-          <option value="">Alle Tags</option>
+        <select id="contactFilter" onchange="filterBrowser()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 12px;font-size:0.82rem;outline:none;cursor:pointer;">
+          <option value="">Alle Kontexte</option>
         </select>
         <select id="projectFilter" onchange="filterBrowser()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 12px;font-size:0.82rem;outline:none;cursor:pointer;">
           <option value="">Alle Projekte</option>
@@ -2011,6 +2008,16 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.72 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.72</span><span class="cl-date">24.08.2026</span></div>
+        <div class="cl-title">Sitzungs-Archiv: Filter auf Kontexte + Projekte reduziert</div>
+        <ul class="cl-list">
+          <li>Ordner-Filter und Tag-Filter in der Sitzungs-Archiv-Toolbar entfernt. Statt Ordner gibt es jetzt einen Kontexte-Filter: wähle einen Kontakt, gefiltert werden alle Sitzungen aus dessen zugeordneten Projekten (über getProjectsForContact()). Projekte-Filter bleibt wie gewohnt. Suchfeld bewusst unverändert – das ist Freitextsuche, kein Kategorie-Filter.</li>
+        </ul>
+        <div class="cl-tech">index.html: #folderFilter + #tagFilter raus, neues #contactFilter. js/ui.js: renderBrowser() – Kontext-Filterlogik statt Ordner/Tag; updateFolderDropdown() ersetzt durch updateContactFilterDropdown(). js/sessions.js + js/drive.js: verwaiste updateFolderDropdown()-Aufrufe entfernt (Funktion existiert nicht mehr).</div>
+      </div>
 
       <!-- ── v6.71 ── -->
       <div class="cl-entry">
@@ -6013,36 +6020,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.71"></script>
-<script src="js/storage.js?v=6.71"></script>
-<script src="js/config.js?v=6.71"></script>
-<script src="js/aiProvider.js?v=6.71"></script>
-<script src="js/auth.js?v=6.71"></script>
-<script src="js/drive.js?v=6.71"></script>
-<script src="js/sessions.js?v=6.71"></script>
-<script src="js/assemblyai.js?v=6.71"></script>
-<script src="js/claude.js?v=6.71"></script>
-<script src="js/ui.js?v=6.71"></script>
-<script src="js/tags.js?v=6.71"></script>
-<script src="js/notes.js?v=6.71"></script>
-<script src="js/photos.js?v=6.71"></script>
-<script src="js/persons.js?v=6.71"></script>
-<script src="js/audio.js?v=6.71"></script>
-<script src="js/recorder.js?v=6.71"></script>
-<script src="js/contacts.js?v=6.71"></script>
-<script src="js/app.js?v=6.71"></script>
+<script src="js/icons.js?v=6.72"></script>
+<script src="js/storage.js?v=6.72"></script>
+<script src="js/config.js?v=6.72"></script>
+<script src="js/aiProvider.js?v=6.72"></script>
+<script src="js/auth.js?v=6.72"></script>
+<script src="js/drive.js?v=6.72"></script>
+<script src="js/sessions.js?v=6.72"></script>
+<script src="js/assemblyai.js?v=6.72"></script>
+<script src="js/claude.js?v=6.72"></script>
+<script src="js/ui.js?v=6.72"></script>
+<script src="js/tags.js?v=6.72"></script>
+<script src="js/notes.js?v=6.72"></script>
+<script src="js/photos.js?v=6.72"></script>
+<script src="js/persons.js?v=6.72"></script>
+<script src="js/audio.js?v=6.72"></script>
+<script src="js/recorder.js?v=6.72"></script>
+<script src="js/contacts.js?v=6.72"></script>
+<script src="js/app.js?v=6.72"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.71"></script>
-<script src="js/search.js?v=6.71"></script>
-<script src="js/embeddings.js?v=6.71"></script>
-<script src="js/calendar.js?v=6.71"></script>
-<script src="js/templateLibrary.js?v=6.71"></script>
-<script src="js/prompts.js?v=6.71"></script>
-<script src="js/projects.js?v=6.71"></script>
-<script src="js/import.js?v=6.71"></script>
-<script src="js/scan.js?v=6.71"></script>
+<script src="js/features.js?v=6.72"></script>
+<script src="js/search.js?v=6.72"></script>
+<script src="js/embeddings.js?v=6.72"></script>
+<script src="js/calendar.js?v=6.72"></script>
+<script src="js/templateLibrary.js?v=6.72"></script>
+<script src="js/prompts.js?v=6.72"></script>
+<script src="js/projects.js?v=6.72"></script>
+<script src="js/import.js?v=6.72"></script>
+<script src="js/scan.js?v=6.72"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>

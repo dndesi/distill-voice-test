@@ -96,15 +96,13 @@ function showBrowser() {
 }
 
 function renderBrowser(filter = '') {
-  const folderFilter   = document.getElementById('folderFilter')?.value || '';
-  const tagFilter      = document.getElementById('tagFilter')?.value || '';
+  const contactFilter  = document.getElementById('contactFilter')?.value || '';
   const projectFilter  = document.getElementById('projectFilter')?.value || '';
   const searchVal = filter || document.getElementById('sidebarSearchMain')?.value || '';
   const grid = document.getElementById('sessionGrid');
   if (!grid) return;
 
-  // Ordner-Dropdown aktualisieren
-  updateFolderDropdown();
+  updateContactFilterDropdown();
   updateProjectFilterDropdown();
 
   // Sessions anzeigen: 'done'/'error' ODER wenn utterances vorhanden (aus Drive geladen)
@@ -113,8 +111,10 @@ function renderBrowser(filter = '') {
     (s.utterances && s.utterances.length > 0)
   );
 
-  if (folderFilter)  list = list.filter(s => s.archiveFolder === folderFilter);
-  if (tagFilter)     list = list.filter(s => (s.tags || []).includes(tagFilter));
+  if (contactFilter) {
+    const contactProjectIds = new Set(getProjectsForContact(contactFilter).map(p => p.id));
+    list = list.filter(s => contactProjectIds.has(s.projectId));
+  }
   if (projectFilter) list = list.filter(s => s.projectId === projectFilter);
 
   if (searchVal.trim()) {
@@ -130,7 +130,7 @@ function renderBrowser(filter = '') {
   list.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   if (list.length === 0) {
-    grid.innerHTML = `<div class="browser-empty">${searchVal || folderFilter ? 'Keine Treffer für diese Suche.' : 'Noch keine Sitzungen vorhanden.<br>Lade eine Aufnahme hoch, um zu starten.'}</div>`;
+    grid.innerHTML = `<div class="browser-empty">${searchVal || contactFilter ? 'Keine Treffer für diese Suche.' : 'Noch keine Sitzungen vorhanden.<br>Lade eine Aufnahme hoch, um zu starten.'}</div>`;
     return;
   }
 
@@ -203,20 +203,17 @@ function filterBrowser() {
   if (currentView === 'timeline') renderTimeline(q);
 }
 
-function updateFolderDropdown() {
-  const sel = document.getElementById('folderFilter');
+function updateContactFilterDropdown() {
+  const sel = document.getElementById('contactFilter');
   if (!sel) return;
-  const fromSessions = sessions.filter(s => s.archiveFolder).map(s => s.archiveFolder);
-  const fromMemory = (rememberedFolders || []).map(f => f.name);
-  const folders = [...new Set([...fromSessions, ...fromMemory])].sort();
   const current = sel.value;
-  sel.innerHTML = '<option value="">Alle Ordner</option>';
-  folders.forEach(f => {
+  sel.innerHTML = '<option value="">Alle Kontexte</option>';
+  (contacts || []).slice().sort((a, b) => a.name.localeCompare(b.name, 'de')).forEach(c => {
+    const count = getSessionsForContact(c.id).length;
     const opt = document.createElement('option');
-    const count = sessions.filter(s => s.archiveFolder === f).length;
-    opt.value = f;
-    opt.textContent = f + (count > 0 ? ` (${count})` : ' – leer');
-    if (f === current) opt.selected = true;
+    opt.value = c.id;
+    opt.textContent = c.name + (count > 0 ? ` (${count})` : '');
+    if (c.id === current) opt.selected = true;
     sel.appendChild(opt);
   });
 }
@@ -518,7 +515,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.71';
+  const title = 'Distill Voice – Systemarchitektur v6.72';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -607,7 +604,7 @@ function renderArchView() {
       ${flowCard('storage.js', 'IndexedDB-Speicher', 'initStorage(), saveSessions(), saveProjects() – Sessions + Projekte in IndexedDB, automatische Migration aus localStorage · v6.71: deletedProjectIds/deletedContactIds – Lösch-Tombstones für den Projekt-/Kontakt-Sync, saveDeletedProjectIds()/saveDeletedContactIds()', '#a78bfa')}
       ${flowCard('assemblyai.js', 'Transkription', 'AssemblyAI Upload → Polling → Utterances mit Speaker-Labels und Timestamps', '#fbbf24')}
       ${flowCard('claude.js', 'KI-Analyse', 'Privat/Arbeit/Gedanken-Analyse, Kapitel, Themen, Stimmung, Anonymisierung, Token-Tracking · v4.81: renderInsights() ruft _refreshAnalysenSubtabs() am Ende – Subtabs aktualisieren sich nach jeder Analyse · v6.26: max_tokens 32000, Freitext-Ergebnisse eigener Prompts über _parseMarkdown() mit Anker-Links (_jumpToAnchor()) · v6.62: Modell-Historie – _archiveAnalysisRun()/_renderRunPills(), erneute Analyse mit anderem Anbieter überschreibt das Ergebnis nicht mehr, Pillen-Switcher pro Analyse-Block · v6.67: MD-/TXT-Export eigener Prompts unterstützt jetzt alle 11 Ausgabe-Feld-Typen (vorher fehlten boolean, rating, quote, key_value, list_with_date, tag_list) · v6.68: Tabellen-Fallback ohne s.columns (Kopf-/Trennzeile), _mdInline() gegen Zeilenumbrüche in Listen/Zitaten/Tabellenzellen · v6.70: Sitzungsname fehlte in _mdFilename() (Dateiname), exportCustomResultPdf() und exportCustomResultText() (Titel/Inhalt) – jetzt ergänzt', '#a78bfa')}
-      ${flowCard('drive.js', 'Cloud Storage', 'Google Drive OAuth, Ordner anlegen, Sessions als JSON speichern/laden/löschen', '#34d399')}
+      ${flowCard('drive.js', 'Cloud Storage', 'Google Drive OAuth, Ordner anlegen, Sessions als JSON speichern/laden/löschen · v6.72: verwaiste updateFolderDropdown()-Aufrufe entfernt (Ordner-Filter im Sitzungs-Archiv entfällt)', '#34d399')}
       ${flowCard('features.js', 'Erweiterte Features', '360°-Analyse, Aufnahme befragen (Chat, sendAskQuestion) · Mind Map (D3.js v7, JSON-Format, horizontal LTR, Zoom/Pan, SVG/PDF-Export) · v6.61: eigenes Claude/Mistral-Dropdown im Gesprächs-Chat, populatePersonaSelects() synct alle 3 Modell-Dropdowns auf den globalen Standard-Anbieter', '#f59e0b')}
       ${flowCard('claude.js (Follow-Up)', 'Folgegespräch', 'Analyse-Kontext aufbauen (_buildFollowUpContext), Folgefragen stellen (askFollowUp), Verlauf in session.claudeFollowUp[] speichern · v5.83: Feldnamen-Fix (entry.text + entry.promptName statt result/name) · v6.61: eigenes Claude/Mistral-Dropdown im Panel-Header (_aiProviderOverride pro Call)', '#06b6d4')}
       ${flowCard('ui.js (Navigation)', 'Sidenav', 'openUploadPanel/closeUploadPanel, toggleSidenav/closeSidenav, setSidenavActive – neue linke Navigation ersetzt 340px Upload-Sidebar', '#8b5cf6')}
@@ -618,10 +615,10 @@ function renderArchView() {
       ${flowCard('embeddings.js', 'Lokale Semantiksuche', 'Transformers.js (Xenova/paraphrase-multilingual-MiniLM-L12-v2, ~118MB, Browser-Download). embGetOrCompute() berechnet Vektor einmalig, IDB-Cache (emb_+id). embSearch() per Cosinus-Ähnlichkeit, Top-N-Ergebnisse mit Relevanz-Badge. embInvalidate() löscht gecachten Vektor. Kein API-Key, komplett lokal.', '#22d3ee')}
       ${flowCard('calendar.js', 'Kalender & Mail', 'Termine via Claude extrahieren → Google Calendar API · E-Mail-Entwürfe → Gmail API', '#f472b6')}
       ${flowCard('persons.js', 'Personen-Profile', 'Profil-Synthese, Selbst-Synthese, Beziehungskontext, Kosten-Übersicht, Ausblenden/Einblenden (toggleHiddenPersons/unhidePerson) · v6.54: Liste „Sitzungen mit unklarer Sprecherzuordnung" (getSessionsUnclearSpeakers) · v6.55: Personen aus benannten Sprechern nachtragen (syncPersonsFromSpeakers) + Namensvarianten-Merge über _personKey() (z.B. "Jan"/"Jan R.") · v6.56: Fix – prüft jetzt alle Sprecher-Slots (A/B/C/D) statt nur B, Platzhalter-Erkennung "?"/"unbekannt" (_isUnclearSpeakerName) · v6.57: Profilbilder (savePersonPhoto/getPersonPhoto/_avatarHtml), 200×200 Cover-Crop, Drive-Sync', '#f472b6')}
-      ${flowCard('ui.js', 'UI-Rendering', 'Session-Browser, Zeitstrahl, Personen, Kosten, Systemarchitektur · v4.74: switchSessionTab(), toggleSessionSidebar(), setSidebarMode() · v4.82: switchAnalysenSubtab(), _analysenVisibleBlocks[] – echtes Tab-Verhalten in Analysen · v4.80: sdc-flap als Desktop-Stil auch auf Mobile (kein FAB)', '#c084fc')}
+      ${flowCard('ui.js', 'UI-Rendering', 'Session-Browser, Zeitstrahl, Personen, Kosten, Systemarchitektur · v4.74: switchSessionTab(), toggleSessionSidebar(), setSidebarMode() · v4.82: switchAnalysenSubtab(), _analysenVisibleBlocks[] – echtes Tab-Verhalten in Analysen · v4.80: sdc-flap als Desktop-Stil auch auf Mobile (kein FAB) · v6.72: renderBrowser() – Ordner-/Tag-Filter raus, neuer Kontexte-Filter (#contactFilter) statt Ordner, updateContactFilterDropdown() ersetzt updateFolderDropdown()', '#c084fc')}
       ${flowCard('audio.js', 'Audio & Zeitstrahl', 'Audio-Player, Sync zu Utterances, Zeitstrahl-Ansicht nach Monat gruppiert', '#34d399')}
       ${flowCard('recorder.js', 'Audio-Aufnahme', 'MediaRecorder API, Mikrofon-Zugriff, WebM-Aufnahme direkt im Browser', '#34d399')}
-      ${flowCard('sessions.js', 'Session-Verwaltung', 'Session speichern, Google Drive Archiv, Sitzungstypen (privat/arbeit/wissen/gedanken) · editAnalysisItem/Field, addAnalysisItem, saveAnalysisItem/Field · v5.95: renderChatGedanken(), deleteChatGedanke() · v6.31: Typ "Wissen" ergänzt, verhält sich wie privat/arbeit (checkSpeakersNamed()/analysePrivate() verzweigen nur auf "gedanken") · v6.36: renderUtterances() in claude.js zeigt bei scan_import kein Sprecher-Label mehr, sondern "Seite N" · v6.37: Aufnahme- und Sprecher-Sektion im Text-Tab bei scan_import ausgeblendet · v6.69: _initialSettingsLoaded-Guard in saveSettingsToDrive() – verhindert dass ein Gerät mit veraltetem lokalen Stand Projekte/Kontexte in Drive überschreibt, bevor es selbst einmal geladen hat · v6.70: printSingleChatGedanke() nutzte falschen Feldnamen session.name statt session.label – Sitzungsname fehlte in Titel/Inhalt · v6.71: loadSettingsFromDrive() – projects-Block von Full-Replace auf ID-Merge + Lösch-Tombstones umgestellt, deleteProject() trägt ID in Lösch-Liste ein, saveSettingsToDrive() lädt beide Lösch-Listen mit hoch', '#60a5fa')}
+      ${flowCard('sessions.js', 'Session-Verwaltung', 'Session speichern, Google Drive Archiv, Sitzungstypen (privat/arbeit/wissen/gedanken) · editAnalysisItem/Field, addAnalysisItem, saveAnalysisItem/Field · v5.95: renderChatGedanken(), deleteChatGedanke() · v6.31: Typ "Wissen" ergänzt, verhält sich wie privat/arbeit (checkSpeakersNamed()/analysePrivate() verzweigen nur auf "gedanken") · v6.36: renderUtterances() in claude.js zeigt bei scan_import kein Sprecher-Label mehr, sondern "Seite N" · v6.37: Aufnahme- und Sprecher-Sektion im Text-Tab bei scan_import ausgeblendet · v6.69: _initialSettingsLoaded-Guard in saveSettingsToDrive() – verhindert dass ein Gerät mit veraltetem lokalen Stand Projekte/Kontexte in Drive überschreibt, bevor es selbst einmal geladen hat · v6.70: printSingleChatGedanke() nutzte falschen Feldnamen session.name statt session.label – Sitzungsname fehlte in Titel/Inhalt · v6.71: loadSettingsFromDrive() – projects-Block von Full-Replace auf ID-Merge + Lösch-Tombstones umgestellt, deleteProject() trägt ID in Lösch-Liste ein, saveSettingsToDrive() lädt beide Lösch-Listen mit hoch · v6.72: verwaister updateFolderDropdown()-Aufruf in loadFromDrive() entfernt (Funktion existiert nicht mehr, Ordner-Filter im Sitzungs-Archiv entfällt)', '#60a5fa')}
       ${flowCard('tags.js', 'Tags', 'Tag-System für Sitzungen, Chips-UI, Filter', '#f59e0b')}
       ${flowCard('import.js', 'Datei-Import', 'parseSamsungTranscript() (UTF-16 BOM), parsePlainText(), extractPdfText() (PDF.js). Multi-File: _importParsedDataList[], handleImportFileSelect() iteriert alle Dateien, startSamsungImport() erstellt eine Session pro Datei. Transkript-Editor: toggleTranscriptEdit(), saveTranscriptEdits() in claude.js', '#34d399')}
       ${flowCard('scan.js', 'Scan-Import', 'Standard-Engine: PaddleOCR (Tiny, lokal, models/paddleocr/, kein API-Key). Alternative: Claude Vision (auch Handschrift). Fotos + PDFs werden automatisch erkannt – PDF.js → _pdfToImageFiles() (Scale 2.0, JPEG). _reflowOcrText() fügt buchzeilenweisen Text zu Fließtext zusammen. Doppelseiten-Split (_splitImageHalves), manuelles Umsortieren. source=scan_import, pageCount statt duration, kein AssemblyAI.', '#2dd4bf')}

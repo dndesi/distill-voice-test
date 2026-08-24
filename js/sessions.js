@@ -119,7 +119,6 @@ async function loadFromDrive() {
     });
     sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
     saveSessions();
-    updateFolderDropdown();
     renderBrowser();
     updateLoadingScreen(55, `${loaded.length} Sitzung(en) geladen ✓ – Einstellungen werden geladen…`);
     if (loaded.length > 0) showToast(`${loaded.length} Sitzung(en) aus Drive geladen`, 'success');
