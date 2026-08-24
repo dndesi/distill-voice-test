@@ -8,6 +8,12 @@ const _IDB_NAME    = 'distill_voice_db';
 const _IDB_VERSION = 1;
 let   _idb         = null;
 
+// v6.71: Lösch-Listen (Tombstones) für Projekte/Kontakte – verhindert, dass ein Gerät beim
+// Sync einen bereits anderswo gelöschten Eintrag durch sein (noch lokal vorhandenes) Exemplar
+// wiederherstellt. Siehe loadSettingsFromDrive() in sessions.js.
+let deletedProjectIds = [];
+let deletedContactIds = [];
+
 function _openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(_IDB_NAME, _IDB_VERSION);
@@ -88,6 +94,12 @@ async function initStorage() {
   if (Array.isArray(storedContacts) && typeof contacts !== 'undefined') {
     contacts = storedContacts;
   }
+
+  // v6.71: Lösch-Listen (Tombstones) laden
+  const storedDeletedProjectIds = await _idbGet('deletedProjectIds');
+  if (Array.isArray(storedDeletedProjectIds)) deletedProjectIds = storedDeletedProjectIds;
+  const storedDeletedContactIds = await _idbGet('deletedContactIds');
+  if (Array.isArray(storedDeletedContactIds)) deletedContactIds = storedDeletedContactIds;
 }
 
 // ── Speichern ─────────────────────────────────────────────────────────────
@@ -111,4 +123,15 @@ async function saveProjects({ skipDriveSync = false } = {}) {
   } catch(e) {
     console.error('[storage] saveProjects Fehler:', e);
   }
+}
+
+// v6.71: Lösch-Listen persistieren (Tombstones für Projekt-/Kontakt-Sync-Merge)
+async function saveDeletedProjectIds() {
+  try { await _idbSet('deletedProjectIds', deletedProjectIds); }
+  catch(e) { console.error('[storage] saveDeletedProjectIds Fehler:', e); }
+}
+
+async function saveDeletedContactIds() {
+  try { await _idbSet('deletedContactIds', deletedContactIds); }
+  catch(e) { console.error('[storage] saveDeletedContactIds Fehler:', e); }
 }

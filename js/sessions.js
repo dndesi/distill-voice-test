@@ -213,6 +213,10 @@ async function saveSettingsToDrive() {
         try { return JSON.parse(localStorage.getItem('personPhotos') || '{}'); } catch { return {}; }
       })(),
       contacts: (typeof contacts !== 'undefined') ? contacts : [],
+      // v6.71: Lösch-Listen (Tombstones) – verhindern, dass gelöschte Projekte/Kontakte
+      // beim Merge in loadSettingsFromDrive() wieder auftauchen
+      deletedProjectIds: deletedProjectIds || [],
+      deletedContactIds: deletedContactIds || [],
     };
     const result = await driveUploadJSON(
       'distill_settings.json', data, _settingsFileId || null, driveFolderId
@@ -254,14 +258,26 @@ async function loadSettingsFromDrive() {
     if (!data || typeof data !== 'object') return;
     _initialSettingsLoaded = true; // v6.69: ab hier kennen wir den aktuellen Drive-Stand
 
-    // ── Projekte: Drive ist autoritativ (v4.95 – gelöschte Projekte bleiben gelöscht) ──
-    // Lokal-only Projekte werden NICHT mehr hinzugefügt – Drive gewinnt.
-    // saveProjects() lädt sofort hoch, daher sollten neue Projekte schon in Drive sein.
-    if (Array.isArray(data.projects) && data.projects.length > 0) {
-      projects = data.projects.map(dp => {
-        const local = (projects || []).find(p => p.id === dp.id);
-        return local ? { ...dp, builtin: local.builtin ?? dp.builtin } : dp;
-      });
+    // ── Projekte: Merge mit Lösch-Tombstones (v6.71 – ersetzt v4.95 Full-Replace) ──
+    // Vorher war Drive komplett autoritativ: ein Gerät, das offen blieb während anderswo ein
+    // Projekt angelegt wurde, hat beim nächsten Speichern dessen Projekt wieder gelöscht.
+    // Jetzt: ID-basiertes Merge (Drive ∪ lokal-only), plus Lösch-Listen (Tombstones), die
+    // verhindern dass ein anderswo gelöschtes Projekt durch den Merge wieder auftaucht.
+    {
+      const driveDeletedProjectIds = Array.isArray(data.deletedProjectIds) ? data.deletedProjectIds : [];
+      deletedProjectIds = Array.from(new Set([...deletedProjectIds, ...driveDeletedProjectIds]));
+      const driveProjects = Array.isArray(data.projects) ? data.projects : [];
+      const driveIds = new Set(driveProjects.map(p => p.id));
+      const localOnly = (projects || []).filter(p => p.id && !driveIds.has(p.id) && !deletedProjectIds.includes(p.id));
+      projects = [
+        ...driveProjects
+          .filter(dp => !deletedProjectIds.includes(dp.id))
+          .map(dp => {
+            const local = (projects || []).find(p => p.id === dp.id);
+            return local ? { ...dp, builtin: local.builtin ?? dp.builtin } : dp;
+          }),
+        ...localOnly,
+      ];
       // Builtin-Projekt immer vorne sicherstellen
       if (typeof BUILTIN_PROJECT_ID !== 'undefined') {
         if (!projects.find(p => p.id === BUILTIN_PROJECT_ID)) {
@@ -271,6 +287,7 @@ async function loadSettingsFromDrive() {
           projects = [bi, ...projects.filter(p => p.id !== BUILTIN_PROJECT_ID)];
         }
       }
+      if (typeof saveDeletedProjectIds === 'function') saveDeletedProjectIds();
       // skipDriveSync=true: kein Re-Upload direkt nach Download (v4.94)
       await saveProjects({ skipDriveSync: true });
       if (typeof renderBrowser === 'function') renderBrowser();
@@ -349,15 +366,22 @@ async function loadSettingsFromDrive() {
       localStorage.setItem('personPhotos', JSON.stringify(mergedPhotos));
     }
 
-    // ── Contacts (v5.42) ──────────────────────────────────────────────────────
-    if (Array.isArray(data.contacts) && data.contacts.length > 0) {
-      if (typeof contacts !== 'undefined') {
-        contacts = data.contacts;
-        if (typeof saveContacts === 'function') saveContacts();
-        const cvEl = document.getElementById('contactsView');
-        if (cvEl && cvEl.style.display !== 'none' && typeof renderContactsView === 'function') {
-          renderContactsView();
-        }
+    // ── Contacts: Merge mit Lösch-Tombstones (v6.71 – ersetzt v5.42 Full-Replace) ──
+    if (typeof contacts !== 'undefined') {
+      const driveDeletedContactIds = Array.isArray(data.deletedContactIds) ? data.deletedContactIds : [];
+      deletedContactIds = Array.from(new Set([...deletedContactIds, ...driveDeletedContactIds]));
+      const driveContacts = Array.isArray(data.contacts) ? data.contacts : [];
+      const driveContactIds = new Set(driveContacts.map(c => c.id));
+      const localOnlyContacts = (contacts || []).filter(c => c.id && !driveContactIds.has(c.id) && !deletedContactIds.includes(c.id));
+      contacts = [
+        ...driveContacts.filter(dc => !deletedContactIds.includes(dc.id)),
+        ...localOnlyContacts,
+      ];
+      if (typeof saveDeletedContactIds === 'function') saveDeletedContactIds();
+      if (typeof saveContacts === 'function') saveContacts();
+      const cvEl = document.getElementById('contactsView');
+      if (cvEl && cvEl.style.display !== 'none' && typeof renderContactsView === 'function') {
+        renderContactsView();
       }
     }
 
@@ -968,6 +992,10 @@ function deleteProject(id) {
   saveSessions();
   // Drive-Sync für betroffene Sessions (async, nicht blockierend)
   affected.forEach(s => saveToArchive(s).catch(() => {}));
+  // v6.71: ID in Lösch-Liste eintragen, damit der Merge in loadSettingsFromDrive() die
+  // Löschung auf anderen Geräten übernimmt statt das Projekt wieder herzustellen
+  deletedProjectIds.push(id);
+  if (typeof saveDeletedProjectIds === 'function') saveDeletedProjectIds();
   projects = projects.filter(p => p.id !== id);
   saveProjects();
 }

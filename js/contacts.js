@@ -40,6 +40,10 @@ function updateContact(id, fields) {
 }
 
 function deleteContact(id) {
+  // v6.71: ID in Lösch-Liste eintragen, damit der Merge in loadSettingsFromDrive() die
+  // Löschung auf anderen Geräten übernimmt statt den Kontakt wieder herzustellen
+  deletedContactIds.push(id);
+  if (typeof saveDeletedContactIds === 'function') saveDeletedContactIds();
   contacts = contacts.filter(c => c.id !== id);
   // Projekte: kontaktId entfernen
   if (typeof projects !== 'undefined') {
