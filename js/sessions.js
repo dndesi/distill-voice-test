@@ -170,6 +170,11 @@ async function checkAndDeleteExpiredAudio() {
 
 let _settingsFileId = null; // Drive-File-ID für distill_settings.json
 let _settingsSaveTimer = null;
+// v6.69: erst true, sobald in dieser Sitzung einmal erfolgreich von Drive geladen wurde (oder feststeht,
+// dass es noch keine Datei gibt). Verhindert dass ein Gerät mit veralteten lokalen Projekten/Kontakten
+// (z.B. Smartphone kurz nach App-Start, Sync noch nicht durch) Drive überschreibt und neuere Einträge
+// von einem anderen Gerät löscht – siehe CLAUDE.md v6.69.
+let _initialSettingsLoaded = false;
 
 // Verzögertes Speichern (2 s Debounce) — verhindert zu viele Drive-Requests
 function queueSettingsSave() {
@@ -179,6 +184,7 @@ function queueSettingsSave() {
 
 async function saveSettingsToDrive() {
   if (!driveToken || !driveFolderId) return;
+  if (!_initialSettingsLoaded) return; // v6.69: erst hochladen, wenn wir den aktuellen Drive-Stand kennen
   try {
     // v5.18: Race-Condition fix – _settingsFileId erst per Search ermitteln wenn noch unbekannt
     if (!_settingsFileId) {
@@ -236,7 +242,9 @@ async function loadSettingsFromDrive() {
     const files = res.files || [];
 
     if (!files.length) {
-      // Noch keine Settings-Datei → aktuellen lokalen Stand hochladen
+      // Noch keine Settings-Datei → aktuellen lokalen Stand hochladen (ist hier automatisch aktuell,
+      // da es nichts von Drive zu laden gibt)
+      _initialSettingsLoaded = true; // v6.69
       await saveSettingsToDrive();
       return;
     }
@@ -244,6 +252,7 @@ async function loadSettingsFromDrive() {
     _settingsFileId = files[0].id;
     const data = await driveDownloadJSON(_settingsFileId);
     if (!data || typeof data !== 'object') return;
+    _initialSettingsLoaded = true; // v6.69: ab hier kennen wir den aktuellen Drive-Stand
 
     // ── Projekte: Drive ist autoritativ (v4.95 – gelöschte Projekte bleiben gelöscht) ──
     // Lokal-only Projekte werden NICHT mehr hinzugefügt – Drive gewinnt.

@@ -518,7 +518,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.68';
+  const title = 'Distill Voice – Systemarchitektur v6.69';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -621,7 +621,7 @@ function renderArchView() {
       ${flowCard('ui.js', 'UI-Rendering', 'Session-Browser, Zeitstrahl, Personen, Kosten, Systemarchitektur · v4.74: switchSessionTab(), toggleSessionSidebar(), setSidebarMode() · v4.82: switchAnalysenSubtab(), _analysenVisibleBlocks[] – echtes Tab-Verhalten in Analysen · v4.80: sdc-flap als Desktop-Stil auch auf Mobile (kein FAB)', '#c084fc')}
       ${flowCard('audio.js', 'Audio & Zeitstrahl', 'Audio-Player, Sync zu Utterances, Zeitstrahl-Ansicht nach Monat gruppiert', '#34d399')}
       ${flowCard('recorder.js', 'Audio-Aufnahme', 'MediaRecorder API, Mikrofon-Zugriff, WebM-Aufnahme direkt im Browser', '#34d399')}
-      ${flowCard('sessions.js', 'Session-Verwaltung', 'Session speichern, Google Drive Archiv, Sitzungstypen (privat/arbeit/wissen/gedanken) · editAnalysisItem/Field, addAnalysisItem, saveAnalysisItem/Field · v5.95: renderChatGedanken(), deleteChatGedanke() · v6.31: Typ "Wissen" ergänzt, verhält sich wie privat/arbeit (checkSpeakersNamed()/analysePrivate() verzweigen nur auf "gedanken") · v6.36: renderUtterances() in claude.js zeigt bei scan_import kein Sprecher-Label mehr, sondern "Seite N" · v6.37: Aufnahme- und Sprecher-Sektion im Text-Tab bei scan_import ausgeblendet', '#60a5fa')}
+      ${flowCard('sessions.js', 'Session-Verwaltung', 'Session speichern, Google Drive Archiv, Sitzungstypen (privat/arbeit/wissen/gedanken) · editAnalysisItem/Field, addAnalysisItem, saveAnalysisItem/Field · v5.95: renderChatGedanken(), deleteChatGedanke() · v6.31: Typ "Wissen" ergänzt, verhält sich wie privat/arbeit (checkSpeakersNamed()/analysePrivate() verzweigen nur auf "gedanken") · v6.36: renderUtterances() in claude.js zeigt bei scan_import kein Sprecher-Label mehr, sondern "Seite N" · v6.37: Aufnahme- und Sprecher-Sektion im Text-Tab bei scan_import ausgeblendet · v6.69: _initialSettingsLoaded-Guard in saveSettingsToDrive() – verhindert dass ein Gerät mit veraltetem lokalen Stand Projekte/Kontexte in Drive überschreibt, bevor es selbst einmal geladen hat', '#60a5fa')}
       ${flowCard('tags.js', 'Tags', 'Tag-System für Sitzungen, Chips-UI, Filter', '#f59e0b')}
       ${flowCard('import.js', 'Datei-Import', 'parseSamsungTranscript() (UTF-16 BOM), parsePlainText(), extractPdfText() (PDF.js). Multi-File: _importParsedDataList[], handleImportFileSelect() iteriert alle Dateien, startSamsungImport() erstellt eine Session pro Datei. Transkript-Editor: toggleTranscriptEdit(), saveTranscriptEdits() in claude.js', '#34d399')}
       ${flowCard('scan.js', 'Scan-Import', 'Standard-Engine: PaddleOCR (Tiny, lokal, models/paddleocr/, kein API-Key). Alternative: Claude Vision (auch Handschrift). Fotos + PDFs werden automatisch erkannt – PDF.js → _pdfToImageFiles() (Scale 2.0, JPEG). _reflowOcrText() fügt buchzeilenweisen Text zu Fließtext zusammen. Doppelseiten-Split (_splitImageHalves), manuelles Umsortieren. source=scan_import, pageCount statt duration, kein AssemblyAI.', '#2dd4bf')}
