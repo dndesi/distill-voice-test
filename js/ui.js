@@ -518,7 +518,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.67';
+  const title = 'Distill Voice – Systemarchitektur v6.68';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -606,7 +606,7 @@ function renderArchView() {
       ${flowCard('config.js', 'Globaler State', 'API-Keys, Sessions[], Drive-Token, OAuth-Scopes, Preise, Wechselkurs', '#60a5fa')}
       ${flowCard('storage.js', 'IndexedDB-Speicher', 'initStorage(), saveSessions(), saveProjects() – Sessions + Projekte in IndexedDB, automatische Migration aus localStorage', '#a78bfa')}
       ${flowCard('assemblyai.js', 'Transkription', 'AssemblyAI Upload → Polling → Utterances mit Speaker-Labels und Timestamps', '#fbbf24')}
-      ${flowCard('claude.js', 'KI-Analyse', 'Privat/Arbeit/Gedanken-Analyse, Kapitel, Themen, Stimmung, Anonymisierung, Token-Tracking · v4.81: renderInsights() ruft _refreshAnalysenSubtabs() am Ende – Subtabs aktualisieren sich nach jeder Analyse · v6.26: max_tokens 32000, Freitext-Ergebnisse eigener Prompts über _parseMarkdown() mit Anker-Links (_jumpToAnchor()) · v6.62: Modell-Historie – _archiveAnalysisRun()/_renderRunPills(), erneute Analyse mit anderem Anbieter überschreibt das Ergebnis nicht mehr, Pillen-Switcher pro Analyse-Block · v6.67: MD-/TXT-Export eigener Prompts unterstützt jetzt alle 11 Ausgabe-Feld-Typen (vorher fehlten boolean, rating, quote, key_value, list_with_date, tag_list)', '#a78bfa')}
+      ${flowCard('claude.js', 'KI-Analyse', 'Privat/Arbeit/Gedanken-Analyse, Kapitel, Themen, Stimmung, Anonymisierung, Token-Tracking · v4.81: renderInsights() ruft _refreshAnalysenSubtabs() am Ende – Subtabs aktualisieren sich nach jeder Analyse · v6.26: max_tokens 32000, Freitext-Ergebnisse eigener Prompts über _parseMarkdown() mit Anker-Links (_jumpToAnchor()) · v6.62: Modell-Historie – _archiveAnalysisRun()/_renderRunPills(), erneute Analyse mit anderem Anbieter überschreibt das Ergebnis nicht mehr, Pillen-Switcher pro Analyse-Block · v6.67: MD-/TXT-Export eigener Prompts unterstützt jetzt alle 11 Ausgabe-Feld-Typen (vorher fehlten boolean, rating, quote, key_value, list_with_date, tag_list) · v6.68: Tabellen-Fallback ohne s.columns (Kopf-/Trennzeile), _mdInline() gegen Zeilenumbrüche in Listen/Zitaten/Tabellenzellen', '#a78bfa')}
       ${flowCard('drive.js', 'Cloud Storage', 'Google Drive OAuth, Ordner anlegen, Sessions als JSON speichern/laden/löschen', '#34d399')}
       ${flowCard('features.js', 'Erweiterte Features', '360°-Analyse, Aufnahme befragen (Chat, sendAskQuestion) · Mind Map (D3.js v7, JSON-Format, horizontal LTR, Zoom/Pan, SVG/PDF-Export) · v6.61: eigenes Claude/Mistral-Dropdown im Gesprächs-Chat, populatePersonaSelects() synct alle 3 Modell-Dropdowns auf den globalen Standard-Anbieter', '#f59e0b')}
       ${flowCard('claude.js (Follow-Up)', 'Folgegespräch', 'Analyse-Kontext aufbauen (_buildFollowUpContext), Folgefragen stellen (askFollowUp), Verlauf in session.claudeFollowUp[] speichern · v5.83: Feldnamen-Fix (entry.text + entry.promptName statt result/name) · v6.61: eigenes Claude/Mistral-Dropdown im Panel-Header (_aiProviderOverride pro Call)', '#06b6d4')}

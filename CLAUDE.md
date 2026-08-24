@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.67** (Stand: 24.08.2026)
+**v6.68** (Stand: 24.08.2026)
+- Fix: Tabellen im MD-Export ohne Kopfzeile + Mehrzeiler konnten Markdown-Struktur zerbrechen. Der `table`-Feldtyp schrieb die Kopf-/Trennzeile (`| --- | --- |`) nur, wenn `s.columns` gesetzt war – im Prompt-Editor gibt es dafür aber gar kein Eingabefeld, `s.columns` war bei echten Prompts also immer leer, wodurch Obsidian die Zeilen nie als Tabelle erkannte (nur rohe Pipe-Zeilen). Fallback ergänzt: fehlen `columns`, werden Spaltenanzahl + generische Namen aus der ersten Datenzeile abgeleitet – derselbe Fallback wie im bestehenden HTML-Renderer `renderCustomSchemaResult()`. Zusätzlich neue Hilfsfunktion `_mdInline()` (`js/claude.js`): enthielt ein Wert (Zitat, Aufgabenbeschreibung, Tabellenzelle, …) einen Zeilenumbruch, brach das bisher die Markdown-Struktur mitten im Listenpunkt/Blockzitat/in der Tabellenzeile – betraf potenziell jede Bullet-/Zitat-/Zellen-Zeile im MD-Export (`_buildAnalysisMdContent()`: Gesprächs-/Arbeitsanalyse, Stimmung, Kapitel, Themen, 360°, alle Custom-Feld-Typen). `_buildSectionText()` (TXT-Export/Kontext) bewusst unverändert – dort keine Markdown-Syntax betroffen.
+
+## v6.67 (Stand: 24.08.2026)
 - Fix: MD-Export ignorierte 6 der 11 Ausgabe-Feld-Typen eigener Prompts. `_buildAnalysisMdContent()` (`js/claude.js`, MD-Export) und `_buildSectionText()` (TXT-Export + Kontext für Folgegespräch/Projekt-Assistent) hatten im `custom:`-Zweig nur `text`, `list`/`list_with_person`, `checklist` und `table` mit echter Formatierung hinterlegt – bei `boolean`, `rating`, `quote`, `key_value`, `list_with_date`, `tag_list` wurde die Feld-Überschrift geschrieben, der Wert danach aber mangels passendem `else if`-Zweig stillschweigend verworfen (in Obsidian erschienen diese Felder dadurch leer/unformatiert statt strukturiert, während gleichzeitig vorhandener Inhalt wie reiner Fließtext wirkte). Beide Funktionen um die 6 fehlenden Typen ergänzt – Datenstruktur pro Typ (z.B. `{wert, begruendung}` bei `rating`, `{datum, text}` bei `list_with_date`) 1:1 aus dem bereits vollständigen HTML-Renderer `renderCustomSchemaResult()` übernommen: im MD-Export als Markdown (Bold, Blockzitat `>`, Listen), im TXT-Export als reiner Text.
 
 ## v6.66 (Stand: 21.08.2026)

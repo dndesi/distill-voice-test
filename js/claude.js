@@ -1891,6 +1891,12 @@ function _stripCodeFences(text) {
   return String(text).replace(/^```[\w]*\n?/gm, '').replace(/^```\n?/gm, '').trim();
 }
 
+// Hilfsfunktion: Freitext für eine einzelne MD-Zeile sicher machen (Liste/Zitat/Tabellenzelle) – v6.68
+// Eingebettete Zeilenumbrüche würden sonst Listen/Blockzitate/Tabellen zerbrechen (Obsidian bricht dort die Struktur ab)
+function _mdInline(text) {
+  return String(text ?? '').replace(/\s*\n+\s*/g, ' ').trim();
+}
+
 // Hilfsfunktion: Session-Datum formatieren → YYYY-MM-DD
 function _formatDateYmd(dateVal) {
   if (!dateVal) return '<unbekannt>';
@@ -2228,21 +2234,21 @@ function _buildAnalysisMdContent(type, session) {
     if (pa.summary)            { lines.push('## Zusammenfassung', '', pa.summary, ''); }
     if (pa.dynamics)           { lines.push('## Gesprächsdynamik', '', pa.dynamics, ''); }
     if (pa.zwischenzeilen)     { lines.push('## Zwischen den Zeilen', '', pa.zwischenzeilen, ''); }
-    if (pa.agreements?.length) { lines.push('## Vereinbarungen', '', ...pa.agreements.map(a => `- ${a}`), ''); }
-    if (pa.wishes?.length)     { lines.push('## Wünsche & Bedürfnisse', '', ...pa.wishes.map(w => `- ${typeof w === 'object' ? (w.person ? w.person + ': ' + w.wish : w.wish) : w}`), ''); }
-    if (pa.openTopics?.length) { lines.push('## Offene Themen', '', ...pa.openTopics.map(t => `- ${t}`), ''); }
-    if (pa.keyThoughts?.length){ lines.push('## Kerngedanken', '', ...pa.keyThoughts.map(t => `- ${t}`), ''); }
-    if (pa.nextSteps?.length)  { lines.push('## Nächste Schritte', '', ...pa.nextSteps.map(t => `- ${t}`), ''); }
+    if (pa.agreements?.length) { lines.push('## Vereinbarungen', '', ...pa.agreements.map(a => `- ${_mdInline(a)}`), ''); }
+    if (pa.wishes?.length)     { lines.push('## Wünsche & Bedürfnisse', '', ...pa.wishes.map(w => `- ${_mdInline(typeof w === 'object' ? (w.person ? w.person + ': ' + w.wish : w.wish) : w)}`), ''); }
+    if (pa.openTopics?.length) { lines.push('## Offene Themen', '', ...pa.openTopics.map(t => `- ${_mdInline(t)}`), ''); }
+    if (pa.keyThoughts?.length){ lines.push('## Kerngedanken', '', ...pa.keyThoughts.map(t => `- ${_mdInline(t)}`), ''); }
+    if (pa.nextSteps?.length)  { lines.push('## Nächste Schritte', '', ...pa.nextSteps.map(t => `- ${_mdInline(t)}`), ''); }
 
   } else if (type === 'work') {
     const wa = session.workAnalysis;
     if (!wa) return '';
     if (wa.summary)              { lines.push('## Zusammenfassung', '', wa.summary, ''); }
     if (wa.zwischenzeilen)       { lines.push('## Zwischen den Zeilen', '', wa.zwischenzeilen, ''); }
-    if (wa.tasks?.length)        { lines.push('## Aufgaben', '', ...wa.tasks.map(t => `- ${t.task}${t.person ? ' [' + t.person + ']' : ''}${t.deadline ? ' bis ' + t.deadline : ''}${t.priority ? ' (' + t.priority + ')' : ''}`), ''); }
-    if (wa.decisions?.length)    { lines.push('## Entscheidungen', '', ...wa.decisions.map(d => `- ${d}`), ''); }
-    if (wa.openQuestions?.length){ lines.push('## Offene Fragen', '', ...wa.openQuestions.map(q => `- ${q}`), ''); }
-    if (wa.risks?.length)        { lines.push('## Risiken', '', ...wa.risks.map(r => `- ${r}`), ''); }
+    if (wa.tasks?.length)        { lines.push('## Aufgaben', '', ...wa.tasks.map(t => `- ${_mdInline(t.task)}${t.person ? ' [' + _mdInline(t.person) + ']' : ''}${t.deadline ? ' bis ' + _mdInline(t.deadline) : ''}${t.priority ? ' (' + _mdInline(t.priority) + ')' : ''}`), ''); }
+    if (wa.decisions?.length)    { lines.push('## Entscheidungen', '', ...wa.decisions.map(d => `- ${_mdInline(d)}`), ''); }
+    if (wa.openQuestions?.length){ lines.push('## Offene Fragen', '', ...wa.openQuestions.map(q => `- ${_mdInline(q)}`), ''); }
+    if (wa.risks?.length)        { lines.push('## Risiken', '', ...wa.risks.map(r => `- ${_mdInline(r)}`), ''); }
 
   } else if (type === 'sentiment') {
     const cs = session.claudeSentiment;
@@ -2252,9 +2258,9 @@ function _buildAnalysisMdContent(type, session) {
       lines.push('## Stimmung pro Sprecher', '');
       cs.speakers.forEach(sp => {
         lines.push(`### ${sp.name || sp.speaker}`);
-        if (sp.overall)    lines.push(`- Grundstimmung: ${sp.overall}`);
-        if (sp.trend)      lines.push(`- Tendenz: ${sp.trend}`);
-        if (sp.highlight)  lines.push(`- Highlight: *„${sp.highlight}"*`);
+        if (sp.overall)    lines.push(`- Grundstimmung: ${_mdInline(sp.overall)}`);
+        if (sp.trend)      lines.push(`- Tendenz: ${_mdInline(sp.trend)}`);
+        if (sp.highlight)  lines.push(`- Highlight: *„${_mdInline(sp.highlight)}"*`);
         lines.push('');
       });
     }
@@ -2264,7 +2270,7 @@ function _buildAnalysisMdContent(type, session) {
     if (!chs?.length) return '';
     lines.push('## Kapitelübersicht', '');
     chs.forEach(c => {
-      lines.push(`### ${c.title}${c.timestamp ? ' (' + c.timestamp + ')' : ''}`);
+      lines.push(`### ${_mdInline(c.title)}${c.timestamp ? ' (' + _mdInline(c.timestamp) + ')' : ''}`);
       if (c.summary) lines.push('', c.summary);
       lines.push('');
     });
@@ -2276,7 +2282,7 @@ function _buildAnalysisMdContent(type, session) {
     const tp = session.claudeTopics;
     if (!tp?.length) return '';
     lines.push('## Themen', '');
-    tp.forEach(t => lines.push(`- ${typeof t === 'string' ? t : t.text}`));
+    tp.forEach(t => lines.push(`- ${_mdInline(typeof t === 'string' ? t : t.text)}`));
 
   } else if (type === '360') {
     const d = session.claude360;
@@ -2285,7 +2291,7 @@ function _buildAnalysisMdContent(type, session) {
       const block = d[key];
       if (!block) return;
       lines.push(`## ${block.titel || key}`, '');
-      if (Array.isArray(block.punkte)) block.punkte.forEach(p => lines.push(`- ${p}`));
+      if (Array.isArray(block.punkte)) block.punkte.forEach(p => lines.push(`- ${_mdInline(p)}`));
       lines.push('');
     });
 
@@ -2303,26 +2309,31 @@ function _buildAnalysisMdContent(type, session) {
           lines.push(_stripCodeFences(val), '');
         } else if (s.type === 'list' || s.type === 'list_with_person') {
           (Array.isArray(val) ? val : []).forEach(item => {
-            if (typeof item === 'object') lines.push(`- ${item.person ? item.person + ': ' : ''}${item.text || JSON.stringify(item)}`);
-            else lines.push(`- ${String(item)}`);
+            if (typeof item === 'object') lines.push(`- ${_mdInline((item.person ? item.person + ': ' : '') + (item.text || JSON.stringify(item)))}`);
+            else lines.push(`- ${_mdInline(item)}`);
           });
           lines.push('');
         } else if (s.type === 'checklist') {
           (Array.isArray(val) ? val : []).forEach(item => {
             const text = typeof item === 'object' ? item.text : String(item);
             const done = typeof item === 'object' && item.done;
-            lines.push(`- [${done ? 'x' : ' '}] ${text}`);
+            lines.push(`- [${done ? 'x' : ' '}] ${_mdInline(text)}`);
           });
           lines.push('');
         } else if (s.type === 'table') {
           const rows = Array.isArray(val) ? val : [];
-          if (s.columns?.length) {
-            lines.push('| ' + s.columns.join(' | ') + ' |');
-            lines.push('| ' + s.columns.map(() => '---').join(' | ') + ' |');
+          // v6.68: Spalten sind im Prompt-Editor gar nicht setzbar (s.columns bei echten Prompts immer leer) –
+          // ohne Fallback fehlte dadurch die Kopf-/Trennzeile und Obsidian erkannte die Tabelle nicht.
+          const cols = s.columns?.length
+            ? s.columns
+            : (rows[0] ? Array.from({length: Array.isArray(rows[0]) ? rows[0].length : 1}, (_, i) => `Spalte ${i + 1}`) : []);
+          if (cols.length) {
+            lines.push('| ' + cols.map(c => _mdInline(c)).join(' | ') + ' |');
+            lines.push('| ' + cols.map(() => '---').join(' | ') + ' |');
           }
           rows.forEach(row => {
             const cells = Array.isArray(row) ? row : [row];
-            lines.push('| ' + cells.map(c => String(c ?? '').replace(/\|/g, '\\|')).join(' | ') + ' |');
+            lines.push('| ' + cells.map(c => _mdInline(c).replace(/\|/g, '\\|')).join(' | ') + ' |');
           });
           lines.push('');
         } else if (s.type === 'boolean') { // v6.67: fehlte bisher komplett im MD-Export
@@ -2333,32 +2344,32 @@ function _buildAnalysisMdContent(type, session) {
           const begr = typeof val === 'object' ? (val.begruendung || '') : '';
           const stars = Array.from({length: 5}, (_, i) => i < wert ? '★' : '☆').join('');
           lines.push(`${stars} (${wert}/5)`);
-          if (begr) lines.push(begr);
+          if (begr) lines.push(_mdInline(begr));
           lines.push('');
         } else if (s.type === 'quote') { // v6.67
           (Array.isArray(val) ? val : []).forEach(item => {
             const text   = typeof item === 'object' ? (item.text   || String(item)) : String(item);
             const person = typeof item === 'object' ? (item.person || '') : '';
-            lines.push(`> ${text}`);
-            if (person) lines.push(`> — ${person}`);
+            lines.push(`> ${_mdInline(text)}`);
+            if (person) lines.push(`> — ${_mdInline(person)}`);
             lines.push('');
           });
         } else if (s.type === 'key_value') { // v6.67
           (Array.isArray(val) ? val : []).forEach(item => {
             const k = typeof item === 'object' ? (item.key   || '') : String(item);
             const v = typeof item === 'object' ? (item.value || '') : '';
-            lines.push(`- **${k}:** ${v}`);
+            lines.push(`- **${_mdInline(k)}:** ${_mdInline(v)}`);
           });
           lines.push('');
         } else if (s.type === 'list_with_date') { // v6.67
           (Array.isArray(val) ? val : []).forEach(item => {
             const datum = typeof item === 'object' ? (item.datum || '') : '';
             const text  = typeof item === 'object' ? (item.text  || String(item)) : String(item);
-            lines.push(`- **${datum}:** ${text}`);
+            lines.push(`- **${_mdInline(datum)}:** ${_mdInline(text)}`);
           });
           lines.push('');
         } else if (s.type === 'tag_list') { // v6.67
-          (Array.isArray(val) ? val : []).forEach(item => lines.push(`- ${String(item)}`));
+          (Array.isArray(val) ? val : []).forEach(item => lines.push(`- ${_mdInline(item)}`));
           lines.push('');
         }
       });
