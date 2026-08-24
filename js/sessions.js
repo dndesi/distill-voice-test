@@ -1203,7 +1203,9 @@ function printSingleChatGedanke(sessionId, idx) {
   const session = getSession(sessionId);
   const item = session?.chatGedanken?.[idx];
   if (!item) return;
-  const sessionTitle = session.name || 'Chat-Gedanken';
+  // v6.70: Feldname korrigiert (session.name existiert nicht, Sitzungen nutzen .label) –
+  // dadurch griff bisher immer der Fallback, nie der tatsächliche Sitzungsname
+  const sessionTitle = session.label || 'Chat-Gedanken';
   const dateStr = item.ts ? new Date(item.ts).toLocaleDateString('de-DE') : '';
   const sourceLabel = item.source === 'analyse' ? 'Analyse-Chat' : 'Gesprächs-Chat';
   const roles = (item.roles || []).filter(Boolean);

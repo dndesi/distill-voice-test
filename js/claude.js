@@ -2027,12 +2027,9 @@ ${content}`);
 // Hilfsfunktion: Dateiname mit Datum-Präfix
 function _mdFilename(session, suffix) {
   const date = _formatDateYmd(session.date).replace('<unbekannt>', '');
-  // Slug aus Teilnehmern aufbauen (speakerA + speakerB, getrennt durch -), Fallback: session.label
-  // v6.32: Scan-Notizen haben keinen "Teilnehmer" (nur speakerA="Ich") – immer Label-Slug nutzen
-  const speakers = session.source === 'scan_import' ? [] : [session.speakerA, session.speakerB].filter(Boolean);
-  const slug = speakers.length
-    ? speakers.map(s => _translitUmlaute(s)).join('-')
-    : _mdSlug(session.label || 'export');
+  // v6.70: immer Sitzungsname (session.label) statt Sprechernamen – vorher fiel der Sitzungsname
+  // bei jeder normalen Sitzung mit gesetzten Sprechern komplett weg (nur Datum-Sprecher-Suffix übrig)
+  const slug = _mdSlug(session.label || 'export');
   return date ? `${date}-${slug}-${suffix}` : `${slug}-${suffix}`;
 }
 
@@ -4016,7 +4013,8 @@ function exportCustomResultText(sessionId, promptId) {
   const res = s.customResults?.[promptId];
   if (!res) return;
 
-  let out = (res.promptName || 'Eigener Prompt') + '\n' + '═'.repeat(50) + '\n\n';
+  // v6.70: Sitzungsname voranstellen – vorher begann der kopierte Text direkt mit dem Prompt-Namen
+  let out = (s.label ? s.label + ' – ' : '') + (res.promptName || 'Eigener Prompt') + '\n' + '═'.repeat(50) + '\n\n';
   if (res.structured && res.schema) {
     res.schema.forEach(field => {
       const val = res.structured[field.field];
@@ -4147,7 +4145,10 @@ function exportCustomResultPdf(blockId) {
   const wasHidden = body && body.style.display === 'none';
   if (wasHidden) body.style.display = 'block';
 
-  const title = block.querySelector('.insights-block-title span')?.textContent?.trim() || 'Analyse';
+  const promptTitle = block.querySelector('.insights-block-title span')?.textContent?.trim() || 'Analyse';
+  // v6.70: Sitzungsname voranstellen – vorher enthielt der Export nur den Prompt-Namen
+  const session = getSession(currentSessionId);
+  const title = session?.label ? `${session.label} – ${promptTitle}` : promptTitle;
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>${title}</title>
