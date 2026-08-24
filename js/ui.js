@@ -515,7 +515,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.72';
+  const title = 'Distill Voice – Systemarchitektur v6.73';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -609,7 +609,7 @@ function renderArchView() {
       ${flowCard('claude.js (Follow-Up)', 'Folgegespräch', 'Analyse-Kontext aufbauen (_buildFollowUpContext), Folgefragen stellen (askFollowUp), Verlauf in session.claudeFollowUp[] speichern · v5.83: Feldnamen-Fix (entry.text + entry.promptName statt result/name) · v6.61: eigenes Claude/Mistral-Dropdown im Panel-Header (_aiProviderOverride pro Call)', '#06b6d4')}
       ${flowCard('ui.js (Navigation)', 'Sidenav', 'openUploadPanel/closeUploadPanel, toggleSidenav/closeSidenav, setSidenavActive – neue linke Navigation ersetzt 340px Upload-Sidebar', '#8b5cf6')}
       ${flowCard('claude.js (Präsentation)', 'Präsentation erstellen', 'generatePresentation(), _renderPresentationPreview(), exportPresentationPptx() via PptxGenJS. 3 Prompt-Typen wählbar. session.claudePresentation[] speichert Ergebnis', '#f43f5e')}
-      ${flowCard('prompts.js', 'Prompt-Bibliothek', 'System/Standard/Feature-Prompts, editierbare Overrides in localStorage, eigene Prompts · v6.26: duplicatePromptById() – eigene Prompts duplizieren · v6.27: Icon-Feld nutzt volles Lucide-Set via iconLucide() · v6.29: Vorlagen-Datenbank-Tab (_renderTemplateLibrary), useTemplateAsPrompt() befüllt KI-Generator · v6.30: deutsche Kategorien, Kategorie-Picker vor Prompt-Erstellung, Vorlagen bearbeiten/löschen (_effectiveTemplates)', '#a78bfa')}
+      ${flowCard('prompts.js', 'Prompt-Bibliothek', 'System/Standard/Feature-Prompts, editierbare Overrides in localStorage, eigene Prompts · v6.26: duplicatePromptById() – eigene Prompts duplizieren · v6.27: Icon-Feld nutzt volles Lucide-Set via iconLucide() · v6.29: Vorlagen-Datenbank-Tab (_renderTemplateLibrary), useTemplateAsPrompt() befüllt KI-Generator · v6.30: deutsche Kategorien, Kategorie-Picker vor Prompt-Erstellung, Vorlagen bearbeiten/löschen (_effectiveTemplates) · v6.73: runCustomPrompt() – zusätzliche Anweisung an die KI, echte Transkript-Namen statt "Sprecher A/B/C"-Platzhaltern zu verwenden', '#a78bfa')}
       ${flowCard('templateLibrary.js', 'Vorlagen-Datenbank', 'v6.29: TEMPLATE_LIBRARY[] – 220 eigene Prompt-Vorlagen-Zusammenfassungen in 15 Kategorien · v6.30: TEMPLATE_CATEGORY_LABELS_DE/_catLabelDe() für deutsche Anzeige', '#fb923c')}
       ${flowCard('search.js', 'Globale Suche', 'Instant-Textsuche über alle Felder inkl. Sprecher A/B/C/D (v6.57) · Claude-Semantiksuche (API, sendet Transkripte) · Lokale Semantiksuche via embeddings.js (runLocalSemanticSearch(), komplett offline)', '#6ee7b7')}
       ${flowCard('embeddings.js', 'Lokale Semantiksuche', 'Transformers.js (Xenova/paraphrase-multilingual-MiniLM-L12-v2, ~118MB, Browser-Download). embGetOrCompute() berechnet Vektor einmalig, IDB-Cache (emb_+id). embSearch() per Cosinus-Ähnlichkeit, Top-N-Ergebnisse mit Relevanz-Badge. embInvalidate() löscht gecachten Vektor. Kein API-Key, komplett lokal.', '#22d3ee')}

@@ -2062,6 +2062,11 @@ async function runCustomPrompt(session, promptObj, transcript, extraPhotos = [])
     promptText += `\n\nTranskript:\n${trimTranscript(transcript, 300000)}`;
   }
 
+  // v6.73: Modell explizit auf echte Transkript-Namen verpflichten – ohne diesen Hinweis
+  // griff das Modell bei frei formulierten Feldtypen (z.B. table) teils auf generische
+  // Platzhalter wie "Sprecher A" zurück, obwohl die echten Namen im Transkript standen.
+  promptText += `\n\nWichtig: Verwende bei Personenbezügen immer die echten Namen aus dem Transkript. Nutze keine Platzhalter wie "Sprecher A", "Sprecher B" o.ä. – diese Bezeichnungen dürfen in deiner Antwort nicht vorkommen.`;
+
   // ── Strukturiertes Ausgabe-Schema (v5.30: aus FIELD_TYPE_CONFIG) ──────────
   const schema = promptObj.outputSchema;
   if (Array.isArray(schema) && schema.length > 0) {

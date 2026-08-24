@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.72** (Stand: 24.08.2026)
+**v6.73** (Stand: 24.08.2026)
+- Fix: Eigene Prompts nannten in der Analyse teils "Sprecher A/B/C" statt der echten Namen aus dem Transkript. Diagnose: `buildTranscriptText()`/`getSpeakerName()` lösen die echten Namen korrekt auf (bestätigt, da andere eigene Prompts auf demselben Transkript korrekt funktionierten) – das Problem lag am Ausgabe-Feldtyp. Feldtypen wie `list_with_person` bekommen über `FIELD_TYPE_CONFIG` (`js/prompts.js`) einen expliziten Hinweis, für das `person`-Feld einen echten Namen zu verwenden ("nur wenn eindeutig erkennbar"). Frei formulierte Feldtypen wie `table` haben dagegen keine Spalten-Semantik und keinen Namens-Hinweis – das Modell hat sich bei einem `table`-Feld ohne definierte Spaltennamen eigene Spalten samt generischen Platzhaltern wie "Sprecher A" ausgedacht, obwohl die echten Namen im mitgeschickten Transkript standen. Fix: `runCustomPrompt()` (`js/prompts.js`) hängt dem `promptText` jetzt eine generelle, für alle eigenen Prompts geltende Anweisung an, echte Transkript-Namen statt Platzhaltern wie "Sprecher A/B/C" zu verwenden – unabhängig vom Feldtyp.
+
+## v6.72 (Stand: 24.08.2026)
 - UI: Sitzungs-Archiv-Toolbar auf zwei Filter reduziert. `folderFilter` (Ordner) und `tagFilter` (Tags) entfernt, neuer `contactFilter` (Kontexte) ergänzt `projectFilter` (Projekte) – filtert über `getProjectsForContact(contactId)` auf alle Sitzungen der zugeordneten Projekte, da Sitzungen nicht direkt mit Kontakten verknüpft sind, sondern nur über ihr Projekt. `renderBrowser()` (`js/ui.js`) entsprechend angepasst, `updateFolderDropdown()` durch neue `updateContactFilterDropdown()` ersetzt. Die drei jetzt verwaisten Aufrufe von `updateFolderDropdown()` in `js/sessions.js` (`loadFromDrive()`) und `js/drive.js` (`onSubfolderSelectChange()`, `selectDriveSubfolder()`) entfernt – die Funktion existiert nicht mehr, sie hätten sonst einen ReferenceError geworfen. Suchfeld (Freitextsuche) bewusst unverändert gelassen. Zugrunde liegende Daten (Ordner-Zuordnung auf der Sitzungskarte, Tag-Chips) bleiben unangetastet, nur die beiden Filter-Dropdowns sind weg.
 
 ## v6.71 (Stand: 24.08.2026)
