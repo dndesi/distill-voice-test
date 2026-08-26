@@ -5,18 +5,25 @@
 async function _claudeFetchWithRetry(body, label) {
   const MAX_RETRIES = 2;
   const RETRY_DELAY_MS = 4000;
+  const TIMEOUT_MS = 120000; // v6.74: bricht eine hängende Analyse nach 120s ab, statt endlos zu warten
   let attempt = 0;
   while (true) {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify(body)
-    });
+    let res;
+    try {
+      res = await _fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify(body)
+      }, TIMEOUT_MS);
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error(`Anthropic antwortet nicht (Zeitüberschreitung nach ${TIMEOUT_MS/1000}s). Bitte erneut versuchen.`);
+      throw e;
+    }
     if (res.ok) {
       const data = await res.json();
       // v5.79: Absicherung falls API leeren Content zurückgibt
@@ -660,12 +667,15 @@ async function analysePrivate(session, transcript) {
     agreements:    Array.isArray(json.agreements)  ? json.agreements  : [],
     wishes:        Array.isArray(json.wishes)       ? json.wishes      : [],
     openTopics:    Array.isArray(json.openTopics)   ? json.openTopics  : [],
-    dynamics:      json.dynamics      || '',
-    zwischenzeilen:json.zwischenzeilen|| '',
+    // v6.74: typeof-Check statt reinem "|| ''" – ein KI-Anbieter (z.B. Mistral), der dieses
+    // Feld abweichend vom erwarteten Format (z.B. als Objekt statt Text) liefert, darf es
+    // nicht mehr ungeprüft in die Sitzung schreiben (führte sonst zum Absturz beim Anzeigen).
+    dynamics:      typeof json.dynamics       === 'string' ? json.dynamics       : '',
+    zwischenzeilen:typeof json.zwischenzeilen === 'string' ? json.zwischenzeilen : '',
     keyThoughts:   Array.isArray(json.keyThoughts)  ? json.keyThoughts : [],
     nextSteps:     Array.isArray(json.nextSteps)    ? json.nextSteps   : [],
-    summary:       json.summary       || '',
-    kernbefund:    json.kernbefund    || '', // v6.19
+    summary:       typeof json.summary        === 'string' ? json.summary        : '',
+    kernbefund:    typeof json.kernbefund     === 'string' ? json.kernbefund     : '', // v6.19
   };
   session.privateAnalysisMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
   // v6.20: Tags auto-speichern wenn Session noch keine hat
@@ -697,9 +707,10 @@ async function analyseWork(session, transcript) {
     decisions:      Array.isArray(json.decisions)     ? json.decisions     : [],
     openQuestions:  Array.isArray(json.openQuestions) ? json.openQuestions : [],
     risks:          Array.isArray(json.risks)         ? json.risks         : [],
-    zwischenzeilen: json.zwischenzeilen || '',
-    summary:        json.summary || '',
-    kernbefund:     json.kernbefund || '', // v6.19
+    // v6.74: typeof-Check statt reinem "|| ''" – siehe analysePrivate() oben
+    zwischenzeilen: typeof json.zwischenzeilen === 'string' ? json.zwischenzeilen : '',
+    summary:        typeof json.summary        === 'string' ? json.summary        : '',
+    kernbefund:     typeof json.kernbefund     === 'string' ? json.kernbefund     : '', // v6.19
   };
   session.workAnalysisMeta = { provider: _lastAiCallMeta.provider, model: _lastAiCallMeta.model, ts: new Date().toISOString() }; // v6.62
 }
@@ -995,21 +1006,24 @@ function renderInsights(session) {
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
         onclick="editAnalysisField('${sid}','${aKey}','${field}')">${icon('pencil',11)}</button>`;
 
-    if (pa.summary) {
+    // v6.74: typeof-Check statt reinem Truthy-Check – ein Analyse-Feld, das (z.B. durch
+    // ein abweichendes Mistral-Antwortformat) als Objekt statt als Text gespeichert wurde,
+    // wird so sauber übersprungen statt die komplette Sitzungsansicht zum Absturz zu bringen.
+    if (typeof pa.summary === 'string' && pa.summary) {
       html += `<div class="work-section">
         <div class="work-section-title">Zusammenfassung ${editFieldBtn('privateAnalysis','summary')}</div>
         <div class="work-summary" data-textfield="privateAnalysis-summary">${escHtml(pa.summary)}</div>
       </div>`;
     }
 
-    if (pa.dynamics) {
+    if (typeof pa.dynamics === 'string' && pa.dynamics) {
       html += `<div class="work-section">
         <div class="work-section-title">${icon('message-circle',13,'margin-right:5px')} Gesprächsdynamik ${editFieldBtn('privateAnalysis','dynamics')}</div>
         <div class="private-dynamics" data-textfield="privateAnalysis-dynamics">${escHtml(pa.dynamics)}</div>
       </div>`;
     }
 
-    if (pa.zwischenzeilen) {
+    if (typeof pa.zwischenzeilen === 'string' && pa.zwischenzeilen) {
       html += `<div class="work-section">
         <div class="work-section-title">${icon('search',13,'margin-right:5px')} Zwischen den Zeilen ${editFieldBtn('privateAnalysis','zwischenzeilen')}</div>
         <div class="private-dynamics" style="border-left:3px solid var(--accent2); padding-left:12px; font-style:italic" data-textfield="privateAnalysis-zwischenzeilen">${escHtml(pa.zwischenzeilen)}</div>
@@ -1115,7 +1129,8 @@ function renderInsights(session) {
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
         onclick="editAnalysisField('${wSid}','workAnalysis','${field}')">${icon('pencil',11)}</button>`;
 
-    if (wa.summary) {
+    // v6.74: typeof-Check statt reinem Truthy-Check – siehe privateAnalysis oben
+    if (typeof wa.summary === 'string' && wa.summary) {
       html += `<div class="work-section">
         <div class="work-section-title">Zusammenfassung ${wEditField('summary')}</div>
         <div class="work-summary" data-textfield="workAnalysis-summary">${escHtml(wa.summary)}</div>
@@ -1174,7 +1189,7 @@ function renderInsights(session) {
       html += `<div class="work-section"><div class="work-section-title">${icon('alert-triangle',13,'margin-right:5px')} Risiken ${wAdd('risks')}</div><div data-section="workAnalysis-risks"></div></div>`;
     }
 
-    if (wa.zwischenzeilen) {
+    if (typeof wa.zwischenzeilen === 'string' && wa.zwischenzeilen) {
       html += `<div class="work-section">
         <div class="work-section-title">${icon('search',13,'margin-right:5px')} Zwischen den Zeilen ${wEditField('zwischenzeilen')}</div>
         <div class="private-dynamics" style="border-left:3px solid var(--accent2); padding-left:12px; font-style:italic" data-textfield="workAnalysis-zwischenzeilen">${escHtml(wa.zwischenzeilen)}</div>

@@ -65,16 +65,23 @@ let _lastAiCallMeta = { provider: 'claude', model: 'claude-sonnet-4-6' };
 async function _mistralFetchWithRetry(body, label) {
   const MAX_RETRIES = 2;
   const RETRY_DELAY_MS = 4000;
+  const TIMEOUT_MS = 120000; // v6.74: bricht eine hängende Analyse nach 120s ab, statt endlos zu warten
   let attempt = 0;
   while (true) {
-    const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${mistralKey}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(body)
-    });
+    let res;
+    try {
+      res = await _fetchWithTimeout('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${mistralKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(body)
+      }, TIMEOUT_MS);
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error(`Mistral antwortet nicht (Zeitüberschreitung nach ${TIMEOUT_MS/1000}s). Bitte erneut versuchen.`);
+      throw e;
+    }
     if (res.ok) {
       const data = await res.json();
       const textVal = data?.choices?.[0]?.message?.content;
@@ -122,14 +129,16 @@ async function callOllamaAPI(prompt, systemPrompt, model) {
   if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
   messages.push({ role: 'user', content: prompt });
 
+  const TIMEOUT_MS = 120000; // v6.74: bricht eine hängende Analyse nach 120s ab, statt endlos zu warten
   let res;
   try {
-    res = await fetch(`${ollamaEndpoint}/api/chat`, {
+    res = await _fetchWithTimeout(`${ollamaEndpoint}/api/chat`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ model, messages, stream: false })
-    });
+    }, TIMEOUT_MS);
   } catch (e) {
+    if (e.name === 'AbortError') throw new Error(`Ollama antwortet nicht (Zeitüberschreitung nach ${TIMEOUT_MS/1000}s). Bitte erneut versuchen.`);
     throw new Error(`Ollama nicht erreichbar unter ${ollamaEndpoint}. Läuft "ollama serve"? Falls die Seite nicht von localhost geladen wird, zusätzlich OLLAMA_ORIGINS setzen (CORS).`);
   }
   if (!res.ok) {
