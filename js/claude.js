@@ -907,23 +907,36 @@ function extractJSON(text, startChar) {
   let depth = 0;
   let inString = false;
   let escape = false;
+  let result = '';
+  // v6.75: rohe Steuerzeichen (z.B. ein echter Zeilenumbruch statt "\n") innerhalb eines
+  // JSON-Strings sind laut Spec ungültig – manche KI-Anbieter (beobachtet bei Mistral,
+  // ohne striktes JSON-Modus) liefern sie trotzdem roh statt korrekt escaped. JSON.parse()
+  // bricht dann mitten im String mit "Expected ',' or '}'..." ab. Bereits escapte Zeichen
+  // (das obige escape-Flag) sind davon nicht betroffen.
+  const CTRL_ESCAPES = { 8:'\\b', 9:'\\t', 10:'\\n', 12:'\\f', 13:'\\r' };
   for (let i = start; i < text.length; i++) {
     const c = text[i];
-    if (escape) { escape = false; continue; }
-    if (c === '\\' && inString) { escape = true; continue; }
-    if (c === '"') { inString = !inString; continue; }
-    if (inString) continue;
+    if (escape) { escape = false; result += c; continue; }
+    if (c === '\\' && inString) { escape = true; result += c; continue; }
+    if (c === '"') { inString = !inString; result += c; continue; }
+    if (inString) {
+      const code = c.charCodeAt(0);
+      if (code < 0x20) { result += CTRL_ESCAPES[code] || ('\\u' + code.toString(16).padStart(4, '0')); continue; }
+      result += c;
+      continue;
+    }
+    result += c;
     // Tiefe für alle öffnenden Klammern erhöhen
     if (c === '[' || c === '{') depth++;
     // Tiefe für alle schließenden Klammern verringern
     if (c === ']' || c === '}') {
       depth--;
       // Wenn wir wieder auf 0 sind und der erwartete End-Char passt: fertig
-      if (depth === 0 && c === endChar) return text.slice(start, i + 1);
+      if (depth === 0 && c === endChar) return result;
     }
   }
   // Falls nicht vollständig abgeschlossen: gib alles vom Start zurück und lass JSON.parse den Fehler werfen
-  return text.slice(start);
+  return result;
 }
 
 // Hilfsfunktion: kürzt Transkript auf maxChars Zeichen, bricht an Zeilengrenzen
