@@ -98,6 +98,7 @@ function showBrowser() {
 function renderBrowser(filter = '') {
   const contactFilter  = document.getElementById('contactFilter')?.value || '';
   const projectFilter  = document.getElementById('projectFilter')?.value || '';
+  const analysisFilter = document.getElementById('analysisFilter')?.value || '';
   const searchVal = filter || document.getElementById('sidebarSearchMain')?.value || '';
   const grid = document.getElementById('sessionGrid');
   if (!grid) return;
@@ -116,6 +117,7 @@ function renderBrowser(filter = '') {
     list = list.filter(s => contactProjectIds.has(s.projectId));
   }
   if (projectFilter) list = list.filter(s => s.projectId === projectFilter);
+  if (analysisFilter === 'none') list = list.filter(s => !_sessionHasAnalysis(s));
 
   if (searchVal.trim()) {
     const q = searchVal.toLowerCase();
@@ -231,6 +233,13 @@ function updateProjectFilterDropdown() {
     if (p.id === current) opt.selected = true;
     sel.appendChild(opt);
   });
+}
+
+// v6.76: prüft, ob für eine Sitzung schon irgendeine Analyse gelaufen ist (Standard-Analysen
+// oder eigene Prompts) – für den Archiv-Filter "Nur ohne Analyse"
+function _sessionHasAnalysis(s) {
+  return !!(s.privateAnalysis || s.workAnalysis || s.claudeChapters?.length || s.claudeTopics?.length ||
+    s.claude360 || s.claudeSentiment || (s.customResults && Object.keys(s.customResults).length));
 }
 
 // ═══════════════════════════════════════════════════
@@ -518,7 +527,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.75';
+  const title = 'Distill Voice – Systemarchitektur v6.76';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -618,7 +627,7 @@ function renderArchView() {
       ${flowCard('embeddings.js', 'Lokale Semantiksuche', 'Transformers.js (Xenova/paraphrase-multilingual-MiniLM-L12-v2, ~118MB, Browser-Download). embGetOrCompute() berechnet Vektor einmalig, IDB-Cache (emb_+id). embSearch() per Cosinus-Ähnlichkeit, Top-N-Ergebnisse mit Relevanz-Badge. embInvalidate() löscht gecachten Vektor. Kein API-Key, komplett lokal.', '#22d3ee')}
       ${flowCard('calendar.js', 'Kalender & Mail', 'Termine via Claude extrahieren → Google Calendar API · E-Mail-Entwürfe → Gmail API', '#f472b6')}
       ${flowCard('persons.js', 'Personen-Profile', 'Profil-Synthese, Selbst-Synthese, Beziehungskontext, Kosten-Übersicht, Ausblenden/Einblenden (toggleHiddenPersons/unhidePerson) · v6.54: Liste „Sitzungen mit unklarer Sprecherzuordnung" (getSessionsUnclearSpeakers) · v6.55: Personen aus benannten Sprechern nachtragen (syncPersonsFromSpeakers) + Namensvarianten-Merge über _personKey() (z.B. "Jan"/"Jan R.") · v6.56: Fix – prüft jetzt alle Sprecher-Slots (A/B/C/D) statt nur B, Platzhalter-Erkennung "?"/"unbekannt" (_isUnclearSpeakerName) · v6.57: Profilbilder (savePersonPhoto/getPersonPhoto/_avatarHtml), 200×200 Cover-Crop, Drive-Sync', '#f472b6')}
-      ${flowCard('ui.js', 'UI-Rendering', 'Session-Browser, Zeitstrahl, Personen, Kosten, Systemarchitektur · v4.74: switchSessionTab(), toggleSessionSidebar(), setSidebarMode() · v4.82: switchAnalysenSubtab(), _analysenVisibleBlocks[] – echtes Tab-Verhalten in Analysen · v4.80: sdc-flap als Desktop-Stil auch auf Mobile (kein FAB) · v6.72: renderBrowser() – Ordner-/Tag-Filter raus, neuer Kontexte-Filter (#contactFilter) statt Ordner, updateContactFilterDropdown() ersetzt updateFolderDropdown() · v6.74: escHtml() wandelt den Wert jetzt per String(str ?? \'\') um statt direkt .replace() aufzurufen – ein einzelnes Feld mit falschem Datentyp kann damit nicht mehr die komplette Sitzungsansicht zum Absturz bringen', '#c084fc')}
+      ${flowCard('ui.js', 'UI-Rendering', 'Session-Browser, Zeitstrahl, Personen, Kosten, Systemarchitektur · v4.74: switchSessionTab(), toggleSessionSidebar(), setSidebarMode() · v4.82: switchAnalysenSubtab(), _analysenVisibleBlocks[] – echtes Tab-Verhalten in Analysen · v4.80: sdc-flap als Desktop-Stil auch auf Mobile (kein FAB) · v6.72: renderBrowser() – Ordner-/Tag-Filter raus, neuer Kontexte-Filter (#contactFilter) statt Ordner, updateContactFilterDropdown() ersetzt updateFolderDropdown() · v6.74: escHtml() wandelt den Wert jetzt per String(str ?? \'\') um statt direkt .replace() aufzurufen – ein einzelnes Feld mit falschem Datentyp kann damit nicht mehr die komplette Sitzungsansicht zum Absturz bringen · v6.76: neuer Filter #analysisFilter ("Nur ohne Analyse") in renderBrowser(), neue Hilfsfunktion _sessionHasAnalysis(s)', '#c084fc')}
       ${flowCard('audio.js', 'Audio & Zeitstrahl', 'Audio-Player, Sync zu Utterances, Zeitstrahl-Ansicht nach Monat gruppiert', '#34d399')}
       ${flowCard('recorder.js', 'Audio-Aufnahme', 'MediaRecorder API, Mikrofon-Zugriff, WebM-Aufnahme direkt im Browser', '#34d399')}
       ${flowCard('sessions.js', 'Session-Verwaltung', 'Session speichern, Google Drive Archiv, Sitzungstypen (privat/arbeit/wissen/gedanken) · editAnalysisItem/Field, addAnalysisItem, saveAnalysisItem/Field · v5.95: renderChatGedanken(), deleteChatGedanke() · v6.31: Typ "Wissen" ergänzt, verhält sich wie privat/arbeit (checkSpeakersNamed()/analysePrivate() verzweigen nur auf "gedanken") · v6.36: renderUtterances() in claude.js zeigt bei scan_import kein Sprecher-Label mehr, sondern "Seite N" · v6.37: Aufnahme- und Sprecher-Sektion im Text-Tab bei scan_import ausgeblendet · v6.69: _initialSettingsLoaded-Guard in saveSettingsToDrive() – verhindert dass ein Gerät mit veraltetem lokalen Stand Projekte/Kontexte in Drive überschreibt, bevor es selbst einmal geladen hat · v6.70: printSingleChatGedanke() nutzte falschen Feldnamen session.name statt session.label – Sitzungsname fehlte in Titel/Inhalt · v6.71: loadSettingsFromDrive() – projects-Block von Full-Replace auf ID-Merge + Lösch-Tombstones umgestellt, deleteProject() trägt ID in Lösch-Liste ein, saveSettingsToDrive() lädt beide Lösch-Listen mit hoch · v6.72: verwaister updateFolderDropdown()-Aufruf in loadFromDrive() entfernt (Funktion existiert nicht mehr, Ordner-Filter im Sitzungs-Archiv entfällt)', '#60a5fa')}
