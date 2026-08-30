@@ -65,7 +65,7 @@ let _lastAiCallMeta = { provider: 'claude', model: 'claude-sonnet-4-6' };
 async function _mistralFetchWithRetry(body, label) {
   const MAX_RETRIES = 2;
   const RETRY_DELAY_MS = 4000;
-  const TIMEOUT_MS = 120000; // v6.74: bricht eine hängende Analyse nach 120s ab, statt endlos zu warten
+  const TIMEOUT_MS = 300000; // v6.74: bricht eine hängende Analyse ab, statt endlos zu warten; v6.77: 120s→300s, da lange Transkripte (z.B. 72min) legitim länger brauchen können
   let attempt = 0;
   while (true) {
     let res;
@@ -129,7 +129,7 @@ async function callOllamaAPI(prompt, systemPrompt, model) {
   if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
   messages.push({ role: 'user', content: prompt });
 
-  const TIMEOUT_MS = 120000; // v6.74: bricht eine hängende Analyse nach 120s ab, statt endlos zu warten
+  const TIMEOUT_MS = 300000; // v6.74: bricht eine hängende Analyse ab, statt endlos zu warten; v6.77: 120s→300s, da lange Transkripte (z.B. 72min) legitim länger brauchen können
   let res;
   try {
     res = await _fetchWithTimeout(`${ollamaEndpoint}/api/chat`, {

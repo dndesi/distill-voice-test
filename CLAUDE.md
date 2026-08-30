@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.76** (Stand: 30.08.2026)
+**v6.77** (Stand: 30.08.2026)
+- Fix: Analyse langer Sitzungen (z.B. 72 Minuten) konnte mit "antwortet nicht (Zeitüberschreitung nach 120s)" abbrechen (beobachtet bei Mistral, eigener Prompt via `runCustomPrompt()`). Ursache: der v6.74-Timeout (`TIMEOUT_MS = 120000`) war als Schutz gegen einen echt hängenden Request gedacht, nicht als Obergrenze für eine legitim langsame Antwort – ein großes Transkript (72min) plus `max_tokens: 32000` für die Ausgabe kann bei einem ausgelasteten Modell durchaus länger als 120s brauchen. Fix: `TIMEOUT_MS` in `_claudeFetchWithRetry()` (`js/claude.js`), `_mistralFetchWithRetry()` und `callOllamaAPI()` (`js/aiProvider.js`) von 120000 auf 300000 (5 Minuten) angehoben, einheitlich für alle drei Anbieter, da lange Transkripte providerunabhängig länger dauern können. Die Fehlermeldung selbst (`AbortError` → deutsche Meldung) ist unverändert, zeigt die Sekundenzahl automatisch aus der Konstante. Bewusst nicht umgesetzt: ein transkriptlängen-abhängiges dynamisches Timeout – für das konkrete Problem unnötig komplex, ein fester großzügigerer Wert reicht.
+
+## v6.76 (Stand: 30.08.2026)
 - Feature: Sitzungs-Archiv-Toolbar bekommt einen dritten Filter-Dropdown "Analyse-Status" (`#analysisFilter`, neben `#contactFilter`/`#projectFilter`) mit der Option "Nur ohne Analyse". Definition (Annahme, mit Daniel abgestimmt): eine Sitzung gilt als "ohne Analyse", wenn **keines** der folgenden Felder befüllt ist – `privateAnalysis`, `workAnalysis`, `claudeChapters` (nicht-leer), `claudeTopics` (nicht-leer), `claude360`, `claudeSentiment`, `customResults` (nicht-leer) – neue Hilfsfunktion `_sessionHasAnalysis(s)` (`js/ui.js`), von `renderBrowser()` genutzt. Bewusst nicht angepasst: die "Keine Treffer"-Leermeldung prüft weiterhin nur `searchVal`/`contactFilter` (bestehendes Muster, `projectFilter` war dort schon vorher bewusst nicht enthalten, siehe v6.72) – bei aktivem `analysisFilter` ohne Treffer erscheint dadurch der generische "Noch keine Sitzungen vorhanden"-Text statt "Keine Treffer für diese Suche", konsistent mit dem bestehenden Verhalten von `projectFilter`.
 
 ## v6.75 (Stand: 30.08.2026)
