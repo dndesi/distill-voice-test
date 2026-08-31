@@ -1386,6 +1386,8 @@ function renderInsights(session) {
                 <button class="insights-export-btn" title="Drucken / PDF" onclick="event.stopPropagation();exportCustomResultPdf('${bid}')">
                   ${icon('printer',11,'pointer-events:none')}PDF</button>
                 <button class="insights-export-btn" title="Als Markdown speichern" onclick="event.stopPropagation();exportAnalysisMd('custom:${pid}')">MD</button>
+                <button class="insights-export-btn" title="Teilen" onclick="event.stopPropagation();shareAnalysisMd('custom:${pid}')">
+                  ${icon('share-2',11,'pointer-events:none')}</button>
                 <button class="insights-export-btn" title="Analyse löschen" style="color:var(--muted)" onclick="event.stopPropagation();deleteCustomAnalysis(this,'${pid}')">
                   ${icon('trash-2',11,'pointer-events:none')}</button>
                 <span class="insights-block-chevron">▾</span>
@@ -2178,8 +2180,35 @@ async function exportTranscriptPdf() {
 
 // Analyse als MD exportieren
 async function exportAnalysisMd(type) {
+  const result = await _prepareAnalysisMd(type);
+  if (!result) return;
+  _downloadMd(result.md, result.filename);
+}
+
+// v6.77: Analyse als MD-Datei direkt an den OS-Teilen-Dialog übergeben (Web Share API), statt sie
+// erst herunterzuladen und manuell irgendwo anzuhängen. Gleicher Inhalt wie exportAnalysisMd().
+async function shareAnalysisMd(type) {
+  const result = await _prepareAnalysisMd(type);
+  if (!result) return;
+  const file = new File([result.md], result.filename + '.md', { type: 'text/markdown' });
+  const canFileShare = navigator.canShare && navigator.canShare({ files: [file] });
+  if (!canFileShare) {
+    showToast('Dieser Browser unterstützt kein Datei-Teilen – MD wird stattdessen heruntergeladen.', 'info');
+    _downloadMd(result.md, result.filename);
+    return;
+  }
+  try {
+    await navigator.share({ files: [file], title: result.filename });
+  } catch (e) {
+    if (e.name !== 'AbortError') showToast('Teilen fehlgeschlagen: ' + e.message, 'error');
+  }
+}
+
+// Baut MD-Inhalt + Dateiname für eine Analyse – gemeinsam genutzt von exportAnalysisMd() (Download)
+// und shareAnalysisMd() (v6.77, OS-Teilen-Dialog)
+async function _prepareAnalysisMd(type) {
   const session = getSession(currentSessionId);
-  if (!session) return;
+  if (!session) return null;
 
   showToast('MD wird erstellt…', 'info');
 
@@ -2246,7 +2275,7 @@ async function exportAnalysisMd(type) {
     contentClean,
   ].join('\n');
 
-  _downloadMd(md, _mdFilename(session, _translitUmlaute(perspektive)));
+  return { md, filename: _mdFilename(session, _translitUmlaute(perspektive)) };
 }
 
 // Analyse-Inhalt als strukturierte MD-Abschnitte aufbauen
