@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.79" />
+  <link rel="stylesheet" href="css/styles.css?v=6.80" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.79</button>
+        onmouseout="this.style.color='var(--muted)'">v6.80</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -2018,6 +2018,17 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.80 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.80</span><span class="cl-date">31.08.2026</span></div>
+        <div class="cl-title">Fix: Löschen in einer Analyse sprang immer zum ersten Analyse-Tab</div>
+        <ul class="cl-list">
+          <li>Löschtest du einen einzelnen Eintrag aus einer Analyse (z.B. einen Listenpunkt), aktualisierte sich die Seite kurz – landete dabei aber immer beim ersten Analyse-Tab der Sitzung statt bei dem, in dem du gerade warst. Ursache: die Tab-Leisten-Funktion baute nach jeder Änderung die Tabs neu auf und wechselte danach hart zum ersten Tab, unabhängig davon, welcher vorher aktiv war.</li>
+          <li>Der aktive Tab wird jetzt vor dem Neuaufbau gemerkt und danach wiederhergestellt, sofern er noch Inhalt hat. Nur wenn genau diese Analyse gerade komplett gelöscht wurde, springt es wie bisher zum ersten Tab zurück.</li>
+        </ul>
+        <div class="cl-tech">js/ui.js: _refreshAnalysenSubtabs() merkt sich .sdc-subtab-active vor dem Neuaufbau, wählt targetId = vorheriger Tab falls noch sichtbar, sonst visible[0].</div>
+      </div>
 
       <!-- ── v6.79 ── -->
       <div class="cl-entry">
@@ -6106,36 +6117,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.79"></script>
-<script src="js/storage.js?v=6.79"></script>
-<script src="js/config.js?v=6.79"></script>
-<script src="js/aiProvider.js?v=6.79"></script>
-<script src="js/auth.js?v=6.79"></script>
-<script src="js/drive.js?v=6.79"></script>
-<script src="js/sessions.js?v=6.79"></script>
-<script src="js/assemblyai.js?v=6.79"></script>
-<script src="js/claude.js?v=6.79"></script>
-<script src="js/ui.js?v=6.79"></script>
-<script src="js/tags.js?v=6.79"></script>
-<script src="js/notes.js?v=6.79"></script>
-<script src="js/photos.js?v=6.79"></script>
-<script src="js/persons.js?v=6.79"></script>
-<script src="js/audio.js?v=6.79"></script>
-<script src="js/recorder.js?v=6.79"></script>
-<script src="js/contacts.js?v=6.79"></script>
-<script src="js/app.js?v=6.79"></script>
+<script src="js/icons.js?v=6.80"></script>
+<script src="js/storage.js?v=6.80"></script>
+<script src="js/config.js?v=6.80"></script>
+<script src="js/aiProvider.js?v=6.80"></script>
+<script src="js/auth.js?v=6.80"></script>
+<script src="js/drive.js?v=6.80"></script>
+<script src="js/sessions.js?v=6.80"></script>
+<script src="js/assemblyai.js?v=6.80"></script>
+<script src="js/claude.js?v=6.80"></script>
+<script src="js/ui.js?v=6.80"></script>
+<script src="js/tags.js?v=6.80"></script>
+<script src="js/notes.js?v=6.80"></script>
+<script src="js/photos.js?v=6.80"></script>
+<script src="js/persons.js?v=6.80"></script>
+<script src="js/audio.js?v=6.80"></script>
+<script src="js/recorder.js?v=6.80"></script>
+<script src="js/contacts.js?v=6.80"></script>
+<script src="js/app.js?v=6.80"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.79"></script>
-<script src="js/search.js?v=6.79"></script>
-<script src="js/embeddings.js?v=6.79"></script>
-<script src="js/calendar.js?v=6.79"></script>
-<script src="js/templateLibrary.js?v=6.79"></script>
-<script src="js/prompts.js?v=6.79"></script>
-<script src="js/projects.js?v=6.79"></script>
-<script src="js/import.js?v=6.79"></script>
-<script src="js/scan.js?v=6.79"></script>
+<script src="js/features.js?v=6.80"></script>
+<script src="js/search.js?v=6.80"></script>
+<script src="js/embeddings.js?v=6.80"></script>
+<script src="js/calendar.js?v=6.80"></script>
+<script src="js/templateLibrary.js?v=6.80"></script>
+<script src="js/prompts.js?v=6.80"></script>
+<script src="js/projects.js?v=6.80"></script>
+<script src="js/import.js?v=6.80"></script>
+<script src="js/scan.js?v=6.80"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
