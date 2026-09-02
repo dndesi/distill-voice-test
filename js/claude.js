@@ -621,15 +621,17 @@ function _archiveAnalysisRun(session, key) {
 }
 
 // v6.62: Pillen-Switcher-HTML für archivierte Modell-Läufe (Claude/Mistral) einer Analyse
+// v6.79: zeigt die "Aktueller Stand"-Pille jetzt auch ohne archivierte Alternativen (vorher nur
+// bei >=2 Läufen sichtbar) – so ist auch bei genau einer Analyse erkennbar, welche KI sie erstellt hat
 function _renderRunPills(session, key) {
   const runs = session[key + 'Runs'];
   const meta = session[key + 'Meta'];
-  if (!runs?.length || !meta) return '';
+  if (!meta) return '';
   const sid = session.id;
   const label = m => _providerLabel(m.provider); // v6.63
   let html = '<div class="ai-run-pills">';
   html += `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(meta))}</span>`;
-  runs.forEach((r, i) => {
+  (runs || []).forEach((r, i) => {
     html += `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="switchAnalysisRun('${sid}','${key}',${i})">${escHtml(label(r))}</span>`;
   });
   html += '</div>';
@@ -1357,14 +1359,15 @@ function renderInsights(session) {
         if (!bodyHtml) return ''; // Kein Inhalt → Block überspringen
         const sid = session.id;
         // v6.62: Pillen-Switcher für archivierte Modell-Läufe dieses Prompts
+        // v6.79: Pille erscheint jetzt auch ohne archivierte Alternativen (vorher nur bei >=2 Läufen)
         const cRuns = session.customResultsRuns?.[pid];
         const cMeta = session.customResultsMeta?.[pid];
         let pillsHtml = '';
-        if (cRuns?.length && cMeta) {
+        if (cMeta) {
           const label = m => _providerLabel(m.provider); // v6.63
           pillsHtml = '<div class="ai-run-pills">' +
             `<span class="ai-run-pill active" title="Aktueller Stand">${escHtml(label(cMeta))}</span>` +
-            cRuns.map((r, i) => `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="event.stopPropagation();switchCustomResultRun('${sid}','${pid}',${i})">${escHtml(label(r))}</span>`).join('') +
+            (cRuns || []).map((r, i) => `<span class="ai-run-pill" title="Zu diesem Stand wechseln" onclick="event.stopPropagation();switchCustomResultRun('${sid}','${pid}',${i})">${escHtml(label(r))}</span>`).join('') +
             '</div>';
         }
         // Pencil nur für Freitext-Analysen (kein Schema) – edit-2 Icon (in icons.js registriert)
