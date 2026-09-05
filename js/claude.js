@@ -1385,12 +1385,12 @@ function renderInsights(session) {
               <span style="display:inline-flex;align-items:center;gap:4px;margin-left:auto">
                 ${editBtn}
                 <button class="insights-export-btn" title="Als Text kopieren" onclick="event.stopPropagation();exportCustomResultText('${sid}','${pid}')">
-                  ${icon('copy',11,'pointer-events:none')}TXT</button>
+                  ${iconLucide('copy',11,'pointer-events:none')}TXT</button>
                 <button class="insights-export-btn" title="Drucken / PDF" onclick="event.stopPropagation();exportCustomResultPdf('${bid}')">
-                  ${icon('printer',11,'pointer-events:none')}PDF</button>
+                  ${iconLucide('printer',11,'pointer-events:none')}PDF</button>
                 <button class="insights-export-btn" title="Als Markdown speichern" onclick="event.stopPropagation();exportAnalysisMd('custom:${pid}')">MD</button>
                 <button class="insights-export-btn" title="Teilen" onclick="event.stopPropagation();shareAnalysisMd('custom:${pid}')">
-                  ${icon('share-2',11,'pointer-events:none')}</button>
+                  ${iconLucide('share-2',11,'pointer-events:none')}</button>
                 <button class="insights-export-btn" title="Analyse löschen" style="color:var(--muted)" onclick="event.stopPropagation();deleteCustomAnalysis(this,'${pid}')">
                   ${icon('trash-2',11,'pointer-events:none')}</button>
                 <span class="insights-block-chevron">▾</span>
