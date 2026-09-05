@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.82" />
+  <link rel="stylesheet" href="css/styles.css?v=6.83" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.82</button>
+        onmouseout="this.style.color='var(--muted)'">v6.83</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -2018,6 +2018,17 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.83 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.83</span><span class="cl-date">05.09.2026</span></div>
+        <div class="cl-title">Fix: Teilen-Button bricht auf manchen Systemen weiterhin mit "Permission denied" ab</div>
+        <ul class="cl-list">
+          <li>Auch nach dem Timing-Fix in v6.82 (keine KI-Anreicherung mehr zwischen Klick und navigator.share()) trat bei einem Test mit macOS + Chrome derselbe Fehler "Permission denied" auf. Ursache liegt diesmal browser-/betriebssystemseitig: canShare() meldet zwar Unterstützung für die Datei-Freigabe, der eigentliche macOS-Freigabe-Dialog lehnt die Datei dann aber trotzdem ab – ein bekanntes, von der App aus nicht behebbares Verhalten von Chrome auf macOS.</li>
+          <li>Statt die Ursache zu bekämpfen (nicht möglich), fängt shareAnalysisMd() jetzt gezielt den NotAllowedError ab und fällt automatisch auf denselben Download zurück, der schon greift, wenn ein Browser gar keine Datei-Freigabe unterstützt – mit kurzem Info-Toast statt Fehlermeldung. Ergebnis: der Teilen-Klick endet nie mehr in einem sichtbaren Fehler, sondern öffnet entweder den OS-Freigabe-Dialog oder lädt die MD-Datei herunter. Ein Abbruch des Freigabe-Dialogs durch den Nutzer (AbortError) bleibt weiterhin bewusst ohne Meldung.</li>
+        </ul>
+        <div class="cl-tech">js/claude.js: shareAnalysisMd() – catch-Block um Sonderfall e.name==='NotAllowedError' erweitert → showToast(info) + _downloadMd(result.md, result.filename) statt showToast('error').</div>
+      </div>
 
       <!-- ── v6.82 ── -->
       <div class="cl-entry">
@@ -6139,36 +6150,36 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.82"></script>
-<script src="js/storage.js?v=6.82"></script>
-<script src="js/config.js?v=6.82"></script>
-<script src="js/aiProvider.js?v=6.82"></script>
-<script src="js/auth.js?v=6.82"></script>
-<script src="js/drive.js?v=6.82"></script>
-<script src="js/sessions.js?v=6.82"></script>
-<script src="js/assemblyai.js?v=6.82"></script>
-<script src="js/claude.js?v=6.82"></script>
-<script src="js/ui.js?v=6.82"></script>
-<script src="js/tags.js?v=6.82"></script>
-<script src="js/notes.js?v=6.82"></script>
-<script src="js/photos.js?v=6.82"></script>
-<script src="js/persons.js?v=6.82"></script>
-<script src="js/audio.js?v=6.82"></script>
-<script src="js/recorder.js?v=6.82"></script>
-<script src="js/contacts.js?v=6.82"></script>
-<script src="js/app.js?v=6.82"></script>
+<script src="js/icons.js?v=6.83"></script>
+<script src="js/storage.js?v=6.83"></script>
+<script src="js/config.js?v=6.83"></script>
+<script src="js/aiProvider.js?v=6.83"></script>
+<script src="js/auth.js?v=6.83"></script>
+<script src="js/drive.js?v=6.83"></script>
+<script src="js/sessions.js?v=6.83"></script>
+<script src="js/assemblyai.js?v=6.83"></script>
+<script src="js/claude.js?v=6.83"></script>
+<script src="js/ui.js?v=6.83"></script>
+<script src="js/tags.js?v=6.83"></script>
+<script src="js/notes.js?v=6.83"></script>
+<script src="js/photos.js?v=6.83"></script>
+<script src="js/persons.js?v=6.83"></script>
+<script src="js/audio.js?v=6.83"></script>
+<script src="js/recorder.js?v=6.83"></script>
+<script src="js/contacts.js?v=6.83"></script>
+<script src="js/app.js?v=6.83"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.82"></script>
-<script src="js/search.js?v=6.82"></script>
-<script src="js/embeddings.js?v=6.82"></script>
-<script src="js/calendar.js?v=6.82"></script>
-<script src="js/templateLibrary.js?v=6.82"></script>
-<script src="js/prompts.js?v=6.82"></script>
-<script src="js/projects.js?v=6.82"></script>
-<script src="js/import.js?v=6.82"></script>
-<script src="js/scan.js?v=6.82"></script>
+<script src="js/features.js?v=6.83"></script>
+<script src="js/search.js?v=6.83"></script>
+<script src="js/embeddings.js?v=6.83"></script>
+<script src="js/calendar.js?v=6.83"></script>
+<script src="js/templateLibrary.js?v=6.83"></script>
+<script src="js/prompts.js?v=6.83"></script>
+<script src="js/projects.js?v=6.83"></script>
+<script src="js/import.js?v=6.83"></script>
+<script src="js/scan.js?v=6.83"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>

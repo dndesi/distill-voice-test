@@ -2206,7 +2206,14 @@ async function shareAnalysisMd(type) {
   try {
     await navigator.share({ files: [file], title: result.filename });
   } catch (e) {
-    if (e.name !== 'AbortError') showToast('Teilen fehlgeschlagen: ' + e.message, 'error');
+    if (e.name === 'AbortError') return; // Nutzer hat den OS-Dialog abgebrochen
+    if (e.name !== 'NotAllowedError') { showToast('Teilen fehlgeschlagen: ' + e.message, 'error'); return; }
+    // v6.83: manche Browser/Betriebssysteme (beobachtet: macOS + Chrome) melden über canShare()
+    // Unterstützung, lehnen die Datei im echten Freigabe-Dialog dann aber mit
+    // NotAllowedError/"Permission denied" ab – browser-/OS-seitige Einschränkung, nicht durch
+    // Code hier behebbar. Fallback: gleicher Download wie beim canFileShare===false-Fall oben.
+    showToast('Teilen von diesem Browser nicht unterstützt – MD wird stattdessen heruntergeladen.', 'info');
+    _downloadMd(result.md, result.filename);
   }
 }
 
