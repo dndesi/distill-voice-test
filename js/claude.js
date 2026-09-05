@@ -1389,8 +1389,8 @@ function renderInsights(session) {
                 <button class="insights-export-btn" title="Drucken / PDF" onclick="event.stopPropagation();exportCustomResultPdf('${bid}')">
                   ${iconLucide('printer',11,'pointer-events:none')}PDF</button>
                 <button class="insights-export-btn" title="Als Markdown speichern" onclick="event.stopPropagation();exportAnalysisMd('custom:${pid}')">MD</button>
-                <button class="insights-export-btn" title="Teilen" onclick="event.stopPropagation();shareAnalysisMd('custom:${pid}')">
-                  ${iconLucide('share-2',11,'pointer-events:none')}</button>
+                <button class="insights-export-btn" title="Speichern unter…" onclick="event.stopPropagation();saveAnalysisMdAs('custom:${pid}')">
+                  ${iconLucide('save',11,'pointer-events:none')}</button>
                 <button class="insights-export-btn" title="Analyse löschen" style="color:var(--muted)" onclick="event.stopPropagation();deleteCustomAnalysis(this,'${pid}')">
                   ${icon('trash-2',11,'pointer-events:none')}</button>
                 <span class="insights-block-chevron">▾</span>
@@ -1972,7 +1972,7 @@ function _buildMdFrontmatter(session, typ, perspektive) {
 }
 
 // kernbefund ermitteln – gespeichert oder auto-generiert (für Kapitel/Themen) oder Mini-Call
-async function _getKernbefund(type, session, skipMiniCall = false) {
+async function _getKernbefund(type, session) {
   // 1. Gespeicherte kernbefund-Felder aus neuen Analysen
   if (type === 'private' && session.privateAnalysis?.kernbefund) return session.privateAnalysis.kernbefund;
   if (type === 'work'    && session.workAnalysis?.kernbefund)    return session.workAnalysis.kernbefund;
@@ -2003,8 +2003,7 @@ async function _getKernbefund(type, session, skipMiniCall = false) {
     if (res?.text) return res.text.split('\n')[0].slice(0, 200);
   }
 
-  // 4. Fallback: Mini-Call (v6.82: übersprungen wenn skipMiniCall, siehe _prepareAnalysisMd)
-  if (skipMiniCall) return '<unbekannt>';
+  // 4. Fallback: Mini-Call
   return await _kernbefundMiniCall(type, session);
 }
 
@@ -2189,45 +2188,70 @@ async function exportAnalysisMd(type) {
   _downloadMd(result.md, result.filename);
 }
 
-// v6.77: Analyse als MD-Datei direkt an den OS-Teilen-Dialog übergeben (Web Share API), statt sie
-// erst herunterzuladen und manuell irgendwo anzuhängen. Gleicher Inhalt wie exportAnalysisMd().
-// v6.82: skipEnrichment=true – kein KI-Call zwischen Klick und navigator.share(), sonst "Permission
-// denied" weil der Browser die Nutzer-Geste als abgelaufen ansieht.
-async function shareAnalysisMd(type) {
-  const result = await _prepareAnalysisMd(type, true);
-  if (!result) return;
-  const file = new File([result.md], result.filename + '.md', { type: 'text/markdown' });
-  const canFileShare = navigator.canShare && navigator.canShare({ files: [file] });
-  if (!canFileShare) {
-    showToast('Dieser Browser unterstützt kein Datei-Teilen – MD wird stattdessen heruntergeladen.', 'info');
+// v6.84: MD in einen frei wählbaren Ordner speichern statt immer automatisch in den Downloads-Ordner
+// (ersetzt den v6.78/v6.82/v6.83 Teilen-Button – navigator.share() bricht auf macOS+Chrome zuverlässig
+// mit "Permission denied" ab und fiel dort ohnehin auf denselben Download zurück wie der MD-Button;
+// die Ordnerwahl über die File System Access API ist die eigentlich gewünschte Funktion).
+async function saveAnalysisMdAs(type) {
+  if (!window.showSaveFilePicker) {
+    const result = await _prepareAnalysisMd(type);
+    if (!result) return;
+    showToast('Dieser Browser unterstützt keine Ordnerauswahl – MD wird stattdessen heruntergeladen.', 'info');
     _downloadMd(result.md, result.filename);
     return;
   }
+  const session = getSession(currentSessionId);
+  if (!session) return;
+  let handle;
   try {
-    await navigator.share({ files: [file], title: result.filename });
+    handle = await window.showSaveFilePicker({
+      suggestedName: _mdFilename(session, _translitUmlaute(_analysisPerspektive(type, session))) + '.md',
+      types: [{ description: 'Markdown-Datei', accept: { 'text/markdown': ['.md'] } }]
+    });
   } catch (e) {
-    if (e.name === 'AbortError') return; // Nutzer hat den OS-Dialog abgebrochen
-    if (e.name !== 'NotAllowedError') { showToast('Teilen fehlgeschlagen: ' + e.message, 'error'); return; }
-    // v6.83: manche Browser/Betriebssysteme (beobachtet: macOS + Chrome) melden über canShare()
-    // Unterstützung, lehnen die Datei im echten Freigabe-Dialog dann aber mit
-    // NotAllowedError/"Permission denied" ab – browser-/OS-seitige Einschränkung, nicht durch
-    // Code hier behebbar. Fallback: gleicher Download wie beim canFileShare===false-Fall oben.
-    showToast('Teilen von diesem Browser nicht unterstützt – MD wird stattdessen heruntergeladen.', 'info');
-    _downloadMd(result.md, result.filename);
+    return; // Nutzer hat den Auswahldialog abgebrochen
+  }
+  const result = await _prepareAnalysisMd(type);
+  if (!result) return;
+  try {
+    const writable = await handle.createWritable();
+    await writable.write(result.md);
+    await writable.close();
+    showToast('MD-Datei gespeichert', 'success');
+  } catch (e) {
+    showToast('Speichern fehlgeschlagen: ' + e.message, 'error');
   }
 }
 
+// Perspektive-Label für Dateiname/Überschrift ermitteln – gemeinsam genutzt von _prepareAnalysisMd()
+// und saveAnalysisMdAs() (braucht den Dateinamen schon vor dem MD-Aufbau für den Auswahldialog)
+function _analysisPerspektive(type, session) {
+  const perspektivMap = {
+    private:   'Gesprächsanalyse',
+    work:      'Arbeitsanalyse',
+    sentiment: 'Stimmungsanalyse',
+    chapters:  'Kapitel',
+    topics:    'Themen',
+    '360':     '360°-Auswertung',
+  };
+  if (type.startsWith('custom:')) {
+    const promptId = type.slice(7);
+    const res = session.customResults?.[promptId];
+    return res?.promptName || 'Eigener Prompt';
+  }
+  return perspektivMap[type] || type;
+}
+
 // Baut MD-Inhalt + Dateiname für eine Analyse – gemeinsam genutzt von exportAnalysisMd() (Download)
-// und shareAnalysisMd() (v6.77, OS-Teilen-Dialog)
-async function _prepareAnalysisMd(type, skipEnrichment = false) {
+// und saveAnalysisMdAs() (v6.84, Ordner-Wahl)
+async function _prepareAnalysisMd(type) {
   const session = getSession(currentSessionId);
   if (!session) return null;
 
   showToast('MD wird erstellt…', 'info');
 
-  // v6.20: Tags auto-generieren wenn leer (v6.82: übersprungen wenn skipEnrichment – der KI-Call
-  // dauert lange genug, dass navigator.share() danach die Nutzer-Geste als abgelaufen ansieht)
-  if (!skipEnrichment && !session.tags?.length) {
+  // v6.20: Tags auto-generieren wenn leer
+  if (!session.tags?.length) {
     const generated = await _generateTagsMiniCall(session);
     if (generated.length) {
       session.tags = generated;
@@ -2237,25 +2261,9 @@ async function _prepareAnalysisMd(type, skipEnrichment = false) {
     }
   }
 
-  const perspektivMap = {
-    private:   'Gesprächsanalyse',
-    work:      'Arbeitsanalyse',
-    sentiment: 'Stimmungsanalyse',
-    chapters:  'Kapitel',
-    topics:    'Themen',
-    '360':     '360°-Auswertung',
-  };
+  const perspektive = _analysisPerspektive(type, session);
 
-  let perspektive = '';
-  if (type.startsWith('custom:')) {
-    const promptId = type.slice(7);
-    const res = session.customResults?.[promptId];
-    perspektive = res?.promptName || 'Eigener Prompt';
-  } else {
-    perspektive = perspektivMap[type] || type;
-  }
-
-  const kernbefund = await _getKernbefund(type, session, skipEnrichment);
+  const kernbefund = await _getKernbefund(type, session);
   const frontmatter = _buildMdFrontmatter(session, 'auswertung', perspektive);
   const titel = session.label || '<unbekannt>';
 
