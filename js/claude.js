@@ -1972,7 +1972,7 @@ function _buildMdFrontmatter(session, typ, perspektive) {
 }
 
 // kernbefund ermitteln – gespeichert oder auto-generiert (für Kapitel/Themen) oder Mini-Call
-async function _getKernbefund(type, session) {
+async function _getKernbefund(type, session, skipMiniCall = false) {
   // 1. Gespeicherte kernbefund-Felder aus neuen Analysen
   if (type === 'private' && session.privateAnalysis?.kernbefund) return session.privateAnalysis.kernbefund;
   if (type === 'work'    && session.workAnalysis?.kernbefund)    return session.workAnalysis.kernbefund;
@@ -2003,7 +2003,8 @@ async function _getKernbefund(type, session) {
     if (res?.text) return res.text.split('\n')[0].slice(0, 200);
   }
 
-  // 4. Fallback: Mini-Call
+  // 4. Fallback: Mini-Call (v6.82: übersprungen wenn skipMiniCall, siehe _prepareAnalysisMd)
+  if (skipMiniCall) return '<unbekannt>';
   return await _kernbefundMiniCall(type, session);
 }
 
@@ -2190,8 +2191,10 @@ async function exportAnalysisMd(type) {
 
 // v6.77: Analyse als MD-Datei direkt an den OS-Teilen-Dialog übergeben (Web Share API), statt sie
 // erst herunterzuladen und manuell irgendwo anzuhängen. Gleicher Inhalt wie exportAnalysisMd().
+// v6.82: skipEnrichment=true – kein KI-Call zwischen Klick und navigator.share(), sonst "Permission
+// denied" weil der Browser die Nutzer-Geste als abgelaufen ansieht.
 async function shareAnalysisMd(type) {
-  const result = await _prepareAnalysisMd(type);
+  const result = await _prepareAnalysisMd(type, true);
   if (!result) return;
   const file = new File([result.md], result.filename + '.md', { type: 'text/markdown' });
   const canFileShare = navigator.canShare && navigator.canShare({ files: [file] });
@@ -2209,14 +2212,15 @@ async function shareAnalysisMd(type) {
 
 // Baut MD-Inhalt + Dateiname für eine Analyse – gemeinsam genutzt von exportAnalysisMd() (Download)
 // und shareAnalysisMd() (v6.77, OS-Teilen-Dialog)
-async function _prepareAnalysisMd(type) {
+async function _prepareAnalysisMd(type, skipEnrichment = false) {
   const session = getSession(currentSessionId);
   if (!session) return null;
 
   showToast('MD wird erstellt…', 'info');
 
-  // v6.20: Tags auto-generieren wenn leer
-  if (!session.tags?.length) {
+  // v6.20: Tags auto-generieren wenn leer (v6.82: übersprungen wenn skipEnrichment – der KI-Call
+  // dauert lange genug, dass navigator.share() danach die Nutzer-Geste als abgelaufen ansieht)
+  if (!skipEnrichment && !session.tags?.length) {
     const generated = await _generateTagsMiniCall(session);
     if (generated.length) {
       session.tags = generated;
@@ -2244,7 +2248,7 @@ async function _prepareAnalysisMd(type) {
     perspektive = perspektivMap[type] || type;
   }
 
-  const kernbefund = await _getKernbefund(type, session);
+  const kernbefund = await _getKernbefund(type, session, skipEnrichment);
   const frontmatter = _buildMdFrontmatter(session, 'auswertung', perspektive);
   const titel = session.label || '<unbekannt>';
 
