@@ -2019,6 +2019,10 @@ function _buildMdFrontmatter(session, typ, perspektive) {
   if (session.quelleTyp)  yaml += `\nquelle_typ: ${session.quelleTyp}`;
   if (session.serie)      yaml += `\nserie: ${session.serie}`;
   if (session.teil)       yaml += `\nteil: ${session.teil}`;
+  // v6.90: fünftes optionales Feld – Bereich 1:1 aus der bestehenden Session-Kategorie
+  // abgeleitet (kein neues UI-Feld), 'gedanken' (Plural, intern) → 'gedanke' (Singular, Export)
+  const bereichMap = { arbeit: 'arbeit', privat: 'privat', wissen: 'wissen', gedanken: 'gedanke' };
+  if (bereichMap[session.type]) yaml += `\nbereich: ${bereichMap[session.type]}`;
   yaml += '\n---';
   return yaml;
 }
