@@ -216,9 +216,9 @@ async function saveSettingsToDrive() {
       // beim Merge in loadSettingsFromDrive() wieder auftauchen
       deletedProjectIds: deletedProjectIds || [],
       deletedContactIds: deletedContactIds || [],
-      // v6.88: eigene Quellentypen (Einstellungen-Seite)
-      customQuelleTypen: (typeof customQuelleTypen !== 'undefined') ? customQuelleTypen : [],
-      deletedQuelleTypen: (typeof deletedQuelleTypen !== 'undefined') ? deletedQuelleTypen : [],
+      // v6.89: Quellentypen (Einstellungen-Seite) – {id,value,label,builtin}[]
+      quelleTypen: (typeof quelleTypen !== 'undefined') ? quelleTypen : [],
+      deletedQuelleTypenIds: (typeof deletedQuelleTypenIds !== 'undefined') ? deletedQuelleTypenIds : [],
     };
     const result = await driveUploadJSON(
       'distill_settings.json', data, _settingsFileId || null, driveFolderId
@@ -387,15 +387,19 @@ async function loadSettingsFromDrive() {
       }
     }
 
-    // ── Eigene Quellentypen: Merge mit Lösch-Tombstones (v6.88, gleiches Muster wie Contacts) ──
-    if (typeof customQuelleTypen !== 'undefined') {
-      const driveDeletedQuelleTypen = Array.isArray(data.deletedQuelleTypen) ? data.deletedQuelleTypen : [];
-      deletedQuelleTypen = Array.from(new Set([...deletedQuelleTypen, ...driveDeletedQuelleTypen]));
-      const driveQuelleTypen = Array.isArray(data.customQuelleTypen) ? data.customQuelleTypen : [];
-      customQuelleTypen = Array.from(new Set([...driveQuelleTypen, ...customQuelleTypen]))
-        .filter(v => !deletedQuelleTypen.includes(v));
-      if (typeof saveDeletedQuelleTypen === 'function') saveDeletedQuelleTypen();
-      if (typeof saveCustomQuelleTypen === 'function') saveCustomQuelleTypen();
+    // ── Quellentypen: Merge mit Lösch-Tombstones (v6.89, ID-basiert – gleiches Muster wie Contacts) ──
+    if (typeof quelleTypen !== 'undefined') {
+      const driveDeletedQuelleTypenIds = Array.isArray(data.deletedQuelleTypenIds) ? data.deletedQuelleTypenIds : [];
+      deletedQuelleTypenIds = Array.from(new Set([...deletedQuelleTypenIds, ...driveDeletedQuelleTypenIds]));
+      const driveQuelleTypen = Array.isArray(data.quelleTypen) ? data.quelleTypen : [];
+      const driveQtIds = new Set(driveQuelleTypen.map(t => t.id));
+      const localOnlyQt = (quelleTypen || []).filter(t => t.id && !driveQtIds.has(t.id) && !deletedQuelleTypenIds.includes(t.id));
+      quelleTypen = [
+        ...driveQuelleTypen.filter(dt => !deletedQuelleTypenIds.includes(dt.id)),
+        ...localOnlyQt,
+      ];
+      if (typeof saveDeletedQuelleTypenIds === 'function') saveDeletedQuelleTypenIds();
+      if (typeof saveQuelleTypen === 'function') saveQuelleTypen();
       const svEl = document.getElementById('settingsView');
       if (svEl && svEl.style.display !== 'none' && typeof renderSettingsView === 'function') {
         renderSettingsView();

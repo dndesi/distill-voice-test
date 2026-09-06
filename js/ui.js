@@ -540,7 +540,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.88';
+  const title = 'Distill Voice – Systemarchitektur v6.89';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -653,7 +653,7 @@ function renderArchView() {
       ${flowCard('auth.js', 'Google Auth', 'Progressive Auth: App startet ohne Login · GIS-Client initialisieren (initGoogleAuth) · Stille Token-Anfrage beim Laden · Werbeblocker-Fallback nach 15s', '#34d399')}
       ${flowCard('icons.js', 'Icon-Helfer', 'Inline Lucide SVG via icon(name, size, style) · Kein CDN-Aufruf zur Laufzeit · Icons als SVG-Strings direkt ins DOM injiziert', '#94a3b8')}
       ${flowCard('contacts.js', 'Kontakte', 'Manuelle Kontaktebene über Projekten: Kontakt → Projekt → Sitzung · CRUD (createContact/updateContact/deleteContact) · Farbkodierung · parallel zum Personen-System · v6.71: deleteContact() trägt ID in deletedContactIds ein (Lösch-Tombstone für Drive-Sync)', '#f472b6')}
-      ${flowCard('settings.js', 'Einstellungen', 'v6.88: neue zentrale Einstellungen-Seite, wächst über die Zeit um weitere Grundeinstellungen. Erster Baustein: eigene Quellentypen für das Quelle-Typ-Dropdown im Transkript-Header (QUELLE_TYP_BUILTIN – 5 feste Werte + getQuelleTypOptions() für eigene). addCustomQuelleTyp()/deleteCustomQuelleTyp(), Drive-Sync mit Lösch-Tombstones (deletedQuelleTypen) analog contacts.js.', '#94a3b8')}
+      ${flowCard('settings.js', 'Einstellungen', 'v6.88: neue zentrale Einstellungen-Seite, wächst über die Zeit um weitere Grundeinstellungen. Erster Baustein: Quellentypen für das Quelle-Typ-Dropdown im Transkript-Header. · v6.89: Datenmodell auf editierbare Objekte umgestellt (quelleTypen = {id,value,label,builtin}[] statt String-Array) – alle Einträge inkl. der 5 ursprünglichen Basiswerte sind jetzt bearbeitbar (Label + interner Wert getrennt) und löschbar (addQuelleTyp()/startEditQuelleTyp()/saveEditQuelleTyp()/deleteQuelleTyp()), Drive-Sync mit ID-basierten Lösch-Tombstones (deletedQuelleTypenIds) analog contacts.js.', '#94a3b8')}
       ${flowCard('photos.js', 'Foto-Analyse', 'Foto-Upload (Drag & Drop + File-Input) · Komprimierung (max 1200px, JPEG 0.75) · Drive-Unterordner pro Sitzung · Claude-Bildanalyse via Foto-Prompts · renderPhotoResults() in Analysen-Tab · session.photos[] + session.photoResults[]', '#f59e0b')}
     </div>
 

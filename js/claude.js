@@ -288,18 +288,35 @@ function checkSpeakersNamed() {
 // v6.86: gleiche Guard-Logik wie beim Analyse-Start (runSingleAnalysis()/openAnalyseModal(), dort
 // bewusst unverändert gelassen), wiederverwendet für MD-Speichern/Export – ohne benannte Sprecher
 // wird kein MD erzeugt, stattdessen rote Markierung + Scroll-zu + Hinweis-Toast.
+// v6.89: zusätzlich Quelle-Link + Quelle-Typ als Pflichtfelder (für alle Sitzungstypen, mit Daniel
+// abgestimmt) – Serie/Teil bleiben bewusst optional. Prüft NUR den MD-Guard, nicht checkSpeakersNamed()
+// selbst, da die beiden Analyse-Start-Guards (runSingleAnalysis()/openAnalyseModal()) keine
+// Quelle-Angaben brauchen (reine Transkript-Analyse, kein Frontmatter).
 function _guardSpeakersNamed(s) {
-  if (!(s?.utterances?.length && !checkSpeakersNamed())) return true;
-  // v6.88: source==='scan_import' ergänzt, damit diese Prüfung exakt zu checkSpeakersNamed()
-  // passt (dort schon länger berücksichtigt) – wirkt sich aktuell nicht aus, da Scan-Sitzungen
-  // speakerA fest auf 'Ich' setzen (scan.js) und schon über checkSpeakersNamed() durchkommen.
-  const isGedanken = s.type === 'gedanken' || s.source === 'scan_import';
-  const elA = document.getElementById('editSpeakerA');
-  const elB = document.getElementById('editSpeakerB');
-  // v6.87: rote Markierung jetzt auch bei Platzhalter-Namen (nicht nur bei leerem Feld)
-  if ((!s.speakerA || _isUnclearSpeakerName(s.speakerA)) && elA) { elA.classList.add('input-required'); setTimeout(() => elA.scrollIntoView({ behavior:'smooth', block:'center' }), 50); }
-  if (!isGedanken && (!s.speakerB || _isUnclearSpeakerName(s.speakerB)) && elB) elB.classList.add('input-required');
-  showToast('Bitte erst die Sprecher benennen.', 'warning');
+  if (!s?.utterances?.length) return true; // nichts zu exportieren
+  const speakersOk = checkSpeakersNamed();
+  const quelleOk = !!(s.quelleLink || '').trim() && !!(s.quelleTyp || '').trim();
+  if (speakersOk && quelleOk) return true;
+
+  if (!speakersOk) {
+    // v6.88: source==='scan_import' ergänzt, damit diese Prüfung exakt zu checkSpeakersNamed() passt
+    const isGedanken = s.type === 'gedanken' || s.source === 'scan_import';
+    const elA = document.getElementById('editSpeakerA');
+    const elB = document.getElementById('editSpeakerB');
+    // v6.87: rote Markierung jetzt auch bei Platzhalter-Namen (nicht nur bei leerem Feld)
+    if ((!s.speakerA || _isUnclearSpeakerName(s.speakerA)) && elA) { elA.classList.add('input-required'); setTimeout(() => elA.scrollIntoView({ behavior:'smooth', block:'center' }), 50); }
+    if (!isGedanken && (!s.speakerB || _isUnclearSpeakerName(s.speakerB)) && elB) elB.classList.add('input-required');
+  }
+  if (!quelleOk) {
+    const elLink = document.getElementById('editQuelleLink');
+    const elTyp  = document.getElementById('editQuelleTyp');
+    if (!(s.quelleLink || '').trim() && elLink) {
+      elLink.classList.add('input-required');
+      if (speakersOk) setTimeout(() => elLink.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
+    }
+    if (!(s.quelleTyp || '').trim() && elTyp) elTyp.classList.add('input-required');
+  }
+  showToast(!speakersOk ? 'Bitte erst die Sprecher benennen.' : 'Bitte Quelle-Link und Quelle-Typ ausfüllen.', 'warning');
   return false;
 }
 
@@ -3905,13 +3922,14 @@ function updateSessionPersons(value) {
   showToast('Beteiligte Personen gespeichert ✓', 'success');
 }
 
-// v6.88: #editQuelleTyp dynamisch befüllen – 5 feste Basiswerte (QUELLE_TYP_BUILTIN, settings.js)
-// + eigene Typen aus den Einstellungen (getQuelleTypOptions()), statt fest verdrahteter <option>s.
+// v6.88: #editQuelleTyp dynamisch befüllen statt fest verdrahteter <option>s – nutzt
+// getQuelleTypOptions() (settings.js), das alle Quellentypen aus den Einstellungen liefert
+// (v6.89: einheitliche editierbare Liste, keine feste Basiswert-Konstante mehr).
 function _renderQuelleTypOptions(session) {
   const sel = document.getElementById('editQuelleTyp');
   if (!sel || typeof getQuelleTypOptions !== 'function') return;
   const options = getQuelleTypOptions();
-  sel.innerHTML = '<option value="">Quelle-Typ …</option>' +
+  sel.innerHTML = '<option value="">Quelle-Typ (Pflicht) …</option>' +
     options.map(o => `<option value="${escHtml(o.value)}">${escHtml(o.label)}</option>`).join('');
   sel.value = session.quelleTyp || '';
 }
@@ -3931,6 +3949,12 @@ function updateSessionQuelle() {
   if (typ)  s.quelleTyp  = typ;  else delete s.quelleTyp;
   if (serie) s.serie = serie; else delete s.serie;
   if (Number.isFinite(teil) && teil > 0) s.teil = teil; else delete s.teil;
+  // v6.89: Pflichtpfad – rote Markierung entfernen sobald ein Wert gespeichert wurde
+  // (gleiches Muster wie bei den Sprecher-Feldern in renameSpeaker())
+  const elLink = document.getElementById('editQuelleLink');
+  const elTyp  = document.getElementById('editQuelleTyp');
+  if (link && elLink) elLink.classList.remove('input-required');
+  if (typ  && elTyp)  elTyp.classList.remove('input-required');
   saveSessions();
   saveToArchive(s);
   showToast('Quelle & Serie gespeichert ✓', 'success');

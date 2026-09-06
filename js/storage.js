@@ -14,10 +14,11 @@ let   _idb         = null;
 let deletedProjectIds = [];
 let deletedContactIds = [];
 
-// v6.88: eigene Quellentypen (Obsidian-Ingest, Einstellungen-Seite) – Werte selbst sind die
-// Identität (keine IDs nötig), gleiches Tombstone-Muster wie oben für Löschungen im Merge.
-let customQuelleTypen = [];
-let deletedQuelleTypen = [];
+// v6.89: Quellentypen (Obsidian-Ingest, Einstellungen-Seite) – Objekte {id,value,label,builtin}
+// statt reinem String-Array (v6.88), da Label+Wert jetzt beide editierbar sind und eine vom
+// Wert unabhängige, stabile ID für Bearbeiten/Löschen/Merge braucht. Tombstones jetzt ID-basiert.
+let quelleTypen = [];
+let deletedQuelleTypenIds = [];
 
 function _openDB() {
   return new Promise((resolve, reject) => {
@@ -106,11 +107,23 @@ async function initStorage() {
   const storedDeletedContactIds = await _idbGet('deletedContactIds');
   if (Array.isArray(storedDeletedContactIds)) deletedContactIds = storedDeletedContactIds;
 
-  // v6.88: eigene Quellentypen laden
-  const storedCustomQuelleTypen = await _idbGet('customQuelleTypen');
-  if (Array.isArray(storedCustomQuelleTypen)) customQuelleTypen = storedCustomQuelleTypen;
-  const storedDeletedQuelleTypen = await _idbGet('deletedQuelleTypen');
-  if (Array.isArray(storedDeletedQuelleTypen)) deletedQuelleTypen = storedDeletedQuelleTypen;
+  // v6.89: Quellentypen laden. Ist der Key noch nie gesetzt worden (allererster Start bzw.
+  // Umstieg von v6.88), einmalig mit den 5 Basiswerten säen + evtl. alte v6.88-Werte (reines
+  // String-Array) migrieren – danach ist ausschließlich der gespeicherte Stand autoritativ,
+  // damit gelöschte/bearbeitete Einträge nicht bei jedem Laden wiederhergestellt werden.
+  const storedQuelleTypen = await _idbGet('quelleTypen');
+  if (Array.isArray(storedQuelleTypen)) {
+    quelleTypen = storedQuelleTypen;
+  } else {
+    const legacyCustom = await _idbGet('customQuelleTypen'); // v6.88-Altdaten
+    const migrated = Array.isArray(legacyCustom)
+      ? legacyCustom.map(v => ({ id: 'qt_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), value: v, label: v, builtin: false }))
+      : [];
+    quelleTypen = [...QUELLE_TYP_BUILTIN_SEED, ...migrated];
+    await saveQuelleTypen();
+  }
+  const storedDeletedQuelleTypenIds = await _idbGet('deletedQuelleTypenIds');
+  if (Array.isArray(storedDeletedQuelleTypenIds)) deletedQuelleTypenIds = storedDeletedQuelleTypenIds;
 }
 
 // ── Speichern ─────────────────────────────────────────────────────────────
@@ -147,13 +160,13 @@ async function saveDeletedContactIds() {
   catch(e) { console.error('[storage] saveDeletedContactIds Fehler:', e); }
 }
 
-// v6.88: eigene Quellentypen persistieren
-async function saveCustomQuelleTypen() {
-  try { await _idbSet('customQuelleTypen', customQuelleTypen); }
-  catch(e) { console.error('[storage] saveCustomQuelleTypen Fehler:', e); }
+// v6.89: Quellentypen persistieren
+async function saveQuelleTypen() {
+  try { await _idbSet('quelleTypen', quelleTypen); }
+  catch(e) { console.error('[storage] saveQuelleTypen Fehler:', e); }
 }
 
-async function saveDeletedQuelleTypen() {
-  try { await _idbSet('deletedQuelleTypen', deletedQuelleTypen); }
-  catch(e) { console.error('[storage] saveDeletedQuelleTypen Fehler:', e); }
+async function saveDeletedQuelleTypenIds() {
+  try { await _idbSet('deletedQuelleTypenIds', deletedQuelleTypenIds); }
+  catch(e) { console.error('[storage] saveDeletedQuelleTypenIds Fehler:', e); }
 }
