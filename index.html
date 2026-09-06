@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.87" />
+  <link rel="stylesheet" href="css/styles.css?v=6.88" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.87</button>
+        onmouseout="this.style.color='var(--muted)'">v6.88</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -509,6 +509,10 @@
         <i data-lucide="key" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0"></i>
         API-Keys
         <span class="dot" id="apiBadgeDot" style="width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:auto;flex-shrink:0"></span>
+      </button>
+      <button class="sidenav-item" id="headerSettingsBtn" onclick="toggleSettingsView(); setSidenavActive(this)">
+        <i data-lucide="settings" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0"></i>
+        Einstellungen
       </button>
       <button class="sidenav-item" id="navArch" id="headerArchBtn" onclick="toggleArchView(); setSidenavActive(this)">
         <i data-lucide="layers" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0"></i>
@@ -1360,6 +1364,7 @@
       </div>
       <div class="timeline-view" id="timelineView"></div>
       <div id="costsView" style="display:none; padding-bottom:40px"></div>
+      <div id="settingsView" style="display:none; padding-bottom:40px"></div>
       <div id="personsView" style="display:none; padding-bottom:40px"></div>
       <input type="file" id="personPhotoInput" accept="image/*" onchange="handlePersonPhotoSelected(event)" style="display:none" />
       <div id="contactsView" style="display:none; padding-bottom:40px"></div>
@@ -1576,12 +1581,7 @@
                   class="speaker-name-input" style="flex:2; min-width:180px"
                   onchange="updateSessionQuelle()" autocomplete="off" />
                 <select id="editQuelleTyp" class="speaker-name-input" style="flex:1; min-width:120px" onchange="updateSessionQuelle()">
-                  <option value="">Quelle-Typ …</option>
-                  <option value="gespraech">Gespräch</option>
-                  <option value="meeting">Meeting</option>
-                  <option value="webinar">Webinar</option>
-                  <option value="tutorial">Tutorial</option>
-                  <option value="reflexion">Reflexion</option>
+                  <!-- v6.88: Optionen werden dynamisch von _renderQuelleTypOptions() (claude.js) befüllt – 5 feste Basiswerte + eigene Typen aus den Einstellungen -->
                 </select>
                 <input type="text" id="editSerie" placeholder="Serie (z.B. Reihen-Name)"
                   class="speaker-name-input" style="flex:1; min-width:120px"
@@ -2043,6 +2043,19 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.88 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.88</span><span class="cl-date">06.09.2026</span></div>
+        <div class="cl-title">Neue Einstellungen-Seite mit eigenen Quellentypen</div>
+        <ul class="cl-list">
+          <li>Neuer Sidenav-Punkt „Einstellungen" – zentrale Seite für Grundeinstellungen, die über die Zeit wachsen kann. Erster Baustein: eigene Quellentypen für das „Quelle-Typ"-Dropdown im Transkript-Header (Obsidian-Ingest, seit v6.85). Die 5 Basiswerte (Gespräch/Meeting/Webinar/Tutorial/Reflexion) bleiben fest, eigene Typen kannst du dort hinzufügen und wieder löschen.</li>
+          <li>Eigener Quellentyp: der eingegebene Text wird 1:1 als interner Wert UND als Anzeigetext übernommen (kein automatisches Umformatieren) – volle Kontrolle über den gespeicherten Wert.</li>
+          <li>Eigene Quellentypen werden geräteübergreifend synchronisiert (über Google Drive, `distill_settings.json`) – gleiches Merge-Verfahren wie bei Projekten/Kontexten (Lösch-Tombstones verhindern, dass ein anderswo gelöschter Typ durch den Sync wieder auftaucht).</li>
+          <li>Fix (Konsistenz): `_guardSpeakersNamed()` (v6.86/v6.87) berücksichtigt jetzt auch `source==='scan_import'` bei der Sprecher-Pflicht – identisch zu `checkSpeakersNamed()`. Wirkt sich aktuell nicht sichtbar aus (Scan-Sitzungen waren schon sicher, da `speakerA` dort immer fest auf "Ich" steht), schließt aber die letzte Lücke zwischen beiden Funktionen.</li>
+        </ul>
+        <div class="cl-tech">Neue Datei `js/settings.js`: `QUELLE_TYP_BUILTIN`, `getQuelleTypOptions()`, `addCustomQuelleTyp()`/`deleteCustomQuelleTyp()`, `renderSettingsView()`. `js/storage.js`: neue globale Arrays `customQuelleTypen`/`deletedQuelleTypen` + `saveCustomQuelleTypen()`/`saveDeletedQuelleTypen()` (IndexedDB), geladen in `initStorage()`. `js/sessions.js`: `saveSettingsToDrive()`/`loadSettingsFromDrive()` um beide Felder erweitert (Merge mit Tombstones, analog Contacts). `js/claude.js`: neue `_renderQuelleTypOptions(session)` befüllt `#editQuelleTyp` dynamisch (vorher 5 statische `&lt;option&gt;`s), aufgerufen in `showTranscript()`. `js/ui.js`: `toggleSettingsView()` + `settingsView` in den bestehenden Overlay-Verstecken-Listen (`setView()`, `_showOverlay()`) ergänzt. `index.html`: neuer Sidenav-Button „Einstellungen", neue `#settingsView`.</div>
+      </div>
 
       <!-- ── v6.87 ── -->
       <div class="cl-entry">
@@ -6220,36 +6233,37 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.87"></script>
-<script src="js/storage.js?v=6.87"></script>
-<script src="js/config.js?v=6.87"></script>
-<script src="js/aiProvider.js?v=6.87"></script>
-<script src="js/auth.js?v=6.87"></script>
-<script src="js/drive.js?v=6.87"></script>
-<script src="js/sessions.js?v=6.87"></script>
-<script src="js/assemblyai.js?v=6.87"></script>
-<script src="js/claude.js?v=6.87"></script>
-<script src="js/ui.js?v=6.87"></script>
-<script src="js/tags.js?v=6.87"></script>
-<script src="js/notes.js?v=6.87"></script>
-<script src="js/photos.js?v=6.87"></script>
-<script src="js/persons.js?v=6.87"></script>
-<script src="js/audio.js?v=6.87"></script>
-<script src="js/recorder.js?v=6.87"></script>
-<script src="js/contacts.js?v=6.87"></script>
-<script src="js/app.js?v=6.87"></script>
+<script src="js/icons.js?v=6.88"></script>
+<script src="js/storage.js?v=6.88"></script>
+<script src="js/config.js?v=6.88"></script>
+<script src="js/aiProvider.js?v=6.88"></script>
+<script src="js/auth.js?v=6.88"></script>
+<script src="js/drive.js?v=6.88"></script>
+<script src="js/sessions.js?v=6.88"></script>
+<script src="js/assemblyai.js?v=6.88"></script>
+<script src="js/claude.js?v=6.88"></script>
+<script src="js/ui.js?v=6.88"></script>
+<script src="js/tags.js?v=6.88"></script>
+<script src="js/notes.js?v=6.88"></script>
+<script src="js/photos.js?v=6.88"></script>
+<script src="js/persons.js?v=6.88"></script>
+<script src="js/audio.js?v=6.88"></script>
+<script src="js/recorder.js?v=6.88"></script>
+<script src="js/contacts.js?v=6.88"></script>
+<script src="js/settings.js?v=6.88"></script>
+<script src="js/app.js?v=6.88"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.87"></script>
-<script src="js/search.js?v=6.87"></script>
-<script src="js/embeddings.js?v=6.87"></script>
-<script src="js/calendar.js?v=6.87"></script>
-<script src="js/templateLibrary.js?v=6.87"></script>
-<script src="js/prompts.js?v=6.87"></script>
-<script src="js/projects.js?v=6.87"></script>
-<script src="js/import.js?v=6.87"></script>
-<script src="js/scan.js?v=6.87"></script>
+<script src="js/features.js?v=6.88"></script>
+<script src="js/search.js?v=6.88"></script>
+<script src="js/embeddings.js?v=6.88"></script>
+<script src="js/calendar.js?v=6.88"></script>
+<script src="js/templateLibrary.js?v=6.88"></script>
+<script src="js/prompts.js?v=6.88"></script>
+<script src="js/projects.js?v=6.88"></script>
+<script src="js/import.js?v=6.88"></script>
+<script src="js/scan.js?v=6.88"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>

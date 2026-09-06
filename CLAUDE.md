@@ -2,7 +2,13 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.87** (Stand: 06.09.2026)
+**v6.88** (Stand: 06.09.2026)
+- Feature: Neue zentrale Einstellungen-Seite (Sidenav-Punkt „Einstellungen", `js/settings.js`, `renderSettingsView()`) – als wachsende Sammelstelle für Grundeinstellungen konzipiert. Erster Baustein: eigene Quellentypen für das `quelle_typ`-Feld (Obsidian-Ingest, seit v6.85). Die 5 Basiswerte (`gespraech`/`meeting`/`webinar`/`tutorial`/`reflexion`) bleiben fest vorgegeben und nicht löschbar, eigene Typen lassen sich dort hinzufügen und löschen. Bewusst (mit Daniel abgestimmt): kein automatisches Slugify – der eingegebene Text wird 1:1 als interner Wert UND Anzeigetext übernommen, volle Kontrolle beim Nutzer statt einer erzwungenen Normalisierung.
+- Datenmodell: neue globale Arrays `customQuelleTypen`/`deletedQuelleTypen` (`js/storage.js`, IndexedDB-persistiert über `saveCustomQuelleTypen()`/`saveDeletedQuelleTypen()`, geladen in `initStorage()`). Geräteübergreifend synchronisiert über `distill_settings.json` (`saveSettingsToDrive()`/`loadSettingsFromDrive()` in `js/sessions.js`) – gleiches Merge-Verfahren wie bei Projekten/Kontakten seit v6.71 (Union aus Drive + lokal, Lösch-Tombstones verhindern, dass ein anderswo gelöschter Typ durch den Sync wieder auftaucht).
+- `#editQuelleTyp` (Transkript-Header) wird jetzt dynamisch befüllt: neue Funktion `_renderQuelleTypOptions(session)` (`js/claude.js`, aufgerufen in `showTranscript()`) nutzt `getQuelleTypOptions()` (`js/settings.js`) statt der vorherigen 5 statischen `<option>`-Tags in `index.html`.
+- Fix (Konsistenz, aus Rückfrage zu Scan-Sitzungen): `_guardSpeakersNamed()` (v6.86/v6.87) prüft `isGedanken` jetzt auch über `source==='scan_import'`, identisch zu `checkSpeakersNamed()`. Wirkt sich aktuell nicht sichtbar aus – Scan-Sitzungen waren schon sicher vor dem Guard, da `speakerA` dort beim Anlegen immer fest auf `"Ich"` gesetzt wird (`js/scan.js`) und nie als Platzhalter erkannt werden kann – schließt aber die letzte Lücke zwischen beiden Funktionen für zukünftige Änderungen.
+
+## v6.87 (Stand: 06.09.2026)
 - Fix: Der in v6.86 eingeführte Pflichtpfad-Guard griff nicht, wenn eine Sitzung noch den Standard-Platzhalter "Sprecher A"/"Sprecher B" trug (Default beim Anlegen, wenn AssemblyAI/Import keinen Namen erkannt hat – gesetzt in `js/app.js`/`js/import.js`). Dieser Wert ist truthy, `checkSpeakersNamed()` prüfte bisher nur auf Falsy (`!s.speakerA`), erkannte den nie umbenannten Platzhalter also fälschlich als "benannt" – weder rote Markierung noch Export-Blockade griffen, obwohl der Sprecher sichtbar unbenannt war. Fix: `checkSpeakersNamed()` (`js/claude.js`) prüft `speakerA`/`speakerB` jetzt zusätzlich über den bereits bestehenden Helfer `_isUnclearSpeakerName()` (`js/persons.js`, seit v6.54/v6.56 für "Sprecher A/B/C/D", "Gesprächspartner/in", "Kollege/Kollegin", "?", "unbekannt", "unklar", "" im Einsatz) – `!s.speakerX || _isUnclearSpeakerName(s.speakerX)`. Bewusst in `checkSpeakersNamed()` selbst und nicht nur im MD-Guard behoben (mit Daniel abgestimmt): dadurch profitieren automatisch auch die 2 bestehenden Analyse-Start-Guards (`runSingleAnalysis()`/`openAnalyseModal()`, deren Code dabei unverändert bleibt) von der schärferen Prüfung. `_guardSpeakersNamed()` markiert `.input-required` aus demselben Grund jetzt ebenfalls bei erkanntem Platzhalter, nicht nur bei leerem Feld. Bewusst nicht betroffen: `_isNoSecondSpeaker()`-Werte ("keinen"/"0" etc., bewusst kein zweiter Sprecher) – nicht in der Platzhalter-Liste von `_isUnclearSpeakerName()` enthalten, gelten weiterhin korrekt als "benannt".
 
 ## v6.86 (Stand: 06.09.2026)
@@ -219,7 +225,7 @@
 - **KI-Modell:** claude-sonnet-4-6 (Browser-Fetch, direkt)
 - **Speicher:** IndexedDB (Sessions + Projekte via `storage.js`), localStorage (API-Keys, Prompts, Theme)
 
-## JS-Module (27 Dateien)
+## JS-Module (28 Dateien)
 | Datei | Aufgabe |
 |---|---|
 | `app.js` | Initialisierung, Theme, Drag & Drop |
@@ -249,6 +255,7 @@
 | `scan.js` | Scan-Import: Foto/Kamera → Claude Vision OCR → Session (kein Dialog, ein Sprecher) |
 | `photos.js` | Foto-Upload, Komprimierung, Claude-Bildanalyse |
 | `icons.js` | Inline Lucide SVG via icon(), kein CDN |
+| `settings.js` | Zentrale Einstellungen-Seite (v6.88): QUELLE_TYP_BUILTIN, getQuelleTypOptions(), eigene Quellentypen |
 
 ## Kontext-Aufbau der drei Assistenten
 Alle drei nutzen dieselben Rollen via `populatePersonaSelects()` (features.js).
@@ -285,6 +292,7 @@ Die App hat eine **linke Sidenav** + einen **Hauptbereich** + optionale Panels.
 | Prompts | navPrompts | promptsView |
 | Hilfe | — | help.html (neues Tab) |
 | API-Keys | — | openApiModal() |
+| Einstellungen | headerSettingsBtn | settingsView (v6.88) |
 | Architektur | navArch | archView |
 | Theme | themeToggleBtn | toggleTheme() |
 
@@ -298,6 +306,7 @@ Die App hat eine **linke Sidenav** + einen **Hauptbereich** + optionale Panels.
 - `archView` — Systemarchitektur (renderArchView in ui.js)
 - `promptsView` — Prompt-Bibliothek
 - `projectsView` — Projektarbeit (fixed overlay)
+- `settingsView` — Einstellungen (renderSettingsView in settings.js, v6.88)
 
 ### Session-Detail (Einzelsitzung)
 Öffnet via `showTranscript()` als Overlay mit Tabs:

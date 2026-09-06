@@ -14,6 +14,11 @@ let   _idb         = null;
 let deletedProjectIds = [];
 let deletedContactIds = [];
 
+// v6.88: eigene Quellentypen (Obsidian-Ingest, Einstellungen-Seite) – Werte selbst sind die
+// Identität (keine IDs nötig), gleiches Tombstone-Muster wie oben für Löschungen im Merge.
+let customQuelleTypen = [];
+let deletedQuelleTypen = [];
+
 function _openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(_IDB_NAME, _IDB_VERSION);
@@ -100,6 +105,12 @@ async function initStorage() {
   if (Array.isArray(storedDeletedProjectIds)) deletedProjectIds = storedDeletedProjectIds;
   const storedDeletedContactIds = await _idbGet('deletedContactIds');
   if (Array.isArray(storedDeletedContactIds)) deletedContactIds = storedDeletedContactIds;
+
+  // v6.88: eigene Quellentypen laden
+  const storedCustomQuelleTypen = await _idbGet('customQuelleTypen');
+  if (Array.isArray(storedCustomQuelleTypen)) customQuelleTypen = storedCustomQuelleTypen;
+  const storedDeletedQuelleTypen = await _idbGet('deletedQuelleTypen');
+  if (Array.isArray(storedDeletedQuelleTypen)) deletedQuelleTypen = storedDeletedQuelleTypen;
 }
 
 // ── Speichern ─────────────────────────────────────────────────────────────
@@ -134,4 +145,15 @@ async function saveDeletedProjectIds() {
 async function saveDeletedContactIds() {
   try { await _idbSet('deletedContactIds', deletedContactIds); }
   catch(e) { console.error('[storage] saveDeletedContactIds Fehler:', e); }
+}
+
+// v6.88: eigene Quellentypen persistieren
+async function saveCustomQuelleTypen() {
+  try { await _idbSet('customQuelleTypen', customQuelleTypen); }
+  catch(e) { console.error('[storage] saveCustomQuelleTypen Fehler:', e); }
+}
+
+async function saveDeletedQuelleTypen() {
+  try { await _idbSet('deletedQuelleTypen', deletedQuelleTypen); }
+  catch(e) { console.error('[storage] saveDeletedQuelleTypen Fehler:', e); }
 }

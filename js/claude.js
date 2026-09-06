@@ -290,7 +290,10 @@ function checkSpeakersNamed() {
 // wird kein MD erzeugt, stattdessen rote Markierung + Scroll-zu + Hinweis-Toast.
 function _guardSpeakersNamed(s) {
   if (!(s?.utterances?.length && !checkSpeakersNamed())) return true;
-  const isGedanken = s.type === 'gedanken';
+  // v6.88: source==='scan_import' ergänzt, damit diese Prüfung exakt zu checkSpeakersNamed()
+  // passt (dort schon länger berücksichtigt) – wirkt sich aktuell nicht aus, da Scan-Sitzungen
+  // speakerA fest auf 'Ich' setzen (scan.js) und schon über checkSpeakersNamed() durchkommen.
+  const isGedanken = s.type === 'gedanken' || s.source === 'scan_import';
   const elA = document.getElementById('editSpeakerA');
   const elB = document.getElementById('editSpeakerB');
   // v6.87: rote Markierung jetzt auch bei Platzhalter-Namen (nicht nur bei leerem Feld)
@@ -1477,7 +1480,7 @@ function showTranscript(session) {
   document.getElementById('editSessionPersons').value = (session.persons || []).join(', ');
   // v6.85: Quelle & Serie – Frontmatter-Zusatzfelder für den Obsidian-Ingest
   document.getElementById('editQuelleLink').value = session.quelleLink || '';
-  document.getElementById('editQuelleTyp').value = session.quelleTyp || '';
+  _renderQuelleTypOptions(session); // v6.88: 5 Basiswerte + eigene Typen aus den Einstellungen
   document.getElementById('editSerie').value = session.serie || '';
   document.getElementById('editTeil').value = session.teil || '';
   renderExtraSpeakerFields(session);
@@ -3900,6 +3903,17 @@ function updateSessionPersons(value) {
   saveSessions();
   saveToArchive(s);
   showToast('Beteiligte Personen gespeichert ✓', 'success');
+}
+
+// v6.88: #editQuelleTyp dynamisch befüllen – 5 feste Basiswerte (QUELLE_TYP_BUILTIN, settings.js)
+// + eigene Typen aus den Einstellungen (getQuelleTypOptions()), statt fest verdrahteter <option>s.
+function _renderQuelleTypOptions(session) {
+  const sel = document.getElementById('editQuelleTyp');
+  if (!sel || typeof getQuelleTypOptions !== 'function') return;
+  const options = getQuelleTypOptions();
+  sel.innerHTML = '<option value="">Quelle-Typ …</option>' +
+    options.map(o => `<option value="${escHtml(o.value)}">${escHtml(o.label)}</option>`).join('');
+  sel.value = session.quelleTyp || '';
 }
 
 // v6.85: Quelle & Serie im Transkript-Header nachträglich bearbeiten – rein optionale

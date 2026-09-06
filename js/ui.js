@@ -395,13 +395,13 @@ function setView(v) {
   document.getElementById('sessionGrid').style.display = v === 'grid' ? '' : 'none';
   document.getElementById('timelineView').classList.toggle('visible', v === 'timeline');
   // Alle Overlay-Views verstecken
-  ['costsView','personsView','archView','promptsView','projectsView','contactsView'].forEach(id => {
+  ['costsView','personsView','archView','promptsView','projectsView','contactsView','settingsView'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   // Browser-Toolbar bei Kachel- und Chronikansicht zeigen (v5.47)
   const bt = document.getElementById('browserToolbar'); if (bt) bt.style.display = (v === 'grid' || v === 'timeline') ? '' : 'none';
   // Alle Overlay-Buttons zurücksetzen inkl. navProjects + navKontakte
-  ['headerCostsBtn','headerPersonsBtn','headerArchBtn','headerPromptsBtn','navProjects','navKontakte'].forEach(id => {
+  ['headerCostsBtn','headerPersonsBtn','headerArchBtn','headerPromptsBtn','headerSettingsBtn','navProjects','navKontakte'].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) { btn.classList.remove('active'); btn.style.borderColor='var(--border)'; btn.style.color='var(--muted)'; btn.style.background='none'; }
   });
@@ -435,7 +435,7 @@ function _showOverlay(viewId, btnId, renderFn) {
   const isProjects = viewId === 'projectsView';
 
   // Andere Overlay-Views (innerhalb browserView) schließen
-  ['costsView','personsView','archView','promptsView','contactsView'].forEach(id => {
+  ['costsView','personsView','archView','promptsView','contactsView','settingsView'].forEach(id => {
     const el = document.getElementById(id);
     if (el && id !== viewId) el.style.display = 'none';
   });
@@ -444,7 +444,7 @@ function _showOverlay(viewId, btnId, renderFn) {
     const pv = document.getElementById('projectsView');
     if (pv) pv.style.display = 'none';
   }
-  ['headerCostsBtn','headerPersonsBtn','headerArchBtn','headerPromptsBtn','navProjects','navKontakte'].forEach(id => {
+  ['headerCostsBtn','headerPersonsBtn','headerArchBtn','headerPromptsBtn','headerSettingsBtn','navProjects','navKontakte'].forEach(id => {
     if (id !== btnId) _setHeaderBtn(id, false);
   });
 
@@ -492,6 +492,19 @@ function toggleCostsView() {
   }
 }
 
+// v6.88: Einstellungen-Seite
+function toggleSettingsView() {
+  const el = document.getElementById('settingsView');
+  if (el.style.display !== 'none') {
+    el.style.display = 'none';
+    _setHeaderBtn('headerSettingsBtn', false);
+    setView(localStorage.getItem('distillSessionsView') || 'list');
+  } else {
+    if (typeof closeSessionSidebar === 'function') closeSessionSidebar(); // v5.17
+    _showOverlay('settingsView', 'headerSettingsBtn', renderSettingsView);
+  }
+}
+
 function toggleArchView() {
   const el = document.getElementById('archView');
   if (el.style.display !== 'none') {
@@ -527,7 +540,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.87';
+  const title = 'Distill Voice – Systemarchitektur v6.88';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -640,6 +653,7 @@ function renderArchView() {
       ${flowCard('auth.js', 'Google Auth', 'Progressive Auth: App startet ohne Login · GIS-Client initialisieren (initGoogleAuth) · Stille Token-Anfrage beim Laden · Werbeblocker-Fallback nach 15s', '#34d399')}
       ${flowCard('icons.js', 'Icon-Helfer', 'Inline Lucide SVG via icon(name, size, style) · Kein CDN-Aufruf zur Laufzeit · Icons als SVG-Strings direkt ins DOM injiziert', '#94a3b8')}
       ${flowCard('contacts.js', 'Kontakte', 'Manuelle Kontaktebene über Projekten: Kontakt → Projekt → Sitzung · CRUD (createContact/updateContact/deleteContact) · Farbkodierung · parallel zum Personen-System · v6.71: deleteContact() trägt ID in deletedContactIds ein (Lösch-Tombstone für Drive-Sync)', '#f472b6')}
+      ${flowCard('settings.js', 'Einstellungen', 'v6.88: neue zentrale Einstellungen-Seite, wächst über die Zeit um weitere Grundeinstellungen. Erster Baustein: eigene Quellentypen für das Quelle-Typ-Dropdown im Transkript-Header (QUELLE_TYP_BUILTIN – 5 feste Werte + getQuelleTypOptions() für eigene). addCustomQuelleTyp()/deleteCustomQuelleTyp(), Drive-Sync mit Lösch-Tombstones (deletedQuelleTypen) analog contacts.js.', '#94a3b8')}
       ${flowCard('photos.js', 'Foto-Analyse', 'Foto-Upload (Drag & Drop + File-Input) · Komprimierung (max 1200px, JPEG 0.75) · Drive-Unterordner pro Sitzung · Claude-Bildanalyse via Foto-Prompts · renderPhotoResults() in Analysen-Tab · session.photos[] + session.photoResults[]', '#f59e0b')}
     </div>
 

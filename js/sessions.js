@@ -216,6 +216,9 @@ async function saveSettingsToDrive() {
       // beim Merge in loadSettingsFromDrive() wieder auftauchen
       deletedProjectIds: deletedProjectIds || [],
       deletedContactIds: deletedContactIds || [],
+      // v6.88: eigene Quellentypen (Einstellungen-Seite)
+      customQuelleTypen: (typeof customQuelleTypen !== 'undefined') ? customQuelleTypen : [],
+      deletedQuelleTypen: (typeof deletedQuelleTypen !== 'undefined') ? deletedQuelleTypen : [],
     };
     const result = await driveUploadJSON(
       'distill_settings.json', data, _settingsFileId || null, driveFolderId
@@ -381,6 +384,21 @@ async function loadSettingsFromDrive() {
       const cvEl = document.getElementById('contactsView');
       if (cvEl && cvEl.style.display !== 'none' && typeof renderContactsView === 'function') {
         renderContactsView();
+      }
+    }
+
+    // ── Eigene Quellentypen: Merge mit Lösch-Tombstones (v6.88, gleiches Muster wie Contacts) ──
+    if (typeof customQuelleTypen !== 'undefined') {
+      const driveDeletedQuelleTypen = Array.isArray(data.deletedQuelleTypen) ? data.deletedQuelleTypen : [];
+      deletedQuelleTypen = Array.from(new Set([...deletedQuelleTypen, ...driveDeletedQuelleTypen]));
+      const driveQuelleTypen = Array.isArray(data.customQuelleTypen) ? data.customQuelleTypen : [];
+      customQuelleTypen = Array.from(new Set([...driveQuelleTypen, ...customQuelleTypen]))
+        .filter(v => !deletedQuelleTypen.includes(v));
+      if (typeof saveDeletedQuelleTypen === 'function') saveDeletedQuelleTypen();
+      if (typeof saveCustomQuelleTypen === 'function') saveCustomQuelleTypen();
+      const svEl = document.getElementById('settingsView');
+      if (svEl && svEl.style.display !== 'none' && typeof renderSettingsView === 'function') {
+        renderSettingsView();
       }
     }
 
