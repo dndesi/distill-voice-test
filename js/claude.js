@@ -1457,6 +1457,11 @@ function showTranscript(session) {
   document.getElementById('editSpeakerA').value = session.speakerA || 'Sprecher A';
   document.getElementById('editSpeakerB').value = session.speakerB || 'Sprecher B';
   document.getElementById('editSessionPersons').value = (session.persons || []).join(', ');
+  // v6.85: Quelle & Serie – Frontmatter-Zusatzfelder für den Obsidian-Ingest
+  document.getElementById('editQuelleLink').value = session.quelleLink || '';
+  document.getElementById('editQuelleTyp').value = session.quelleTyp || '';
+  document.getElementById('editSerie').value = session.serie || '';
+  document.getElementById('editTeil').value = session.teil || '';
   renderExtraSpeakerFields(session);
   updateSpeakerStatus();
   updateAnalyseDropdown();
@@ -1967,6 +1972,13 @@ function _buildMdFrontmatter(session, typ, perspektive) {
     : '[]';
   let yaml = `---\ndatum: ${datum}\nprojekte: ${projekte}\nteilnehmer: ${teilnehmer}\ntags: ${tags}\ntyp: ${typ}`;
   if (perspektive) yaml += `\nperspektive: ${_translitUmlaute(perspektive)}`;
+  // v6.85: vier rein optionale Felder für den Obsidian-Ingest, nur wenn manuell im
+  // Transkript-Header gesetzt (updateSessionQuelle()) – Bestandssitzungen ohne diese
+  // Felder erzeugen exakt dasselbe Frontmatter wie vorher.
+  if (session.quelleLink) yaml += `\nquelle_link: ${session.quelleLink}`;
+  if (session.quelleTyp)  yaml += `\nquelle_typ: ${session.quelleTyp}`;
+  if (session.serie)      yaml += `\nserie: ${session.serie}`;
+  if (session.teil)       yaml += `\nteil: ${session.teil}`;
   yaml += '\n---';
   return yaml;
 }
@@ -3863,6 +3875,26 @@ function updateSessionPersons(value) {
   saveSessions();
   saveToArchive(s);
   showToast('Beteiligte Personen gespeichert ✓', 'success');
+}
+
+// v6.85: Quelle & Serie im Transkript-Header nachträglich bearbeiten – rein optionale
+// Frontmatter-Zusatzfelder für den Obsidian-Ingest (quelle_link/quelle_typ/serie/teil).
+// Leere Werte werden aus dem Session-Objekt entfernt statt als leerer String gespeichert,
+// damit _buildMdFrontmatter() sie sauber weglässt (kein "quelle_link: " ohne Wert).
+function updateSessionQuelle() {
+  const s = getSession();
+  if (!s) return;
+  const link = document.getElementById('editQuelleLink').value.trim();
+  const typ  = document.getElementById('editQuelleTyp').value;
+  const serie = document.getElementById('editSerie').value.trim();
+  const teil  = parseInt(document.getElementById('editTeil').value, 10);
+  if (link) s.quelleLink = link; else delete s.quelleLink;
+  if (typ)  s.quelleTyp  = typ;  else delete s.quelleTyp;
+  if (serie) s.serie = serie; else delete s.serie;
+  if (Number.isFinite(teil) && teil > 0) s.teil = teil; else delete s.teil;
+  saveSessions();
+  saveToArchive(s);
+  showToast('Quelle & Serie gespeichert ✓', 'success');
 }
 
 // Zeigt Umbenennung für Sprecher C, D, … (Samsung Multi-Speaker)
