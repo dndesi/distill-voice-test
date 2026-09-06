@@ -282,6 +282,20 @@ function checkSpeakersNamed() {
   return true;
 }
 
+// v6.86: gleiche Guard-Logik wie beim Analyse-Start (runSingleAnalysis()/openAnalyseModal(), dort
+// bewusst unverändert gelassen), wiederverwendet für MD-Speichern/Export – ohne benannte Sprecher
+// wird kein MD erzeugt, stattdessen rote Markierung + Scroll-zu + Hinweis-Toast.
+function _guardSpeakersNamed(s) {
+  if (!(s?.utterances?.length && !checkSpeakersNamed())) return true;
+  const isGedanken = s.type === 'gedanken';
+  const elA = document.getElementById('editSpeakerA');
+  const elB = document.getElementById('editSpeakerB');
+  if (!s.speakerA && elA) { elA.classList.add('input-required'); setTimeout(() => elA.scrollIntoView({ behavior:'smooth', block:'center' }), 50); }
+  if (!isGedanken && !s.speakerB && elB) elB.classList.add('input-required');
+  showToast('Bitte erst die Sprecher benennen.', 'warning');
+  return false;
+}
+
 function updateSpeakerStatus() {
   const hint = document.getElementById('speakerHint');
   if (!hint) return;
@@ -1963,9 +1977,11 @@ function _buildMdFrontmatter(session, typ, perspektive) {
   const projectName = _getProjectName(session.projectId);
   const projekte = projectName ? `[${projectName}]` : '[]';
   // v6.32: Scan-Notizen sind kein Dialog – keine Teilnehmer-Liste
+  // v6.86: bewusst eingetragenes "kein zweiter Sprecher" (_isNoSecondSpeaker(), z.B. "keinen"/"0")
+  // wird aus der Teilnehmer-Liste rausgefiltert statt als Name mitaufgeführt zu werden
   const speakers = session.source === 'scan_import'
     ? []
-    : [session.speakerA || '<unbekannt>', session.speakerB].filter(Boolean);
+    : [session.speakerA || '<unbekannt>', session.speakerB].filter(name => name && !_isNoSecondSpeaker(name));
   const teilnehmer = `[${speakers.join(', ')}]`;
   const tags = Array.isArray(session.tags) && session.tags.length
     ? `[${session.tags.map(t => (typeof t === 'object' ? t.text || t.label : t)).join(', ')}]`
@@ -2082,6 +2098,7 @@ function _mdFilename(session, suffix) {
 async function exportTranscriptMd() {
   const session = getSession(currentSessionId);
   if (!session) return;
+  if (!_guardSpeakersNamed(session)) return;
 
   showToast('MD wird erstellt…', 'info');
 
@@ -2205,6 +2222,11 @@ async function exportAnalysisMd(type) {
 // mit "Permission denied" ab und fiel dort ohnehin auf denselben Download zurück wie der MD-Button;
 // die Ordnerwahl über die File System Access API ist die eigentlich gewünschte Funktion).
 async function saveAnalysisMdAs(type) {
+  const session = getSession(currentSessionId);
+  if (!session) return;
+  // v6.86: Guard vor dem Ordner-Dialog prüfen (nicht erst danach in _prepareAnalysisMd()) – sonst
+  // müsste der Nutzer erst einen Speicherort wählen, bevor der Hinweis "Sprecher benennen" kommt.
+  if (!_guardSpeakersNamed(session)) return;
   if (!window.showSaveFilePicker) {
     const result = await _prepareAnalysisMd(type);
     if (!result) return;
@@ -2212,8 +2234,6 @@ async function saveAnalysisMdAs(type) {
     _downloadMd(result.md, result.filename);
     return;
   }
-  const session = getSession(currentSessionId);
-  if (!session) return;
   let handle;
   try {
     handle = await window.showSaveFilePicker({
@@ -2259,6 +2279,7 @@ function _analysisPerspektive(type, session) {
 async function _prepareAnalysisMd(type) {
   const session = getSession(currentSessionId);
   if (!session) return null;
+  if (!_guardSpeakersNamed(session)) return null;
 
   showToast('MD wird erstellt…', 'info');
 
