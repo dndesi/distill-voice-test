@@ -274,8 +274,11 @@ function checkSpeakersNamed() {
   const s = getSession();
   if (!s || !s.utterances?.length) return true;
   const isGedanken = s.type === 'gedanken' || s.source === 'scan_import';
-  if (!s.speakerA) return false;
-  if (!isGedanken && !s.speakerB) return false;
+  // v6.87: _isUnclearSpeakerName() (persons.js) fängt auch unbenannte Platzhalter wie "Sprecher A"
+  // ab (Default beim Anlegen, wenn kein Name erkannt wurde) – vorher nur Falsy-Prüfung, dadurch galt
+  // ein nie umbenannter Platzhalter fälschlich als "benannt".
+  if (!s.speakerA || _isUnclearSpeakerName(s.speakerA)) return false;
+  if (!isGedanken && (!s.speakerB || _isUnclearSpeakerName(s.speakerB))) return false;
   // v6.66: zusätzliche Sprecher (C, D, …) müssen ebenfalls benannt sein
   const extra = (s.speakers || []).filter(sp => sp.id !== 'A' && sp.id !== 'B');
   if (extra.some(sp => !sp.name)) return false;
@@ -290,8 +293,9 @@ function _guardSpeakersNamed(s) {
   const isGedanken = s.type === 'gedanken';
   const elA = document.getElementById('editSpeakerA');
   const elB = document.getElementById('editSpeakerB');
-  if (!s.speakerA && elA) { elA.classList.add('input-required'); setTimeout(() => elA.scrollIntoView({ behavior:'smooth', block:'center' }), 50); }
-  if (!isGedanken && !s.speakerB && elB) elB.classList.add('input-required');
+  // v6.87: rote Markierung jetzt auch bei Platzhalter-Namen (nicht nur bei leerem Feld)
+  if ((!s.speakerA || _isUnclearSpeakerName(s.speakerA)) && elA) { elA.classList.add('input-required'); setTimeout(() => elA.scrollIntoView({ behavior:'smooth', block:'center' }), 50); }
+  if (!isGedanken && (!s.speakerB || _isUnclearSpeakerName(s.speakerB)) && elB) elB.classList.add('input-required');
   showToast('Bitte erst die Sprecher benennen.', 'warning');
   return false;
 }
