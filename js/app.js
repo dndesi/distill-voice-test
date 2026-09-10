@@ -14,6 +14,7 @@ async function init() {
   renderBrowser();
   setupAudioSync();
   setDateInputToNow();
+  if (typeof _openDeepLinkSession === 'function') _openDeepLinkSession(); // v6.91: ?session=<id> öffnet direkt die Sitzung
 
   // Drag & Drop
   const zone = document.getElementById('uploadZone');

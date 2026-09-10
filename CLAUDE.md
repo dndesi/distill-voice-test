@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.90** (Stand: 06.09.2026)
+**v6.91** (Stand: 10.09.2026)
+- Feature: Sitzungs-Deep-Link + Haken „Diese Sitzung" bei Quelle-Link. Die App hatte bisher keine eigene URL pro Sitzung (reine SPA). Neu: `_sessionDeepLink(sessionId)`/`_openDeepLinkSession()` (`js/sessions.js`) – ein Link mit `?session=<id>` öffnet die App und springt beim Laden automatisch zu genau dieser Sitzung (Aufruf am Ende von `init()` in `js/app.js` für bereits lokal vorhandene Sitzungen und am Ende von `enterApp()` in `js/auth.js` nach Drive-Sync, deckt beide Fälle ab ohne Doppel-Öffnen). Checkbox `#editQuelleLinkSelf` neben `#editQuelleLink` (`toggleQuelleLinkSelf()`, `js/claude.js`): angehakt wird das Feld automatisch mit dem Deep-Link dieser Sitzung befüllt und schreibgeschützt (statt eines externen Links wie YouTube), abgehakt wird es wieder geleert und frei editierbar. Kein neues Datenfeld – der Haken-Zustand wird beim Öffnen (`showTranscript()`) aus dem vorhandenen `quelleLink`-Wert abgeleitet.
+
+## v6.90 (Stand: 06.09.2026)
 - Feature: MD-Export bekommt ein fünftes, rein optionales Frontmatter-Feld `bereich` – abgeleitet aus der bestehenden Sitzungs-Kategorie (`session.type`: Arbeit/Privat/Wissen/Gedanken), kein neues Eingabefeld. `_buildMdFrontmatter()` (`js/claude.js`): neue Mapping-Konstante `bereichMap` (`{arbeit:'arbeit', privat:'privat', wissen:'wissen', gedanken:'gedanke'}` – bewusst Singular `gedanke` im Export, abweichend vom internen Pluralwert `gedanken`), Feld wird direkt nach `teil` geschrieben und komplett weggelassen, wenn keine Kategorie gesetzt ist. Rein additiv – bestehende Felder/Reihenfolge/Verhalten unverändert.
 
 ## v6.89 (Stand: 06.09.2026)

@@ -27,6 +27,28 @@ function initLoadingScreen() {
   }, 20000);
 }
 
+// ═══════════════════════════════════════════════════
+// SITZUNGS-DEEP-LINK (v6.91)
+// ═══════════════════════════════════════════════════
+// Baut einen Link, der diese Sitzung beim Öffnen der App direkt anzeigt.
+function _sessionDeepLink(sessionId) {
+  return location.origin + location.pathname + '?session=' + encodeURIComponent(sessionId);
+}
+
+// Prüft beim App-Start auf ?session=<id> in der URL und öffnet die Sitzung,
+// sobald sie in sessions[] vorhanden ist (lokal oder nach Drive-Sync).
+function _openDeepLinkSession() {
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('session');
+  if (!sid) return;
+  const s = (typeof sessions !== 'undefined' ? sessions : []).find(x => x.id === sid);
+  if (!s) return; // evtl. erst nach Drive-Sync verfügbar – zweiter Versuch dort
+  params.delete('session');
+  const qs = params.toString();
+  history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  showTranscript(s);
+}
+
 // DRIVE SESSION MANAGEMENT
 // ═══════════════════════════════════════════════════
 async function saveToArchive(session, audioFile = null) {

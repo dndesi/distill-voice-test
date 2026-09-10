@@ -142,6 +142,7 @@ async function enterApp() {
   renderBrowser();
   setupAudioSync();
   await loadFromDrive();
+  if (typeof _openDeepLinkSession === 'function') _openDeepLinkSession(); // v6.91: falls erst nach Drive-Sync verfügbar
   // hideLoadingScreen() wird von loadSettingsFromDrive() am Ende aufgerufen
 }
 

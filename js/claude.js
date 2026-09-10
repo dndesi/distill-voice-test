@@ -1497,6 +1497,14 @@ function showTranscript(session) {
   document.getElementById('editSessionPersons').value = (session.persons || []).join(', ');
   // v6.85: Quelle & Serie – Frontmatter-Zusatzfelder für den Obsidian-Ingest
   document.getElementById('editQuelleLink').value = session.quelleLink || '';
+  // v6.91: Haken "Diese Sitzung" spiegelt, ob der gespeicherte Link bereits der Deep-Link dieser Sitzung ist
+  {
+    const isSelfLink = session.quelleLink && session.quelleLink === _sessionDeepLink(session.id);
+    const elLinkSelf = document.getElementById('editQuelleLinkSelf');
+    const elLinkEl = document.getElementById('editQuelleLink');
+    if (elLinkSelf) elLinkSelf.checked = !!isSelfLink;
+    if (elLinkEl) elLinkEl.readOnly = !!isSelfLink;
+  }
   _renderQuelleTypOptions(session); // v6.88: 5 Basiswerte + eigene Typen aus den Einstellungen
   document.getElementById('editSerie').value = session.serie || '';
   document.getElementById('editTeil').value = session.teil || '';
@@ -3962,6 +3970,24 @@ function updateSessionQuelle() {
   saveSessions();
   saveToArchive(s);
   showToast('Quelle & Serie gespeichert ✓', 'success');
+}
+
+// v6.91: Haken "Diese Sitzung" neben Quelle-Link – befüllt das Feld mit einem Deep-Link,
+// der diese Sitzung beim Öffnen der App direkt anzeigt (_sessionDeepLink(), sessions.js),
+// statt eines externen Links (YouTube o.ä.). Feld wird dabei schreibgeschützt.
+function toggleQuelleLinkSelf() {
+  const s = getSession();
+  const elLinkSelf = document.getElementById('editQuelleLinkSelf');
+  const elLink = document.getElementById('editQuelleLink');
+  if (!s || !elLinkSelf || !elLink) return;
+  if (elLinkSelf.checked) {
+    elLink.value = _sessionDeepLink(s.id);
+    elLink.readOnly = true;
+  } else {
+    elLink.value = '';
+    elLink.readOnly = false;
+  }
+  updateSessionQuelle();
 }
 
 // Zeigt Umbenennung für Sprecher C, D, … (Samsung Multi-Speaker)
