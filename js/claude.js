@@ -2246,11 +2246,22 @@ async function exportTranscriptPdf() {
   win.document.close();
 }
 
+// v6.92: markiert eine Sitzung als exportiert, sobald eine Analyse als MD exportiert oder
+// gespeichert wurde (exportAnalysisMd()/saveAnalysisMdAs()) – für die Export-Markierung/den
+// Filter im Sitzungs-Archiv. Reiner Transkript-Export zählt bewusst nicht mit (mit Daniel
+// abgestimmt), da es dabei explizit um den Export/das Speichern einer ANALYSE geht.
+function _markSessionExported(session) {
+  session.exportedAt = Date.now();
+  saveSessions();
+  saveToArchive(session);
+}
+
 // Analyse als MD exportieren
 async function exportAnalysisMd(type) {
   const result = await _prepareAnalysisMd(type);
   if (!result) return;
   _downloadMd(result.md, result.filename);
+  _markSessionExported(getSession(currentSessionId));
 }
 
 // v6.84: MD in einen frei wählbaren Ordner speichern statt immer automatisch in den Downloads-Ordner
@@ -2268,6 +2279,7 @@ async function saveAnalysisMdAs(type) {
     if (!result) return;
     showToast('Dieser Browser unterstützt keine Ordnerauswahl – MD wird stattdessen heruntergeladen.', 'info');
     _downloadMd(result.md, result.filename);
+    _markSessionExported(session);
     return;
   }
   let handle;
@@ -2286,6 +2298,7 @@ async function saveAnalysisMdAs(type) {
     await writable.write(result.md);
     await writable.close();
     showToast('MD-Datei gespeichert', 'success');
+    _markSessionExported(session);
   } catch (e) {
     showToast('Speichern fehlgeschlagen: ' + e.message, 'error');
   }
