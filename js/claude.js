@@ -1057,7 +1057,7 @@ function renderInsights(session) {
 
     const editFieldBtn = (aKey, field) =>
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
-        onclick="editAnalysisField('${sid}','${aKey}','${field}')">${icon('pencil',11)}</button>`;
+        onclick="editAnalysisField('${sid}','${aKey}','${field}')">${icon('edit-2',11)}</button>`;
 
     // v6.74: typeof-Check statt reinem Truthy-Check – ein Analyse-Feld, das (z.B. durch
     // ein abweichendes Mistral-Antwortformat) als Objekt statt als Text gespeichert wurde,
@@ -1092,7 +1092,7 @@ function renderInsights(session) {
         onclick="addAnalysisItem('${sid}','${aKey}','${field}')">${icon('plus',11)} Hinzufügen</button>`;
     const editItemBtn = (aKey, field, i) =>
       `<button class="work-item-del" title="Bearbeiten" style="opacity:0.5"
-        onclick="editAnalysisItem('${sid}','${aKey}','${field}',${i})">${icon('pencil',11)}</button>`;
+        onclick="editAnalysisItem('${sid}','${aKey}','${field}',${i})">${icon('edit-2',11)}</button>`;
 
     if (pa.agreements?.length) {
       html += `<div class="work-section"><div class="work-section-title">${icon('check-circle',13,'margin-right:5px')} Vereinbarungen ${addBtn('privateAnalysis','agreements')}</div><div data-section="privateAnalysis-agreements">`;
@@ -1174,13 +1174,13 @@ function renderInsights(session) {
         onclick="deleteAnalysisItem('${wSid}','workAnalysis','${field}',${i})">${icon('trash-2',12)}</button>`;
     const wEdit = (field, i) =>
       `<button class="work-item-del" title="Bearbeiten" style="opacity:0.5"
-        onclick="editAnalysisItem('${wSid}','workAnalysis','${field}',${i})">${icon('pencil',11)}</button>`;
+        onclick="editAnalysisItem('${wSid}','workAnalysis','${field}',${i})">${icon('edit-2',11)}</button>`;
     const wAdd = (field) =>
       `<button class="work-item-del" title="Hinzufügen" style="margin-left:6px;opacity:0.6;font-size:0.75rem"
         onclick="addAnalysisItem('${wSid}','workAnalysis','${field}')">${icon('plus',11)} Hinzufügen</button>`;
     const wEditField = (field) =>
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
-        onclick="editAnalysisField('${wSid}','workAnalysis','${field}')">${icon('pencil',11)}</button>`;
+        onclick="editAnalysisField('${wSid}','workAnalysis','${field}')">${icon('edit-2',11)}</button>`;
 
     // v6.74: typeof-Check statt reinem Truthy-Check – siehe privateAnalysis oben
     if (typeof wa.summary === 'string' && wa.summary) {
@@ -1566,13 +1566,13 @@ function renderCustomSchemaResult(session, promptId, data, schema) {
     // ── Hilfsfunktionen ──────────────────────────────
     const editFieldBtn = () =>
       `<button class="work-item-del" title="Bearbeiten" style="margin-left:6px;opacity:0.6"
-        onclick="editCustomResultField('${sid}','${promptId}','${field}')">${icon('pencil',11)}</button>`;
+        onclick="editCustomResultField('${sid}','${promptId}','${field}')">${icon('edit-2',11)}</button>`;
     const addBtn = () =>
       `<button class="work-item-del" title="Hinzufügen" style="margin-left:6px;opacity:0.6;font-size:0.75rem"
         onclick="addCustomResultItem('${sid}','${promptId}','${field}')">${icon('plus',11)} Hinzufügen</button>`;
     const editItemBtn = (i) =>
       `<button class="work-item-del" title="Bearbeiten" style="opacity:0.5"
-        onclick="editCustomResultItem('${sid}','${promptId}','${field}',${i})">${icon('pencil',11)}</button>`;
+        onclick="editCustomResultItem('${sid}','${promptId}','${field}',${i})">${icon('edit-2',11)}</button>`;
     const delItemBtn = (i) =>
       `<button class="work-item-del" title="Löschen"
         onclick="deleteCustomResultItem('${sid}','${promptId}','${field}',${i})">${icon('trash-2',12)}</button>`;

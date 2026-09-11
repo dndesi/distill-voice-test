@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.92** (Stand: 10.09.2026)
+**v6.93** (Stand: 11.09.2026)
+- Bugfix: Bearbeiten-Icon bei Analysen unsichtbar. `icon('pencil',11)` (6 Stellen in `js/claude.js`: `editAnalysisField()`/`editAnalysisItem()` für Gesprächs-/Arbeitsanalyse, `editCustomResultField()`/`editCustomResultItem()` für eigene Prompts) lieferte ein leeres SVG, da `'pencil'` nicht in der festen 62-Icon-Liste von `icons.js` registriert ist – die Bearbeiten-Funktion selbst hat funktioniert, war aber mangels sichtbarem Icon praktisch nicht auffindbar. Auf `icon('edit-2',11)` umgestellt (bereits im festen Set, gleiches Icon wie an anderer Stelle der App). Derselbe Bug wurde schon einmal in v5.40 gefixt, ist mit der späteren Umstellung auf die feingranulare Feld-/Eintrags-Bearbeitung aber wieder eingeschlichen.
+
+## v6.92 (Stand: 10.09.2026)
 - Feature: Export-Markierung + Filter für Sitzungen. Neues Feld `session.exportedAt` (Zeitstempel), gesetzt über neue `_markSessionExported(session)` (`js/claude.js`) – aufgerufen in `exportAnalysisMd()` (nach dem Download) und `saveAnalysisMdAs()` (nach erfolgreichem Speichern, sowohl File-System-Access-Pfad als auch Download-Fallback). Bewusst **nur** bei Export/Speichern einer Analyse, nicht beim reinen Transkript-Export (`exportTranscriptMd()`, mit Daniel abgestimmt). Sitzungskarte (`renderBrowser()`, `js/ui.js`) zeigt bei gesetztem `exportedAt` einen grünen „Exportiert"-Badge mit Datum. Neuer Filter-Dropdown `#exportFilter` im Sitzungs-Archiv (neben `#analysisFilter`): „Nur exportierte" / „Nur nicht exportierte".
 
 ## v6.91 (Stand: 10.09.2026)
