@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.95** (Stand: 18.09.2026)
+**v6.96** (Stand: 18.09.2026)
+- Debug (temporär): Die v6.95-Diagnose-Toasts nutzen beide dasselbe `#toast`-Element – lief `checkPendingShares()` (per `setTimeout`, 500ms) kurz nach dem URL-Toast (300ms), wurde dieser fast sofort überschrieben und war nur als kurzer Flash sichtbar, nicht zuverlässig lesbar. Das erklärt die widersprüchlichen Testergebnisse (Daniel las u.a. „shared=0" statt „shared=1" – vermutlich ein Lesefehler durch den Timing-Konflikt, nicht der tatsächliche Wert). Fix: neue `_debugLog(msg)` (`js/app.js`) erzeugt ein bleibendes `position:fixed`-Panel am unteren Bildschirmrand, das jede Diagnose-Zeile mit Zeitstempel anhängt statt zu überschreiben, inkl. Schließen-Button – bleibt stehen, bis Daniel es manuell schließt. Ersetzt die `showToast('DEBUG: ...')`-Aufrufe aus v6.95 an denselben Stellen und ergänzt zusätzliche Log-Zeilen in den `visibilitychange`/`pageshow`-Listenern (v6.94), damit sichtbar wird, welcher der drei möglichen Auslöser tatsächlich feuert. Zwischenstand vor diesem Fix: Reinstallation der PWA (Homescreen-Icon entfernt + neu hinzugefügt) hat dazu geführt, dass der URL-Query-String beim App-Start überhaupt erstmals wieder auftauchte (spricht für die zuvor vermutete veraltete WebAPK-Registrierung als Teilursache) – der eigentliche Inhalt des Query-Strings muss mit dem neuen Panel aber erst noch zuverlässig verifiziert werden, bevor die eigentliche Fehlerursache feststeht.
+
+## v6.95 (Stand: 18.09.2026)
 - Debug (temporär): Der v6.94-Fix (visibilitychange/pageshow-Trigger für `checkPendingShares()`) hat das Teilen-Popup-Problem nicht behoben – von Daniel bestätigt getestet, exakt gleiches Verhalten wie vorher, auch mit sicher geladener v6.94. Die tatsächliche Ursache liegt also woanders in der Kette (Service-Worker-Interception des POST /share, Redirect, oder IndexedDB-Speicherung) – ohne Möglichkeit, Android-Sharing selbst zu testen, wäre jede weitere Änderung geraten. Stattdessen zwei temporäre Diagnose-Toasts in `js/app.js`: (1) `init()` zeigt beim App-Start den rohen `location.search` an, falls vorhanden – zeigt, ob der Service Worker den Request überhaupt abfängt und mit `?shared=1` redirected. (2) `checkPendingShares()` zeigt bei jedem Aufruf die Anzahl gefundener Einträge in `distill_share_db` an – zeigt, ob der Service Worker die Datei tatsächlich in der IndexedDB gespeichert hat. Beide rein additiv (keine Logikänderung), werden nach der Diagnose mit Daniel wieder entfernt. Nebeneffekt: da `checkPendingShares()` seit v6.94 auch bei jedem Vordergrund-Wechsel läuft, erscheint testweise bei jedem App-Wechsel ein "0 gefunden"-Toast – gewollt für diese Debug-Version.
 
 ## v6.94 (Stand: 18.09.2026)
@@ -358,7 +361,8 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
-| v6.95 | 18.09.2026 | Debug (temporär): Diagnose-Toasts für Teilen-Popup-Problem (v6.94-Fix hat nicht geholfen) – URL-Query-String beim Start + checkPendingShares()-Ergebnis |
+| v6.96 | 18.09.2026 | Debug (temporär): bleibendes Panel (_debugLog()) statt sich überschreibender Toasts aus v6.95 |
+| v6.95 | 18.09.2026 | Debug (temporär, s. v6.96): Diagnose-Toasts für Teilen-Popup-Problem (v6.94-Fix hat nicht geholfen) – URL-Query-String beim Start + checkPendingShares()-Ergebnis |
 | v6.94 | 18.09.2026 | Fix (nicht ausreichend, siehe v6.95): Teilen-Popup öffnete sich nach Android-Audioteilen nicht – checkPendingShares() jetzt auch bei visibilitychange/pageshow, nicht nur einmalig in init() |
 | v6.66 | 21.08.2026 | Feature: Bis zu 4 Sprecher statt fest 2 – C/D aus AssemblyAI-Diarization ins bestehende speakers-Array (_applyExtraSpeaker), checkSpeakersNamed()/toggleUtteranceSpeaker() erweitert |
 | v6.65 | 15.08.2026 | Fix: PWA start_url/SW-Pfade zeigten auf altes Original-Repo statt auf diese Kopie – jetzt relativ/dynamisch (getAppPath()) |
