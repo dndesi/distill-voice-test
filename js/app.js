@@ -104,6 +104,20 @@ async function checkPendingShares() {
   openShareOverlay(shares);
 }
 
+// v6.94: Erneuter Check bei Rückkehr in den Vordergrund. init() (und damit der
+// einmalige shared=1-Check) läuft nur einmal beim ersten Laden des Scripts – holt
+// Android beim Teilen ein bereits offenes App-Fenster nur in den Vordergrund
+// (ohne echten Reload) oder wird die Seite aus dem Back-Forward-Cache wiederhergestellt,
+// läuft init() nicht erneut und das Popup bleibt zu, obwohl der Service Worker die
+// Datei bereits gespeichert hat. checkPendingShares() ist ungefährlich mehrfach
+// aufrufbar (tut nichts, wenn nichts in der IndexedDB liegt).
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') checkPendingShares();
+});
+window.addEventListener('pageshow', e => {
+  if (e.persisted) checkPendingShares();
+});
+
 function openShareOverlay(shares) {
   // Dateitypen klassifizieren
   const txtFiles   = shares.filter(f => f.type === 'text/plain' || f.name.endsWith('.txt'));

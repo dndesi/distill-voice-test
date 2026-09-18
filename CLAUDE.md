@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.93** (Stand: 11.09.2026)
+**v6.94** (Stand: 18.09.2026)
+- Bugfix: Teilen-Popup öffnete sich nach Android-Audioteilen manchmal nicht. Der Check auf geteilte Dateien (`shared=1`-URL-Parameter → `checkPendingShares()` → `openShareOverlay()`) läuft bisher ausschließlich einmalig innerhalb von `init()` (`js/app.js`), das seinerseits nur einmal als Top-Level-Statement beim ersten Parsen des Scripts ausgeführt wird (`init();`, Zeile 640). Holt Android beim Teilen ein bereits offenes/pausiertes PWA-Fenster lediglich in den Vordergrund statt eines echten Neuladens, oder wird die Seite aus dem Back-Forward-Cache wiederhergestellt, läuft `init()` nie erneut – der Service Worker hat die geteilte Datei zwar korrekt in der IndexedDB (`distill_share_db`) gespeichert, aber nichts fragt mehr danach, das Popup bleibt zu. Fix: zwei neue Listener in `js/app.js` (direkt nach `checkPendingShares()`) – `document.addEventListener('visibilitychange', …)` ruft `checkPendingShares()` erneut auf, sobald `document.visibilityState === 'visible'`; `window.addEventListener('pageshow', …)` ruft es zusätzlich bei `event.persisted` (Wiederherstellung aus dem Cache) auf. `checkPendingShares()` selbst unverändert und gefahrlos mehrfach aufrufbar (bricht sofort ab, wenn nichts in der IndexedDB liegt). Der bestehende einmalige `shared=1`-Check in `init()` bleibt unverändert als erste Prüfung bestehen.
+
+## v6.93 (Stand: 11.09.2026)
 - Bugfix: Bearbeiten-Icon bei Analysen unsichtbar. `icon('pencil',11)` (6 Stellen in `js/claude.js`: `editAnalysisField()`/`editAnalysisItem()` für Gesprächs-/Arbeitsanalyse, `editCustomResultField()`/`editCustomResultItem()` für eigene Prompts) lieferte ein leeres SVG, da `'pencil'` nicht in der festen 62-Icon-Liste von `icons.js` registriert ist – die Bearbeiten-Funktion selbst hat funktioniert, war aber mangels sichtbarem Icon praktisch nicht auffindbar. Auf `icon('edit-2',11)` umgestellt (bereits im festen Set, gleiches Icon wie an anderer Stelle der App). Derselbe Bug wurde schon einmal in v5.40 gefixt, ist mit der späteren Umstellung auf die feingranulare Feld-/Eintrags-Bearbeitung aber wieder eingeschlichen.
 
 ## v6.92 (Stand: 10.09.2026)
@@ -352,6 +355,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.94 | 18.09.2026 | Fix: Teilen-Popup öffnete sich nach Android-Audioteilen nicht – checkPendingShares() jetzt auch bei visibilitychange/pageshow, nicht nur einmalig in init() |
 | v6.66 | 21.08.2026 | Feature: Bis zu 4 Sprecher statt fest 2 – C/D aus AssemblyAI-Diarization ins bestehende speakers-Array (_applyExtraSpeaker), checkSpeakersNamed()/toggleUtteranceSpeaker() erweitert |
 | v6.65 | 15.08.2026 | Fix: PWA start_url/SW-Pfade zeigten auf altes Original-Repo statt auf diese Kopie – jetzt relativ/dynamisch (getAppPath()) |
 | v6.64 | 15.08.2026 | Neue Markenfarbe Orange statt Violett – --accent/--accent2, color-mix() statt --accent-rgb, Header schwarz, Favicon/Icons neu |

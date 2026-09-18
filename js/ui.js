@@ -544,7 +544,7 @@ function toggleContactsView() {
 function exportArchPdf() {
   const el = document.getElementById('archView');
   if (!el) return;
-  const title = 'Distill Voice – Systemarchitektur v6.93';
+  const title = 'Distill Voice – Systemarchitektur v6.94';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
   <style>
     body { font-family: -apple-system, sans-serif; margin: 20px; color: #1a1a2e; background: #fff; }
@@ -653,7 +653,7 @@ function renderArchView() {
       ${flowCard('scan.js', 'Scan-Import', 'Standard-Engine: PaddleOCR (Tiny, lokal, models/paddleocr/, kein API-Key). Alternative: Claude Vision (auch Handschrift). Fotos + PDFs werden automatisch erkannt – PDF.js → _pdfToImageFiles() (Scale 2.0, JPEG). _reflowOcrText() fügt buchzeilenweisen Text zu Fließtext zusammen. Doppelseiten-Split (_splitImageHalves), manuelles Umsortieren. source=scan_import, pageCount statt duration, kein AssemblyAI.', '#2dd4bf')}
       ${flowCard('notes.js', 'Notizen', 'Persönliche Notizen pro Sitzung, Auto-Save', '#94a3b8')}
       ${flowCard('projects.js', 'Projektarbeit', 'Projekt-Browser (Kacheln, Anlegen/Bearbeiten/Archivieren), Detailansicht, Dashboard mit Statistiken, Aufgaben-Tracking (checklistItem), Projekt-Analyse via Claude (builtin_project_analysis) · BUILTIN_PROJECT_ID = Allgemeines Projekt · _buildProjectAnalysisContext(projectId, question): v5.87: smarte Session-Erkennung (Sitzungsname in Frage → nur diese laden, kein Limit), Fallback: MAX_CHARS=100.000, pro-Sitzung-Budget, neueste zuerst · v6.61: eigenes Claude/Mistral-Dropdown im Projekt-Assistent-Header', '#f59e0b')}
-      ${flowCard('app.js', 'Initialisierung', 'async init() → await initStorage() → IndexedDB laden vor UI-Start · Theme-Toggle · Upload-Schrittvalidierung · Drag & Drop', '#c084fc')}
+      ${flowCard('app.js', 'Initialisierung', 'async init() → await initStorage() → IndexedDB laden vor UI-Start · Theme-Toggle · Upload-Schrittvalidierung · Drag & Drop · v6.94: checkPendingShares() zusätzlich bei visibilitychange/pageshow (nicht nur einmalig in init()), da Android beim Teilen ein bereits offenes Fenster nur in den Vordergrund holen kann, ohne dass init() erneut läuft', '#c084fc')}
       ${flowCard('auth.js', 'Google Auth', 'Progressive Auth: App startet ohne Login · GIS-Client initialisieren (initGoogleAuth) · Stille Token-Anfrage beim Laden · Werbeblocker-Fallback nach 15s', '#34d399')}
       ${flowCard('icons.js', 'Icon-Helfer', 'Inline Lucide SVG via icon(name, size, style) · Kein CDN-Aufruf zur Laufzeit · Icons als SVG-Strings direkt ins DOM injiziert', '#94a3b8')}
       ${flowCard('contacts.js', 'Kontakte', 'Manuelle Kontaktebene über Projekten: Kontakt → Projekt → Sitzung · CRUD (createContact/updateContact/deleteContact) · Farbkodierung · parallel zum Personen-System · v6.71: deleteContact() trägt ID in deletedContactIds ein (Lösch-Tombstone für Drive-Sync)', '#f472b6')}
