@@ -2,7 +2,11 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.97** (Stand: 19.09.2026)
+**v6.98** (Stand: 19.09.2026)
+- Aufräumen: Teilen-Popup-Problem (Android) bleibt trotz mehrerer Fixversuche (v6.94 visibilitychange/pageshow-Trigger, v6.97 Manifest-Cache-Buster) ungelöst. Diagnose (v6.95/v6.96) zeigte konsequent: `location.search` ist beim App-Start nach dem Antippen von „Distill Voice" im Android-Teilen-Menü immer leer, identisch zum normalen App-Öffnen über das Icon – auch nach kompletter Neuinstallation. Wahrscheinlichste verbleibende Ursache liegt außerhalb dieser App (Androids/Chromes automatischer Hintergrund-Rebuild der installierten PWA-Hülle/WebAPK) und ist von hier aus, ohne direkten Geräte-/Systemzugriff, nicht weiter einzugrenzen oder zu beheben. Mit Daniel abgestimmt: Suche eingestellt (offen bliebe nur noch `chrome://webapks` auf dem Gerät zu prüfen, falls später nochmal Interesse besteht).
+- Aufräumen: sichtbares Debug-Panel (v6.95/v6.96, `_debugLog()`) entfernt – störte im Alltag bei jedem App-Vordergrund-Wechsel. `js/app.js`: alle `_debugLog(...)`-Aufrufe und die Funktion selbst entfernt (in `init()`, `checkPendingShares()`, den beiden Foreground-Listenern). Die harmlosen `visibilitychange`/`pageshow`-Trigger aus v6.94 bleiben unverändert bestehen (kein sichtbares Verhalten, potenziell weiterhin nützlich für andere Fälle wie den Sitzungs-Deep-Link). Keine Änderung an sw.js, manifest.json oder der Kernlogik.
+
+## v6.97 (Stand: 19.09.2026)
 - Fix: Das v6.96-Debug-Panel lieferte den entscheidenden Befund – Daniel bestätigt, per Screenshot: beim Antippen von „Distill Voice" im Android-Teilen-Menü ist `location.search` beim App-Start konsequent leer (`""`), identisch zum ganz normalen Öffnen der App über das Icon. Kein `shared=1` kommt jemals an, auch nach komplettem Deinstallieren + Neuinstallieren der App auf dem Handy (Chrome bestätigt als Browser, Samsung Internet als Ursache damit ausgeschlossen). Wahrscheinlichste Erklärung: `manifest.json` (aus der Android beim „Zum Startbildschirm hinzufügen" den nativen Teilen-Eintrag/WebAPK baut) war die einzige zentrale Datei der App ohne Cache-Buster – jede JS/CSS-Datei trägt bei jeder Version `?v=X.XX`, die `manifest.json` wurde dagegen immer unversioniert unter derselben URL referenziert. Eine irgendwann zwischengespeicherte veraltete Kopie (GitHub-Pages-CDN und/oder Googles WebAPK-Baudienst) kann dadurch beliebig lange bestehen bleiben – eine reine Neuinstallation auf dem Handy erzwingt keinen erneuten Abruf beim Hosting, das erklärt auch, warum Daniels Uninstall/Reinstall-Test allein nicht geholfen hat. Fix: `index.html` referenziert `manifest.json` jetzt mit Versions-Parameter (`manifest.json?v=6.97`), wie alle anderen Dateien auch – wird künftig automatisch mit jedem Versions-Bump hochgezählt. Damit der Fix am Gerät wirksam wird, zusätzlich nötig (kein Code, sondern Gerätehandlung): App-Icon deinstallieren, in Chrome Website-Daten für die Distill-Voice-Seite löschen (Client-Cache der alten Manifest-URL entfernen), erneut zum Startbildschirm hinzufügen, Teilen erneut testen. Die v6.94–v6.96-Debug-Zusätze (visibilitychange/pageshow-Trigger, `_debugLog()`-Panel) bleiben bis zur Bestätigung aktiv, danach Rückbau geplant.
 
 ## v6.96 (Stand: 18.09.2026)
@@ -364,7 +368,8 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
-| v6.97 | 19.09.2026 | Fix: Cache-Buster für manifest.json – wahrscheinliche Ursache für das Teilen-Popup-Problem (fehlte als einzige zentrale Datei ohne ?v=X.XX) |
+| v6.98 | 19.09.2026 | Aufräumen: Teilen-Popup-Problem bleibt ungelöst (vermutlich außerhalb der App), Suche eingestellt – Debug-Panel entfernt |
+| v6.97 | 19.09.2026 | Fix-Versuch: Cache-Buster für manifest.json – hat das Teilen-Popup-Problem nicht behoben (siehe v6.98) |
 | v6.96 | 18.09.2026 | Debug (temporär): bleibendes Panel (_debugLog()) statt sich überschreibender Toasts aus v6.95 |
 | v6.95 | 18.09.2026 | Debug (temporär, s. v6.96): Diagnose-Toasts für Teilen-Popup-Problem (v6.94-Fix hat nicht geholfen) – URL-Query-String beim Start + checkPendingShares()-Ergebnis |
 | v6.94 | 18.09.2026 | Fix (nicht ausreichend, siehe v6.95): Teilen-Popup öffnete sich nach Android-Audioteilen nicht – checkPendingShares() jetzt auch bei visibilitychange/pageshow, nicht nur einmalig in init() |

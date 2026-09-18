@@ -2,11 +2,6 @@
 // INIT
 // ═══════════════════════════════════════════════════
 async function init() {
-  // v6.96 DEBUG (temporär): protokolliert in einem bleibenden Panel statt in Toasts –
-  // zwei Toasts kurz nacheinander überschreiben sich gegenseitig (nur ein Toast-Element),
-  // das Panel sammelt stattdessen alle Schritte sichtbar untereinander. Wird nach der
-  // Diagnose wieder entfernt.
-  _debugLog('init() gestartet, location.search = "' + location.search + '"');
   await initStorage();               // IndexedDB laden (sessions + projects)
   migrateSessionsToDefaultProject(); // Paket 1: bestehende Sessions → Allgemeines Projekt
   updateProjectBadge();              // Paket 2: Sidenav-Badge aktualisieren
@@ -48,11 +43,8 @@ async function init() {
 
   // Geteilte Dateien prüfen (wenn App über Share-Intent geöffnet wurde)
   if (location.search.includes('shared=1')) {
-    _debugLog('shared=1 erkannt → checkPendingShares() in 500ms');
     history.replaceState({}, '', location.pathname);
     setTimeout(() => checkPendingShares(), 500); // kurze Pause damit UI aufgebaut ist
-  } else {
-    _debugLog('kein shared=1 in der URL');
   }
 
   // v5.18: Ladebildschirm – ohne Drive kurz anzeigen dann schließen
@@ -107,8 +99,6 @@ async function _clearPendingShares() {
 
 async function checkPendingShares() {
   const shares = await _loadPendingShares();
-  // v6.96 DEBUG (temporär): siehe _debugLog() weiter unten – bleibendes Panel statt Toast.
-  _debugLog('checkPendingShares() → ' + (shares ? shares.length : 0) + ' gefunden');
   if (!shares || shares.length === 0) return;
   await _clearPendingShares();
   openShareOverlay(shares);
@@ -122,43 +112,11 @@ async function checkPendingShares() {
 // Datei bereits gespeichert hat. checkPendingShares() ist ungefährlich mehrfach
 // aufrufbar (tut nichts, wenn nichts in der IndexedDB liegt).
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    _debugLog('visibilitychange → visible');
-    checkPendingShares();
-  }
+  if (document.visibilityState === 'visible') checkPendingShares();
 });
 window.addEventListener('pageshow', e => {
-  if (e.persisted) {
-    _debugLog('pageshow persisted=true');
-    checkPendingShares();
-  }
+  if (e.persisted) checkPendingShares();
 });
-
-// v6.96 DEBUG (temporär): bleibendes Panel statt Toasts – zwei Toasts kurz hintereinander
-// überschreiben sich (nur ein Toast-Element), dadurch waren Ergebnisse aus v6.95 nicht
-// zuverlässig lesbar. Sammelt stattdessen alle Diagnose-Zeilen sichtbar untereinander,
-// bleibt stehen bis manuell geschlossen. Wird nach der Diagnose mit Daniel wieder entfernt.
-function _debugLog(msg) {
-  let panel = document.getElementById('_debugSharePanel');
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = '_debugSharePanel';
-    panel.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;z-index:99999;'
-      + 'background:rgba(0,0,0,0.9);color:#4ade80;font-family:monospace;font-size:11px;'
-      + 'padding:8px 30px 8px 8px;border-radius:8px;max-height:45vh;overflow-y:auto;'
-      + 'white-space:pre-wrap;line-height:1.5;';
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
-    closeBtn.style.cssText = 'position:absolute;top:4px;right:8px;background:none;border:none;'
-      + 'color:#4ade80;font-size:18px;cursor:pointer;line-height:1;';
-    closeBtn.onclick = () => panel.remove();
-    panel.appendChild(closeBtn);
-    document.body.appendChild(panel);
-  }
-  const line = document.createElement('div');
-  line.textContent = new Date().toLocaleTimeString('de-DE') + '  ' + msg;
-  panel.appendChild(line);
-}
 
 function openShareOverlay(shares) {
   // Dateitypen klassifizieren
