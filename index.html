@@ -6,12 +6,12 @@
   <title>Distill Voice</title>
   <link rel="icon" href="img/icon-192.png" />
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="manifest.json?v=6.97" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.96" />
+  <link rel="stylesheet" href="css/styles.css?v=6.97" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.96</button>
+        onmouseout="this.style.color='var(--muted)'">v6.97</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -2054,6 +2054,17 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.97 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.97</span><span class="cl-date">19.09.2026</span></div>
+        <div class="cl-title">Fix: Cache-Buster für manifest.json (Android-Teilen)</div>
+        <ul class="cl-list">
+          <li>Das v6.96-Debug-Panel zeigte klar: beim Antippen von „Distill Voice" im Android-Teilen-Menü kommt nie eine geteilte Datei an – die App öffnet sich exakt so, als wäre nur das Icon angetippt worden, auch nach kompletter Neuinstallation der App auf dem Handy. Wahrscheinliche Ursache: `manifest.json` (aus der Android beim „Zum Startbildschirm hinzufügen" den nativen Teilen-Eintrag baut) hatte als einzige zentrale Datei der App keinen Cache-Buster – anders als jede JS/CSS-Datei, die bei jeder Version `?v=X.XX` trägt. Eine veraltete, zwischengespeicherte Kopie (GitHub-Pages-CDN und/oder der Google-Dienst, der aus der Manifest-Datei die Android-App baut) konnte dadurch beliebig lange bestehen bleiben – auch eine Neuinstallation auf dem Handy erzwingt keinen erneuten Abruf beim Hosting.</li>
+          <li>Fix: `index.html` lädt `manifest.json` jetzt mit demselben Versions-Parameter wie alle anderen Dateien (`manifest.json?v=6.97`), wird bei jedem künftigen Versions-Bump automatisch mit hochgezählt. Damit das wirksam wird: App-Icon vom Handy nochmal deinstallieren, in Chrome die Website-Daten für die Distill-Voice-Seite löschen (damit auch der Client-Cache der alten Manifest-URL weg ist), dann erneut zum Startbildschirm hinzufügen und Teilen testen.</li>
+        </ul>
+        <div class="cl-tech">index.html: `&lt;link rel="manifest" href="manifest.json"&gt;` → `href="manifest.json?v=6.97"`. Einzige Änderung – sw.js, manifest.json selbst und die komplette Share-Verarbeitung in js/app.js bleiben unverändert. Die v6.94/v6.95/v6.96-Debug-Zusätze (visibilitychange/pageshow-Trigger, `_debugLog()`-Panel) bleiben vorerst aktiv, bis der Fix am Gerät bestätigt ist.</div>
+      </div>
 
       <!-- ── v6.96 ── -->
       <div class="cl-entry">
@@ -6327,37 +6338,37 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.96"></script>
-<script src="js/storage.js?v=6.96"></script>
-<script src="js/config.js?v=6.96"></script>
-<script src="js/aiProvider.js?v=6.96"></script>
-<script src="js/auth.js?v=6.96"></script>
-<script src="js/drive.js?v=6.96"></script>
-<script src="js/sessions.js?v=6.96"></script>
-<script src="js/assemblyai.js?v=6.96"></script>
-<script src="js/claude.js?v=6.96"></script>
-<script src="js/ui.js?v=6.96"></script>
-<script src="js/tags.js?v=6.96"></script>
-<script src="js/notes.js?v=6.96"></script>
-<script src="js/photos.js?v=6.96"></script>
-<script src="js/persons.js?v=6.96"></script>
-<script src="js/audio.js?v=6.96"></script>
-<script src="js/recorder.js?v=6.96"></script>
-<script src="js/contacts.js?v=6.96"></script>
-<script src="js/settings.js?v=6.96"></script>
-<script src="js/app.js?v=6.96"></script>
+<script src="js/icons.js?v=6.97"></script>
+<script src="js/storage.js?v=6.97"></script>
+<script src="js/config.js?v=6.97"></script>
+<script src="js/aiProvider.js?v=6.97"></script>
+<script src="js/auth.js?v=6.97"></script>
+<script src="js/drive.js?v=6.97"></script>
+<script src="js/sessions.js?v=6.97"></script>
+<script src="js/assemblyai.js?v=6.97"></script>
+<script src="js/claude.js?v=6.97"></script>
+<script src="js/ui.js?v=6.97"></script>
+<script src="js/tags.js?v=6.97"></script>
+<script src="js/notes.js?v=6.97"></script>
+<script src="js/photos.js?v=6.97"></script>
+<script src="js/persons.js?v=6.97"></script>
+<script src="js/audio.js?v=6.97"></script>
+<script src="js/recorder.js?v=6.97"></script>
+<script src="js/contacts.js?v=6.97"></script>
+<script src="js/settings.js?v=6.97"></script>
+<script src="js/app.js?v=6.97"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.96"></script>
-<script src="js/search.js?v=6.96"></script>
-<script src="js/embeddings.js?v=6.96"></script>
-<script src="js/calendar.js?v=6.96"></script>
-<script src="js/templateLibrary.js?v=6.96"></script>
-<script src="js/prompts.js?v=6.96"></script>
-<script src="js/projects.js?v=6.96"></script>
-<script src="js/import.js?v=6.96"></script>
-<script src="js/scan.js?v=6.96"></script>
+<script src="js/features.js?v=6.97"></script>
+<script src="js/search.js?v=6.97"></script>
+<script src="js/embeddings.js?v=6.97"></script>
+<script src="js/calendar.js?v=6.97"></script>
+<script src="js/templateLibrary.js?v=6.97"></script>
+<script src="js/prompts.js?v=6.97"></script>
+<script src="js/projects.js?v=6.97"></script>
+<script src="js/import.js?v=6.97"></script>
+<script src="js/scan.js?v=6.97"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
