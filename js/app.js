@@ -2,6 +2,12 @@
 // INIT
 // ═══════════════════════════════════════════════════
 async function init() {
+  // v6.95 DEBUG (temporär): zeigt beim App-Start den URL-Query-String an, falls vorhanden –
+  // hilft zu sehen, ob nach Android-Teilen überhaupt "?shared=1" ankommt. Wird nach der
+  // Diagnose wieder entfernt.
+  if (location.search) {
+    setTimeout(() => showToast('DEBUG: URL = ' + location.search, 'warning'), 300);
+  }
   await initStorage();               // IndexedDB laden (sessions + projects)
   migrateSessionsToDefaultProject(); // Paket 1: bestehende Sessions → Allgemeines Projekt
   updateProjectBadge();              // Paket 2: Sidenav-Badge aktualisieren
@@ -99,6 +105,10 @@ async function _clearPendingShares() {
 
 async function checkPendingShares() {
   const shares = await _loadPendingShares();
+  // v6.95 DEBUG (temporär): zeigt bei jedem Aufruf das Ergebnis an – hilft zu sehen, ob
+  // überhaupt etwas in der IndexedDB (distill_share_db) ankommt. Wird nach der Diagnose
+  // wieder entfernt.
+  showToast('DEBUG: checkPendingShares → ' + (shares ? shares.length : 0) + ' gefunden', 'warning');
   if (!shares || shares.length === 0) return;
   await _clearPendingShares();
   openShareOverlay(shares);

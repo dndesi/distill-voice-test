@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.94** (Stand: 18.09.2026)
+**v6.95** (Stand: 18.09.2026)
+- Debug (temporär): Der v6.94-Fix (visibilitychange/pageshow-Trigger für `checkPendingShares()`) hat das Teilen-Popup-Problem nicht behoben – von Daniel bestätigt getestet, exakt gleiches Verhalten wie vorher, auch mit sicher geladener v6.94. Die tatsächliche Ursache liegt also woanders in der Kette (Service-Worker-Interception des POST /share, Redirect, oder IndexedDB-Speicherung) – ohne Möglichkeit, Android-Sharing selbst zu testen, wäre jede weitere Änderung geraten. Stattdessen zwei temporäre Diagnose-Toasts in `js/app.js`: (1) `init()` zeigt beim App-Start den rohen `location.search` an, falls vorhanden – zeigt, ob der Service Worker den Request überhaupt abfängt und mit `?shared=1` redirected. (2) `checkPendingShares()` zeigt bei jedem Aufruf die Anzahl gefundener Einträge in `distill_share_db` an – zeigt, ob der Service Worker die Datei tatsächlich in der IndexedDB gespeichert hat. Beide rein additiv (keine Logikänderung), werden nach der Diagnose mit Daniel wieder entfernt. Nebeneffekt: da `checkPendingShares()` seit v6.94 auch bei jedem Vordergrund-Wechsel läuft, erscheint testweise bei jedem App-Wechsel ein "0 gefunden"-Toast – gewollt für diese Debug-Version.
+
+## v6.94 (Stand: 18.09.2026)
 - Bugfix: Teilen-Popup öffnete sich nach Android-Audioteilen manchmal nicht. Der Check auf geteilte Dateien (`shared=1`-URL-Parameter → `checkPendingShares()` → `openShareOverlay()`) läuft bisher ausschließlich einmalig innerhalb von `init()` (`js/app.js`), das seinerseits nur einmal als Top-Level-Statement beim ersten Parsen des Scripts ausgeführt wird (`init();`, Zeile 640). Holt Android beim Teilen ein bereits offenes/pausiertes PWA-Fenster lediglich in den Vordergrund statt eines echten Neuladens, oder wird die Seite aus dem Back-Forward-Cache wiederhergestellt, läuft `init()` nie erneut – der Service Worker hat die geteilte Datei zwar korrekt in der IndexedDB (`distill_share_db`) gespeichert, aber nichts fragt mehr danach, das Popup bleibt zu. Fix: zwei neue Listener in `js/app.js` (direkt nach `checkPendingShares()`) – `document.addEventListener('visibilitychange', …)` ruft `checkPendingShares()` erneut auf, sobald `document.visibilityState === 'visible'`; `window.addEventListener('pageshow', …)` ruft es zusätzlich bei `event.persisted` (Wiederherstellung aus dem Cache) auf. `checkPendingShares()` selbst unverändert und gefahrlos mehrfach aufrufbar (bricht sofort ab, wenn nichts in der IndexedDB liegt). Der bestehende einmalige `shared=1`-Check in `init()` bleibt unverändert als erste Prüfung bestehen.
 
 ## v6.93 (Stand: 11.09.2026)
@@ -355,7 +358,8 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
-| v6.94 | 18.09.2026 | Fix: Teilen-Popup öffnete sich nach Android-Audioteilen nicht – checkPendingShares() jetzt auch bei visibilitychange/pageshow, nicht nur einmalig in init() |
+| v6.95 | 18.09.2026 | Debug (temporär): Diagnose-Toasts für Teilen-Popup-Problem (v6.94-Fix hat nicht geholfen) – URL-Query-String beim Start + checkPendingShares()-Ergebnis |
+| v6.94 | 18.09.2026 | Fix (nicht ausreichend, siehe v6.95): Teilen-Popup öffnete sich nach Android-Audioteilen nicht – checkPendingShares() jetzt auch bei visibilitychange/pageshow, nicht nur einmalig in init() |
 | v6.66 | 21.08.2026 | Feature: Bis zu 4 Sprecher statt fest 2 – C/D aus AssemblyAI-Diarization ins bestehende speakers-Array (_applyExtraSpeaker), checkSpeakersNamed()/toggleUtteranceSpeaker() erweitert |
 | v6.65 | 15.08.2026 | Fix: PWA start_url/SW-Pfade zeigten auf altes Original-Repo statt auf diese Kopie – jetzt relativ/dynamisch (getAppPath()) |
 | v6.64 | 15.08.2026 | Neue Markenfarbe Orange statt Violett – --accent/--accent2, color-mix() statt --accent-rgb, Header schwarz, Favicon/Icons neu |

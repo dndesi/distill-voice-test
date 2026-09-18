@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Distill Voice" />
   <meta name="theme-color" content="#ff7a1a" />
-  <link rel="stylesheet" href="css/styles.css?v=6.94" />
+  <link rel="stylesheet" href="css/styles.css?v=6.95" />
   <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
@@ -97,7 +97,7 @@
         background:none; border:none; color:var(--muted); font-size:0.7rem;
         padding:0; cursor:pointer; letter-spacing:0.03em; white-space:nowrap;"
         onmouseover="this.style.color='var(--accent)'"
-        onmouseout="this.style.color='var(--muted)'">v6.94</button>
+        onmouseout="this.style.color='var(--muted)'">v6.95</button>
       <a href="help.html" target="_blank" title="Hilfe öffnen" style="
         display:inline-flex; align-items:center; justify-content:center;
         width:22px; height:22px; border-radius:50%;
@@ -2054,6 +2054,16 @@
       <button onclick="closeChangelogModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="overflow-y:auto; flex:1; padding-right:4px">
+
+      <!-- ── v6.95 ── -->
+      <div class="cl-entry">
+        <div class="cl-header"><span class="cl-version">v6.95</span><span class="cl-date">18.09.2026</span></div>
+        <div class="cl-title">Debug: Diagnose-Ausgaben für Android-Teilen-Popup (temporär)</div>
+        <ul class="cl-list">
+          <li>Der v6.94-Fix hat das Problem (Teilen-Popup öffnet sich nicht) nicht behoben – die Ursache liegt woanders. Statt weiter zu raten: temporäre Diagnose-Toasts, um beim nächsten Testlauf live zu sehen, an welcher Stelle der Ablauf abbricht. Werden nach der Diagnose wieder entfernt.</li>
+        </ul>
+        <div class="cl-tech">js/app.js: `init()` zeigt beim App-Start einen Toast mit dem rohen URL-Query-String, falls vorhanden (zeigt, ob nach dem Teilen überhaupt `?shared=1` ankommt). `checkPendingShares()` zeigt bei jedem Aufruf einen Toast mit der Anzahl gefundener geteilter Dateien (zeigt, ob der Service Worker etwas in `distill_share_db` gespeichert hat). Beide rein additiv, keine Logikänderung an der eigentlichen Share-Verarbeitung.</div>
+      </div>
 
       <!-- ── v6.94 ── -->
       <div class="cl-entry">
@@ -6307,37 +6317,37 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/icons.js?v=6.94"></script>
-<script src="js/storage.js?v=6.94"></script>
-<script src="js/config.js?v=6.94"></script>
-<script src="js/aiProvider.js?v=6.94"></script>
-<script src="js/auth.js?v=6.94"></script>
-<script src="js/drive.js?v=6.94"></script>
-<script src="js/sessions.js?v=6.94"></script>
-<script src="js/assemblyai.js?v=6.94"></script>
-<script src="js/claude.js?v=6.94"></script>
-<script src="js/ui.js?v=6.94"></script>
-<script src="js/tags.js?v=6.94"></script>
-<script src="js/notes.js?v=6.94"></script>
-<script src="js/photos.js?v=6.94"></script>
-<script src="js/persons.js?v=6.94"></script>
-<script src="js/audio.js?v=6.94"></script>
-<script src="js/recorder.js?v=6.94"></script>
-<script src="js/contacts.js?v=6.94"></script>
-<script src="js/settings.js?v=6.94"></script>
-<script src="js/app.js?v=6.94"></script>
+<script src="js/icons.js?v=6.95"></script>
+<script src="js/storage.js?v=6.95"></script>
+<script src="js/config.js?v=6.95"></script>
+<script src="js/aiProvider.js?v=6.95"></script>
+<script src="js/auth.js?v=6.95"></script>
+<script src="js/drive.js?v=6.95"></script>
+<script src="js/sessions.js?v=6.95"></script>
+<script src="js/assemblyai.js?v=6.95"></script>
+<script src="js/claude.js?v=6.95"></script>
+<script src="js/ui.js?v=6.95"></script>
+<script src="js/tags.js?v=6.95"></script>
+<script src="js/notes.js?v=6.95"></script>
+<script src="js/photos.js?v=6.95"></script>
+<script src="js/persons.js?v=6.95"></script>
+<script src="js/audio.js?v=6.95"></script>
+<script src="js/recorder.js?v=6.95"></script>
+<script src="js/contacts.js?v=6.95"></script>
+<script src="js/settings.js?v=6.95"></script>
+<script src="js/app.js?v=6.95"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>if (window.lucide) lucide.createIcons();</script>
 <script>document.addEventListener('DOMContentLoaded', () => { if (typeof initHighlightSelection === 'function') initHighlightSelection(); });</script>
-<script src="js/features.js?v=6.94"></script>
-<script src="js/search.js?v=6.94"></script>
-<script src="js/embeddings.js?v=6.94"></script>
-<script src="js/calendar.js?v=6.94"></script>
-<script src="js/templateLibrary.js?v=6.94"></script>
-<script src="js/prompts.js?v=6.94"></script>
-<script src="js/projects.js?v=6.94"></script>
-<script src="js/import.js?v=6.94"></script>
-<script src="js/scan.js?v=6.94"></script>
+<script src="js/features.js?v=6.95"></script>
+<script src="js/search.js?v=6.95"></script>
+<script src="js/embeddings.js?v=6.95"></script>
+<script src="js/calendar.js?v=6.95"></script>
+<script src="js/templateLibrary.js?v=6.95"></script>
+<script src="js/prompts.js?v=6.95"></script>
+<script src="js/projects.js?v=6.95"></script>
+<script src="js/import.js?v=6.95"></script>
+<script src="js/scan.js?v=6.95"></script>
 <!-- PDF.js für PDF-Import (v4.91) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
