@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.99** (Stand: 02.10.2026)
+**v7.0** (Stand: 02.10.2026)
+- Fix: Der eigene Sprecher-Platzhalter ("Ich" etc.) erschien in der `teilnehmer`-Liste des MD-Export-Frontmatters wörtlich als „Ich" statt mit dem echten Namen. `_buildMdFrontmatter()` (`js/claude.js`): Namen, die `_isMyName()` erkennt (ich/daniel/`ownerName`), werden vor dem Dedup-Schritt durch den in den Einstellungen hinterlegten `ownerName` ersetzt, sofern gesetzt.
+
+## v6.99 (Stand: 02.10.2026)
 - Fix: MD-Export von Transkripten und Analysen sicherte im YAML-Frontmatter nicht alle Personennamen. `_buildMdFrontmatter()` (`js/claude.js`) baute die `teilnehmer`-Liste bisher ausschließlich aus `session.speakerA`/`session.speakerB` – zwei weitere, längst existierende Namensquellen fehlten komplett: `session.speakers[]` (Sprecher C/D, seit v6.66 aus AssemblyAI-Diarization oder Samsung-Mehrsprecher-Import) und `session.persons[]` (manuell eingetragene „Beteiligte Personen", seit v6.53 unabhängig von den Sprecher-Feldern editierbar). Fix: Teilnehmer-Liste wird jetzt aus allen vier Quellen vereint, case-insensitiv dedupliziert und zusätzlich über `_isUnclearSpeakerName()` gefiltert (bisher nur `_isNoSecondSpeaker()`) – Platzhalter wie „Sprecher A" tauchen damit nicht mehr als echter Name auf. Scan-Import (`source === 'scan_import'`) bleibt unverändert ohne Teilnehmer-Liste, da kein Dialog.
 
 ## v6.98 (Stand: 19.09.2026)
@@ -371,6 +374,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v7.0 | 02.10.2026 | Fix: eigener Name ("Ich") im MD-Export-Frontmatter – wird jetzt durch ownerName ersetzt |
 | v6.99 | 02.10.2026 | Fix: MD-Export-Frontmatter – teilnehmer-Liste bezog Sprecher C/D und Beteiligte Personen nicht ein, jetzt alle vier Quellen vereint + dedupliziert |
 | v6.98 | 19.09.2026 | Aufräumen: Teilen-Popup-Problem bleibt ungelöst (vermutlich außerhalb der App), Suche eingestellt – Debug-Panel entfernt |
 | v6.97 | 19.09.2026 | Fix-Versuch: Cache-Buster für manifest.json – hat das Teilen-Popup-Problem nicht behoben (siehe v6.98) |

@@ -2015,10 +2015,13 @@ function _buildMdFrontmatter(session, typ, perspektive) {
   // (session.speakers[], seit v6.66) und manuell eingetragene "Beteiligte Personen"
   // (session.persons[], seit v6.53) fehlten komplett. Jetzt alle vier Quellen vereint,
   // Platzhalter (_isUnclearSpeakerName()) und "kein zweiter Sprecher" rausgefiltert, dedupliziert.
+  // v7.0: eigener Sprecher-Platzhalter ("Ich" etc., _isMyName()) wird durch den echten,
+  // in den Einstellungen hinterlegten Namen (ownerName) ersetzt, statt roh "Ich" zu zeigen.
   let speakers = [];
   if (session.source !== 'scan_import') {
     const extraNames = (session.speakers || []).map(sp => sp.name || sp.speaker || sp.label);
-    const raw = [session.speakerA, session.speakerB, ...extraNames, ...(session.persons || [])];
+    const raw = [session.speakerA, session.speakerB, ...extraNames, ...(session.persons || [])]
+      .map(name => (name && _isMyName(name) && ownerName) ? ownerName : name);
     const seen = new Set();
     speakers = raw.filter(name => {
       if (!name || _isNoSecondSpeaker(name) || _isUnclearSpeakerName(name)) return false;
