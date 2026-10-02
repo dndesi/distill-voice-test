@@ -2011,9 +2011,24 @@ function _buildMdFrontmatter(session, typ, perspektive) {
   // v6.32: Scan-Notizen sind kein Dialog – keine Teilnehmer-Liste
   // v6.86: bewusst eingetragenes "kein zweiter Sprecher" (_isNoSecondSpeaker(), z.B. "keinen"/"0")
   // wird aus der Teilnehmer-Liste rausgefiltert statt als Name mitaufgeführt zu werden
-  const speakers = session.source === 'scan_import'
-    ? []
-    : [session.speakerA || '<unbekannt>', session.speakerB].filter(name => name && !_isNoSecondSpeaker(name));
+  // v6.99: Teilnehmer-Liste bezog bisher nur speakerA/speakerB ein – Sprecher C/D
+  // (session.speakers[], seit v6.66) und manuell eingetragene "Beteiligte Personen"
+  // (session.persons[], seit v6.53) fehlten komplett. Jetzt alle vier Quellen vereint,
+  // Platzhalter (_isUnclearSpeakerName()) und "kein zweiter Sprecher" rausgefiltert, dedupliziert.
+  let speakers = [];
+  if (session.source !== 'scan_import') {
+    const extraNames = (session.speakers || []).map(sp => sp.name || sp.speaker || sp.label);
+    const raw = [session.speakerA, session.speakerB, ...extraNames, ...(session.persons || [])];
+    const seen = new Set();
+    speakers = raw.filter(name => {
+      if (!name || _isNoSecondSpeaker(name) || _isUnclearSpeakerName(name)) return false;
+      const key = name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (speakers.length === 0) speakers = ['<unbekannt>'];
+  }
   const teilnehmer = `[${speakers.join(', ')}]`;
   const tags = Array.isArray(session.tags) && session.tags.length
     ? `[${session.tags.map(t => (typeof t === 'object' ? t.text || t.label : t)).join(', ')}]`

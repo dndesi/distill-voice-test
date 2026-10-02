@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v6.98** (Stand: 19.09.2026)
+**v6.99** (Stand: 02.10.2026)
+- Fix: MD-Export von Transkripten und Analysen sicherte im YAML-Frontmatter nicht alle Personennamen. `_buildMdFrontmatter()` (`js/claude.js`) baute die `teilnehmer`-Liste bisher ausschließlich aus `session.speakerA`/`session.speakerB` – zwei weitere, längst existierende Namensquellen fehlten komplett: `session.speakers[]` (Sprecher C/D, seit v6.66 aus AssemblyAI-Diarization oder Samsung-Mehrsprecher-Import) und `session.persons[]` (manuell eingetragene „Beteiligte Personen", seit v6.53 unabhängig von den Sprecher-Feldern editierbar). Fix: Teilnehmer-Liste wird jetzt aus allen vier Quellen vereint, case-insensitiv dedupliziert und zusätzlich über `_isUnclearSpeakerName()` gefiltert (bisher nur `_isNoSecondSpeaker()`) – Platzhalter wie „Sprecher A" tauchen damit nicht mehr als echter Name auf. Scan-Import (`source === 'scan_import'`) bleibt unverändert ohne Teilnehmer-Liste, da kein Dialog.
+
+## v6.98 (Stand: 19.09.2026)
 - Aufräumen: Teilen-Popup-Problem (Android) bleibt trotz mehrerer Fixversuche (v6.94 visibilitychange/pageshow-Trigger, v6.97 Manifest-Cache-Buster) ungelöst. Diagnose (v6.95/v6.96) zeigte konsequent: `location.search` ist beim App-Start nach dem Antippen von „Distill Voice" im Android-Teilen-Menü immer leer, identisch zum normalen App-Öffnen über das Icon – auch nach kompletter Neuinstallation. Wahrscheinlichste verbleibende Ursache liegt außerhalb dieser App (Androids/Chromes automatischer Hintergrund-Rebuild der installierten PWA-Hülle/WebAPK) und ist von hier aus, ohne direkten Geräte-/Systemzugriff, nicht weiter einzugrenzen oder zu beheben. Mit Daniel abgestimmt: Suche eingestellt (offen bliebe nur noch `chrome://webapks` auf dem Gerät zu prüfen, falls später nochmal Interesse besteht).
 - Aufräumen: sichtbares Debug-Panel (v6.95/v6.96, `_debugLog()`) entfernt – störte im Alltag bei jedem App-Vordergrund-Wechsel. `js/app.js`: alle `_debugLog(...)`-Aufrufe und die Funktion selbst entfernt (in `init()`, `checkPendingShares()`, den beiden Foreground-Listenern). Die harmlosen `visibilitychange`/`pageshow`-Trigger aus v6.94 bleiben unverändert bestehen (kein sichtbares Verhalten, potenziell weiterhin nützlich für andere Fälle wie den Sitzungs-Deep-Link). Keine Änderung an sw.js, manifest.json oder der Kernlogik.
 
@@ -368,6 +371,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v6.99 | 02.10.2026 | Fix: MD-Export-Frontmatter – teilnehmer-Liste bezog Sprecher C/D und Beteiligte Personen nicht ein, jetzt alle vier Quellen vereint + dedupliziert |
 | v6.98 | 19.09.2026 | Aufräumen: Teilen-Popup-Problem bleibt ungelöst (vermutlich außerhalb der App), Suche eingestellt – Debug-Panel entfernt |
 | v6.97 | 19.09.2026 | Fix-Versuch: Cache-Buster für manifest.json – hat das Teilen-Popup-Problem nicht behoben (siehe v6.98) |
 | v6.96 | 18.09.2026 | Debug (temporär): bleibendes Panel (_debugLog()) statt sich überschreibender Toasts aus v6.95 |
