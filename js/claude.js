@@ -2183,10 +2183,13 @@ async function exportTranscriptMd() {
       // in Upload-Reihenfolge, mit Seiten-Markierung statt Sprecher-Label
       verlauf = session.utterances.map((u, i) => `**Seite ${i + 1}**\n\n${u.text}`).join('\n\n');
     } else {
+      // v7.1: getSpeakerName() statt hartcodiertem A/B-Ternary – löst auch Sprecher C/D
+      // korrekt über session.speakers[] auf (vorher fielen sie fälschlich in den B-Zweig
+      // und wurden mit Sprecher B verschmolzen).
       let lastSpeaker = '';
       const lines = [];
       session.utterances.forEach(u => {
-        const name = u.speaker === 'A' ? (session.speakerA || 'A') : (session.speakerB || 'B');
+        const name = getSpeakerName(u.speaker, session);
         if (name !== lastSpeaker) { lines.push(`\n**${name}:** ${u.text}`); lastSpeaker = name; }
         else lines.push(u.text);
       });
@@ -2229,10 +2232,11 @@ async function exportTranscriptPdf() {
         `<p><strong>Seite ${i + 1}</strong><br>${u.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</p>`
       ).join('\n');
     } else {
+      // v7.1: getSpeakerName() statt hartcodiertem A/B-Ternary – siehe exportTranscriptMd()
       let lastSpeaker = '';
       const parts = [];
       session.utterances.forEach(u => {
-        const name = u.speaker === 'A' ? (session.speakerA || 'A') : (session.speakerB || 'B');
+        const name = getSpeakerName(u.speaker, session);
         const txt  = u.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         if (name !== lastSpeaker) { parts.push(`<p><strong>${name}:</strong> ${txt}</p>`); lastSpeaker = name; }
         else { parts[parts.length - 1] = parts[parts.length - 1].replace(/<\/p>$/, ` ${txt}</p>`); }

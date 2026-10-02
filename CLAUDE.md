@@ -2,7 +2,10 @@
 > Pflichtlektüre vor jeder Coding-Session. Bei jeder Versionsänderung aktualisieren.
 
 ## Aktuelle Version
-**v7.0** (Stand: 02.10.2026)
+**v7.1** (Stand: 02.10.2026)
+- Fix: `exportTranscriptMd()` und `exportTranscriptPdf()` (`js/claude.js`) lösten Sprechernamen im Transkript-Export bisher über ein hartcodiertes A/B-Ternary auf (`u.speaker === 'A' ? speakerA : speakerB`) – ein 3. oder 4. Sprecher (`session.speakers[]`, seit v6.66) fiel dadurch fälschlich in den B-Zweig und wurde mit Sprecher B zu einem Textblock verschmolzen, statt als eigene Person im Export zu erscheinen. Fix: beide Funktionen nutzen jetzt die bereits vorhandene, generische `getSpeakerName(u.speaker, session)` – dieselbe Funktion, die Analyse-Export und Gesprächs-Chat schon korrekt verwendeten.
+
+## v7.0 (Stand: 02.10.2026)
 - Fix: Der eigene Sprecher-Platzhalter ("Ich" etc.) erschien in der `teilnehmer`-Liste des MD-Export-Frontmatters wörtlich als „Ich" statt mit dem echten Namen. `_buildMdFrontmatter()` (`js/claude.js`): Namen, die `_isMyName()` erkennt (ich/daniel/`ownerName`), werden vor dem Dedup-Schritt durch den in den Einstellungen hinterlegten `ownerName` ersetzt, sofern gesetzt.
 
 ## v6.99 (Stand: 02.10.2026)
@@ -374,6 +377,7 @@ Aktuelle Kacheln: Rollen (v5.89), Foto-Analyse, Lesezeichen, Kontakte/Themen, Au
 ## Changelog-Highlights (letzte Versionen)
 | Version | Datum | Feature/Fix |
 |---|---|---|
+| v7.1 | 02.10.2026 | Fix: Sprecher C/D fehlten im Transkript-MD-/PDF-Export – getSpeakerName() statt hartcodiertem A/B-Ternary |
 | v7.0 | 02.10.2026 | Fix: eigener Name ("Ich") im MD-Export-Frontmatter – wird jetzt durch ownerName ersetzt |
 | v6.99 | 02.10.2026 | Fix: MD-Export-Frontmatter – teilnehmer-Liste bezog Sprecher C/D und Beteiligte Personen nicht ein, jetzt alle vier Quellen vereint + dedupliziert |
 | v6.98 | 19.09.2026 | Aufräumen: Teilen-Popup-Problem bleibt ungelöst (vermutlich außerhalb der App), Suche eingestellt – Debug-Panel entfernt |
